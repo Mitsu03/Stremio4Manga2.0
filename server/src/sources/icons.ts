@@ -22,9 +22,16 @@ import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
+import themed from '../../sources.themed.json' with { type: 'json' };
 import { sourceHttpFor } from './registry.js';
 
-/** Where each source's icon is fetched from. Keyed by pkgName. */
+/**
+ * Where each source's icon is fetched from, keyed by pkgName.
+ *
+ * The six hand-written sources are listed here because their base URL lives
+ * inside their module; the themed ones already carry theirs as data, so they
+ * are folded in rather than repeated.
+ */
 const SITES: Record<string, string> = {
   mangadex: 'https://mangadex.org',
   comick: 'https://comick.io',
@@ -32,6 +39,12 @@ const SITES: Record<string, string> = {
   mangadistrict: 'https://mangadistrict.com',
   asurascans: 'https://asuracomic.net',
   rizzfables: 'https://rizzfables.com',
+  ...Object.fromEntries(
+    (themed.extensions as { pkgName: string; baseUrl: string }[]).map((entry) => [
+      entry.pkgName,
+      entry.baseUrl,
+    ]),
+  ),
 };
 
 /**

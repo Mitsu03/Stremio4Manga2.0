@@ -1,0 +1,1535 @@
+{
+  "$comment": "Generated from the Tachiyomi extensions a v1 install had on disk: each entry is one Madara or MangaThemesia site, reduced to the four values those engines actually need (name, language, base URL, theme). No code is carried over — the engines are the ones already in src/sources/themes. Ids continue the catalog.json sequence and are stable forever; never renumber one. Regenerate only by appending: a changed id orphans every library row that points at it.",
+  "extensions": [
+    {
+      "pkgName": "en.novel24h",
+      "name": "24HNovel",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://24hnovel.com",
+      "id": "1000000000000000009",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "ar.manga3asq",
+      "name": "3asq",
+      "lang": "ar",
+      "theme": "madara",
+      "baseUrl": "https://3asq.online",
+      "id": "1000000000000000010",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.akazascans",
+      "name": "Akaza Scans",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://akazascans.org",
+      "id": "1000000000000000011",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.allporncomic",
+      "name": "AllPornComic",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://allporncomic.com",
+      "id": "1000000000000000012",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.allporncomicio",
+      "name": "AllPornComic.io",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://allporncomic.io",
+      "id": "1000000000000000013",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.anisascans",
+      "name": "Anisa Scans",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://anisascans.in",
+      "id": "1000000000000000014",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.apcomics",
+      "name": "AP Comics",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://apcomics.org",
+      "id": "1000000000000000015",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.aquamanga",
+      "name": "Aqua Manga",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://aquareader.org",
+      "id": "1000000000000000016",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.arenascans",
+      "name": "Arena Scans",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://arenascan.com",
+      "id": "1000000000000000017",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.armageddon",
+      "name": "Armageddon",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://www.silentquill.net",
+      "id": "1000000000000000018",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.aryascans",
+      "name": "Arya Scans",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://brainrotcomics.com",
+      "id": "1000000000000000019",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.athreascans",
+      "name": "Athrea Scans",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://athreascans.com",
+      "id": "1000000000000000020",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.battleinfivesecondsaftermeeting",
+      "name": "Battle In 5 Seconds After Meeting",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://www.deatte5.com",
+      "id": "1000000000000000021",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.boratscans",
+      "name": "Borat Scans",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://boratscans.com",
+      "id": "1000000000000000022",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.bunmanga",
+      "name": "Bun Manga",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://bunmanga.com",
+      "id": "1000000000000000023",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.cocomic",
+      "name": "Cocomic",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://cocomic.co",
+      "id": "1000000000000000024",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.coffeemanga",
+      "name": "Coffee Manga",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://coffeemanga.ink",
+      "id": "1000000000000000025",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.comicasura",
+      "name": "Comic Asura",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://comicasura.net",
+      "id": "1000000000000000026",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.comicsland",
+      "name": "Comics Land",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://comicsland.org",
+      "id": "1000000000000000027",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.crowscans",
+      "name": "Crow Scans",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://crowscans.xyz",
+      "id": "1000000000000000028",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.cucumbermanga",
+      "name": "Cucumber Manga",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://cucumbermanga.com",
+      "id": "1000000000000000029",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.culturedworks",
+      "name": "CulturedWorks",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://culturedworks.com",
+      "id": "1000000000000000030",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.decadencescans",
+      "name": "Decadence Scans",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://reader.decadencescans.com",
+      "id": "1000000000000000031",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.dragontea",
+      "name": "DragonTea",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://dragontea.ink",
+      "id": "1000000000000000032",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.drakescans",
+      "name": "Drake Scans",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://drakecomic.org",
+      "id": "1000000000000000033",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.elftoon",
+      "name": "Elf Toon",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://elftoon.com",
+      "id": "1000000000000000034",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.ero18x",
+      "name": "Ero18x",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://ero18x.com",
+      "id": "1000000000000000035",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.evascans",
+      "name": "Eva Scans",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://evascans.org",
+      "id": "1000000000000000036",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.firescans",
+      "name": "Firescans",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://firescans.xyz",
+      "id": "1000000000000000037",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.plutoscans",
+      "name": "FlameScans.lol",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://flamescans.lol",
+      "id": "1000000000000000038",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.frierenonline",
+      "name": "Frieren Online",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://www.frieren.online",
+      "id": "1000000000000000039",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.gakamangas",
+      "name": "GakaMangas",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://gakamangas.com",
+      "id": "1000000000000000040",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.galaxymanga",
+      "name": "Galaxy Manga",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://galaxymanga.io",
+      "id": "1000000000000000041",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.galaxydegenscans",
+      "name": "GalaxyDegenScans",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://gdscans.com",
+      "id": "1000000000000000042",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.gedecomix",
+      "name": "GEDE Comix",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://gedecomix.com",
+      "id": "1000000000000000043",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.gingertoon",
+      "name": "GingeRTooN",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://gingertoon.com",
+      "id": "1000000000000000044",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.gourmetscans",
+      "name": "Gourmet Scans",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://gourmetsupremacy.com",
+      "id": "1000000000000000045",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.hadesscans",
+      "name": "Hades Scans",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://hadesscans.com",
+      "id": "1000000000000000046",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.hentai4free",
+      "name": "Hentai4Free",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://hentai4free.net",
+      "id": "1000000000000000047",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.hentaidex",
+      "name": "HentaiDex",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://dexhentai.com",
+      "id": "1000000000000000048",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.hentairead",
+      "name": "HentaiRead",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://hentairead.com",
+      "id": "1000000000000000049",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.hentaisco",
+      "name": "HentaiSco",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://hentaisco.cc",
+      "id": "1000000000000000050",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.hentaixcomic",
+      "name": "HentaiXComic",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://hentaixcomic.com",
+      "id": "1000000000000000051",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.hentaixdickgirl",
+      "name": "HentaiXDickgirl",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://hentaixdickgirl.com",
+      "id": "1000000000000000052",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.hentaixyuri",
+      "name": "HentaiXYuri",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://hentaixyuri.com",
+      "id": "1000000000000000053",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.hm2d",
+      "name": "HM2D",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://doujindistrict.com",
+      "id": "1000000000000000054",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.isekaiscantop",
+      "name": "IsekaiScan.top (unoriginal)",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://isekaiscan.top",
+      "id": "1000000000000000055",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.jinmangas",
+      "name": "Jinmangas",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://jinmangas.com",
+      "id": "1000000000000000056",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.kingofshojo",
+      "name": "King of Shojo",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://kingofshojo.com",
+      "id": "1000000000000000057",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.kissmangain",
+      "name": "Kissmanga.in",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://kissmanga.in",
+      "id": "1000000000000000058",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.wearehunger",
+      "name": "KokoMangas",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://kokomangas.com",
+      "id": "1000000000000000059",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.ksgroupscans",
+      "name": "KSGroupScans",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://ksgroupscans.com",
+      "id": "1000000000000000060",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.kunmangaonline",
+      "name": "Kun Manga Online",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://www.kunmanga.online",
+      "id": "1000000000000000061",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.lagoonscans",
+      "name": "Lagoon Scans",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://lagoonscans.com",
+      "id": "1000000000000000062",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.lhtranslation",
+      "name": "LHTranslation",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://lhtranslation.net",
+      "id": "1000000000000000063",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.lilymanga",
+      "name": "Lily Manga",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://lilymanga.net",
+      "id": "1000000000000000064",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.linkmanga",
+      "name": "LinkManga",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://linkmanga.com",
+      "id": "1000000000000000065",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.madarascans",
+      "name": "Madara Scans",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://madarascans.com",
+      "id": "1000000000000000066",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.madaradex",
+      "name": "MadaraDex",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://madaradex.org",
+      "id": "1000000000000000067",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.mahouirexnohentaikarte",
+      "name": "Mahouirexnohentaikarte",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://mahouirexnohentaikarte.com",
+      "id": "1000000000000000068",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.manga18x",
+      "name": "Manga 18x",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://manga18x.net",
+      "id": "1000000000000000069",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.mangadass",
+      "name": "Manga Dass",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://mangadass.com",
+      "id": "1000000000000000070",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.mangadistrict",
+      "name": "Manga District",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://mangadistrict.com",
+      "id": "1000000000000000071",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.mangadrama",
+      "name": "Manga Drama",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://mangadrama.com",
+      "id": "1000000000000000072",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.mangakiss",
+      "name": "Manga Kiss",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://mangakiss.org",
+      "id": "1000000000000000073",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.mangatrend",
+      "name": "Manga Trend",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://mangatrend.org",
+      "id": "1000000000000000074",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.manga18free",
+      "name": "Manga18Free",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://manga18free.com",
+      "id": "1000000000000000075",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.manga18fx",
+      "name": "Manga18fx",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://manga18fx.com",
+      "id": "1000000000000000076",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.mangablaze",
+      "name": "MangaBlaze",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://mangablaze.com",
+      "id": "1000000000000000077",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.mangadia",
+      "name": "MangaDia",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://mangadia.com",
+      "id": "1000000000000000078",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.mangaforfreecom",
+      "name": "Mangaforfree.com",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://mangaforfree.com",
+      "id": "1000000000000000079",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.mangafree",
+      "name": "Mangafree",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://mangafree.info",
+      "id": "1000000000000000080",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.mangagg",
+      "name": "MangaGG",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://mangagg.com",
+      "id": "1000000000000000081",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.mangagofun",
+      "name": "MangaGo.fun",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://www.mangago.fun",
+      "id": "1000000000000000082",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.mangahe",
+      "name": "MangaHe",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://mangahe.com",
+      "id": "1000000000000000083",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.mangaka",
+      "name": "MangaKa",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://mangaka.cc",
+      "id": "1000000000000000084",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.mangamaniacs",
+      "name": "MangaManiacs",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://mangamaniacs.org",
+      "id": "1000000000000000085",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.mangaowlio",
+      "name": "MangaOwl.io (unoriginal)",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://mangaowl.io",
+      "id": "1000000000000000086",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.mangareadorg",
+      "name": "MangaRead.org",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://www.mangaread.org",
+      "id": "1000000000000000087",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.mangasushi",
+      "name": "Mangasushi",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://mangasushi.org",
+      "id": "1000000000000000088",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.mangatx",
+      "name": "MangaTX",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://mangatx.cc",
+      "id": "1000000000000000089",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.likemangain",
+      "name": "MangaYY",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://mangayy.org",
+      "id": "1000000000000000090",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.manhuaplus",
+      "name": "Manhua Plus",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://manhuaplus.com",
+      "id": "1000000000000000091",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.manhuazonghe",
+      "name": "Manhua Zonghe",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://www.manhuazonghe.com",
+      "id": "1000000000000000092",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.manhuafastnet",
+      "name": "ManhuaFast.net (unoriginal)",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://manhuafast.net",
+      "id": "1000000000000000093",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.manhuahot",
+      "name": "ManhuaHot",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://manhuahot.com",
+      "id": "1000000000000000094",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.manhuanext",
+      "name": "Manhuanext",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://manhuanext.com",
+      "id": "1000000000000000095",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.manhuascanus",
+      "name": "Manhuascan.us",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://manhuascan.us",
+      "id": "1000000000000000096",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.manhuatop",
+      "name": "ManhuaTop",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://manhuatop.org",
+      "id": "1000000000000000097",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.manhuaus",
+      "name": "ManhuaUS",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://manhuaus.com",
+      "id": "1000000000000000098",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.manhwacomics",
+      "name": "Manhwa Comics",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://manhwacomics.com",
+      "id": "1000000000000000099",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.manhwareads",
+      "name": "Manhwa Reads",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://manhwareads.com",
+      "id": "1000000000000000100",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.manhwatoon",
+      "name": "Manhwa Toon",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://www.manhwatoon.me",
+      "id": "1000000000000000101",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.manhwa18org",
+      "name": "Manhwa18.org",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://manhwa18.org",
+      "id": "1000000000000000102",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.manhwa68",
+      "name": "Manhwa68",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://manhwa68.com",
+      "id": "1000000000000000103",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.manhwaden",
+      "name": "ManhwaDen",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://www.manhwaden.com",
+      "id": "1000000000000000104",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.manhwaget",
+      "name": "ManhwaGet",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://manhwaget.com",
+      "id": "1000000000000000105",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.manhwalover",
+      "name": "Manhwalover",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://www.manhwalover.org",
+      "id": "1000000000000000106",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.manhwamanhua",
+      "name": "ManhwaManhua",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://manhwamanhua.com",
+      "id": "1000000000000000107",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.manhwanex",
+      "name": "ManhwaNex",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://manhwanex.com",
+      "id": "1000000000000000108",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.manhwatop",
+      "name": "Manhwatop",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://manhwatop.com",
+      "id": "1000000000000000109",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.manhwax",
+      "name": "Manhwax",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://manhwax.top",
+      "id": "1000000000000000110",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.milftoon",
+      "name": "Milftoon",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://milftoon.xxx",
+      "id": "1000000000000000111",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.nexcomic",
+      "name": "NexComic",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://nexcomic.com",
+      "id": "1000000000000000112",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.nikatoons",
+      "name": "Nika Toons",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://nikatoons.com",
+      "id": "1000000000000000113",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.novelcrow",
+      "name": "NovelCrow",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://novelcrow.com",
+      "id": "1000000000000000114",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.noxenscans",
+      "name": "Noxen Scans",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://noxenscan.com",
+      "id": "1000000000000000115",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.octopusmanga",
+      "name": "OctopusManga",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://octopusmanga.com",
+      "id": "1000000000000000116",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.orchisasia",
+      "name": "Orchisasia",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://www.orchisasia.org",
+      "id": "1000000000000000117",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.paritehaber",
+      "name": "Paritehaber",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://www.paritehaber.com",
+      "id": "1000000000000000118",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.pawmanga",
+      "name": "Paw Manga",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://pawmanga.com",
+      "id": "1000000000000000119",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.petrotechsociety",
+      "name": "Petrotechsociety",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://www.petrotechsociety.org",
+      "id": "1000000000000000120",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.pmscans",
+      "name": "Rackus",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://rackusreads.com",
+      "id": "1000000000000000121",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.ragescans",
+      "name": "Rage Scans",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://ragescans.com",
+      "id": "1000000000000000122",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.ravenscans",
+      "name": "Raven Scans",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://ravenscans.org",
+      "id": "1000000000000000123",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.razure",
+      "name": "Razure",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://razure.org",
+      "id": "1000000000000000124",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.rdscans",
+      "name": "RD Scans",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://rdscans.com",
+      "id": "1000000000000000125",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.restscans",
+      "name": "Rest Scans",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://restscans.com",
+      "id": "1000000000000000126",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.rizzcomic",
+      "name": "Rizz Comic",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://rizzfables.com",
+      "id": "1000000000000000127",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.rizzcomicunoriginal",
+      "name": "Rizz Comic (unoriginal)",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://rizzcomic.com",
+      "id": "1000000000000000128",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.rokaricomics",
+      "name": "RokariComics",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://rokaricomics.com",
+      "id": "1000000000000000129",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.rosesquadscans",
+      "name": "Rose Squad Scans",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://rosesquadscans.aishiteru.org",
+      "id": "1000000000000000130",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.s2manga",
+      "name": "S2Manga",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://s2read.com",
+      "id": "1000000000000000131",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.erosscans",
+      "name": "Scythe Scans",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://scythescans.com",
+      "id": "1000000000000000132",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.setsuscans",
+      "name": "Setsu Scans",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://setsuscans.com",
+      "id": "1000000000000000133",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.shibamanga",
+      "name": "Shiba Manga",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://shibamanga.com",
+      "id": "1000000000000000134",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.skymanga",
+      "name": "Sky Manga",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://skymanga.work",
+      "id": "1000000000000000135",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.sleepytranslations",
+      "name": "Sleepy Translations",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://sleepytranslations.com",
+      "id": "1000000000000000136",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.spmanhwa",
+      "name": "Spmanhwa",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://spmanhwa.online",
+      "id": "1000000000000000137",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.thunderscans",
+      "name": "Thunder Scans",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://en-thunderscans.com",
+      "id": "1000000000000000138",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.toon18",
+      "name": "Toon18",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://toon18.to",
+      "id": "1000000000000000139",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.toongod",
+      "name": "ToonGod",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://www.toongod.org",
+      "id": "1000000000000000140",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.toonily",
+      "name": "Toonily",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://toonily.com",
+      "id": "1000000000000000141",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.toonizy",
+      "name": "Toonizy",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://toonizy.com",
+      "id": "1000000000000000142",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.topmanhua",
+      "name": "Top Manhua",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://mangatop.org",
+      "id": "1000000000000000143",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.topmanhuafan",
+      "name": "TopManhua.fan",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://www.topmanhua.fan",
+      "id": "1000000000000000144",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.topmanhuanet",
+      "name": "TopManhua.net",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://topmanhua.net",
+      "id": "1000000000000000145",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.tritiniascans",
+      "name": "TritiniaScans",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://tritinia.org",
+      "id": "1000000000000000146",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.utoon",
+      "name": "Utoon",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://utoon.net",
+      "id": "1000000000000000147",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.shojoscans",
+      "name": "Violet Scans",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://violetscans.org",
+      "id": "1000000000000000148",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.vyvymangaorg",
+      "name": "VyvyManga.org",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://vyvymanga.org",
+      "id": "1000000000000000149",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.webtoonscan",
+      "name": "WebtoonScan",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://webtoonscan.com",
+      "id": "1000000000000000150",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.webtoonxyz",
+      "name": "WebtoonXYZ",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://www.webtoon.xyz",
+      "id": "1000000000000000151",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.whalemanga",
+      "name": "Whale Manga",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://whalemanga.com",
+      "id": "1000000000000000152",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.witchscans",
+      "name": "WitchScans",
+      "lang": "en",
+      "theme": "mangathemesia",
+      "baseUrl": "https://witchscans.com",
+      "id": "1000000000000000153",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.woopread",
+      "name": "WoopRead",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://woopread.com",
+      "id": "1000000000000000154",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.wuxiaworld",
+      "name": "WuxiaWorld",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://wuxiaworld.site",
+      "id": "1000000000000000155",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.yakshacomics",
+      "name": "YakshaComics",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://yakshacomics.com",
+      "id": "1000000000000000156",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.yaoihub",
+      "name": "Yaoihub",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://yaoihub.org",
+      "id": "1000000000000000157",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.yaoiscan",
+      "name": "YaoiScan",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://yaoiscan.com",
+      "id": "1000000000000000158",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.zazamanga",
+      "name": "Zazamanga",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://www.zazamanga.com",
+      "id": "1000000000000000159",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.zinmanga",
+      "name": "Zinmanga",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://mangazin.org",
+      "id": "1000000000000000160",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    },
+    {
+      "pkgName": "en.zinmanganet",
+      "name": "Zinmanga.net",
+      "lang": "en",
+      "theme": "madara",
+      "baseUrl": "https://zinmanga.net",
+      "id": "1000000000000000161",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0"
+    }
+  ]
+}

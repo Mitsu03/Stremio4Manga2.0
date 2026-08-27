@@ -15,7 +15,28 @@
 import type { Config } from '../config.js';
 import type { Db } from '../db/open.js';
 import { createHttpClient, type HttpClient } from './http.js';
-import type { FilterChange, FilterSpec, Source, SourceDefinition, SourceId } from './types.js';
+import type {
+  FilterChange,
+  FilterSpec,
+  Source,
+  SourceDefinition,
+  SourceDeps,
+  SourceId,
+} from './types.js';
+import themed from '../../sources.themed.json' with { type: 'json' };
+import { createMadaraSource } from './themes/madara.js';
+import { createMangaThemesiaSource } from './themes/mangathemesia.js';
+
+interface ThemedEntry {
+  pkgName: string;
+  name: string;
+  lang: string;
+  theme: string;
+  baseUrl: string;
+  id: string;
+  contentWarning: 'SAFE' | 'MIXED' | 'NSFW';
+  versionName: string;
+}
 
 import { definition as mangadex } from './sites/mangadex.js';
 import { definition as comick } from './sites/comick.js';
@@ -24,6 +45,49 @@ import { definition as mangadistrict } from './sites/mangadistrict.js';
 import { definition as asurascans } from './sites/asurascans.js';
 import { definition as rizzfables } from './sites/rizzfables.js';
 
+/**
+ * The themed sources, built from data rather than written out.
+ *
+ * Most of what the old server installed was not bespoke code: a keiyoushi
+ * extension is very often one WordPress theme pointed at one domain, which is
+ * why `sites/mangadistrict.ts` and `sites/rizzfables.ts` are twenty lines each
+ * around an engine that does the work. `sources.themed.json` carries the same
+ * four values for every such site a v1 install had, so they cost a row of data
+ * instead of a file of code.
+ *
+ * A theme this build does not have is skipped rather than guessed at: the entry
+ * disappears from the catalogue, which is the honest outcome — better than a
+ * source that installs and then fails on every search.
+ */
+const THEMED: SourceDefinition[] = (themed.extensions as ThemedEntry[]).flatMap((entry) => {
+  const shared = {
+    id: entry.id,
+    name: entry.name,
+    lang: entry.lang,
+    baseUrl: entry.baseUrl,
+    contentWarning: entry.contentWarning,
+  };
+  const build =
+    entry.theme === 'madara'
+      ? (deps: SourceDeps) => createMadaraSource(shared, deps)
+      : entry.theme === 'mangathemesia'
+        ? (deps: SourceDeps) => createMangaThemesiaSource(shared, deps)
+        : undefined;
+  if (!build) return [];
+
+  return [
+    {
+      pkgName: entry.pkgName,
+      name: entry.name,
+      lang: entry.lang,
+      id: entry.id,
+      contentWarning: entry.contentWarning,
+      versionName: entry.versionName,
+      build,
+    },
+  ];
+});
+
 const DEFINITIONS: SourceDefinition[] = [
   mangadex,
   comick,
@@ -31,6 +95,7 @@ const DEFINITIONS: SourceDefinition[] = [
   mangadistrict,
   asurascans,
   rizzfables,
+  ...THEMED,
 ];
 
 /**
