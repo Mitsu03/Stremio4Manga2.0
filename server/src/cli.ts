@@ -16,6 +16,7 @@ import { ConfigError, dataPaths, defaultConfigPath, loadConfig } from './config.
 import { openDb, type Db } from './db/open.js';
 import { hashPassword } from './http/crypto.js';
 import { importTachibk } from './backup/tachibk.js';
+import { seedDefaults } from './sources/registry.js';
 
 const MIN_PASSWORD_LENGTH = 10;
 
@@ -174,8 +175,14 @@ async function add(positional: string[], options: Options): Promise<void> {
     );
   });
 
+  // An account with no sources has an empty Sources page, an empty Discover and
+  // a search that can reach nothing — which reads as a broken install rather
+  // than an empty one. Version 1 seeded every new account for the same reason.
+  const seeded = seedDefaults(db, name);
+
   out('');
   out(`Added "${name}". They can sign in now — no restart needed.`);
+  if (seeded > 0) out(`${seeded} built-in sources are installed and ready to search.`);
 }
 
 async function passwd(positional: string[], options: Options): Promise<void> {

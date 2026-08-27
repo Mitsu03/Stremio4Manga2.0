@@ -147,6 +147,35 @@ export function isInstalled(db: Db, userId: string, pkgName: string): boolean {
   );
 }
 
+/**
+ * Give a brand-new account the built-in catalogue, already installed.
+ *
+ * Version 1 did this too — its gateway installed a frozen list of 299 keiyoushi
+ * packages the moment an account was created — and without it the Sources page,
+ * Discover and every search open empty on a first sign-in, which reads as the
+ * app being broken rather than as a choice waiting to be made.
+ *
+ * The guard is "no rows at all", never "nothing installed". Uninstalling leaves
+ * the row behind with `installed = 0` (see `uninstall`), so somebody who has
+ * deliberately cleared their sources still has rows and is never re-seeded.
+ * Only an account that has never been seeded has none, which is what makes this
+ * safe to run over existing accounts at boot as well as at creation.
+ *
+ * Returns how many were installed, so a caller can say so.
+ */
+export function seedDefaults(db: Db, userId: string): number {
+  const seen = db.get<StateRow>(
+    'SELECT pkg_name FROM source_state WHERE user_id = ? LIMIT 1',
+    userId,
+  );
+  if (seen !== undefined) return 0;
+
+  db.transaction(() => {
+    for (const definition of DEFINITIONS) install(db, userId, definition.pkgName);
+  });
+  return DEFINITIONS.length;
+}
+
 export function install(db: Db, userId: string, pkgName: string): void {
   db.run(
     `INSERT INTO source_state (user_id, pkg_name, installed, installed_at)

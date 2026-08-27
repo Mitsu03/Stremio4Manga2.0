@@ -19,7 +19,7 @@ import { createGraphQLHandler } from './graphql/execute.js';
 import { createApiHandler } from './reader/api.js';
 import { startDownloadWorker } from './downloads/worker.js';
 import { startBackupSchedule } from './backup/schedule.js';
-import { configureSources } from './sources/registry.js';
+import { configureSources, seedDefaults } from './sources/registry.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 // dist/ sits one level below the workspace root, which is where config.json lives.
@@ -39,6 +39,15 @@ async function main(): Promise<void> {
   // solver come from the config — so this has to happen before anything can
   // reach a source, not lazily on the first request.
   configureSources(config);
+
+  // Accounts made before there was any seeding still open on an empty Sources
+  // page. `seedDefaults` only touches an account with no source rows at all —
+  // uninstalling leaves the row behind — so this cannot undo somebody's
+  // deliberate choice, and it is a no-op on every boot after the first.
+  for (const row of db.all<{ username: string }>('SELECT username FROM users')) {
+    const seeded = seedDefaults(db, row.username);
+    if (seeded > 0) log.info(`installed ${seeded} built-in sources for "${row.username}"`);
+  }
 
   const graphql = createGraphQLHandler({ config, db, log });
   const api = createApiHandler({ config, db, log });
