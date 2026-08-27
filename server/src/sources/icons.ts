@@ -189,14 +189,22 @@ async function fetchIcon(pkgName: string, dir: string): Promise<void> {
   missing.add(pkgName);
 }
 
-/** Run `job` when a warming slot frees up. Fire-and-forget by design. */
+/**
+ * Run `job` when a warming slot frees up. Fire-and-forget by design.
+ *
+ * `catch` before `finally`, and not the other way round: nothing awaits this, so
+ * a rejection escaping here is an unhandled rejection, and Node's default for
+ * one of those is to end the process. An icon is not worth the server.
+ */
 function schedule(job: () => Promise<void>): void {
   const run = () => {
     active++;
-    void job().finally(() => {
-      active--;
-      queue.shift()?.();
-    });
+    void job()
+      .catch(() => undefined)
+      .finally(() => {
+        active--;
+        queue.shift()?.();
+      });
   };
   if (active < WARM_CONCURRENCY) run();
   else queue.push(run);

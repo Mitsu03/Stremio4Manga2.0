@@ -260,14 +260,42 @@ $script:tray.Add_MouseDoubleClick({ Start-Process $openUrl })
 
 # --- vigia: espera pelo arranque e deteta se o servidor morre ---------------
 
+# Reinicios automaticos: quantos, e desde quando os contamos.
+$script:restarts = 0
+$script:maxRestarts = 3
+$script:restartWindow = Get-Date
+
 $script:timer = New-Object System.Windows.Forms.Timer
 $script:timer.Interval = 2000
 $script:timer.Add_Tick({
     if ($script:proc -and $script:proc.HasExited) {
-        $script:timer.Stop()
+        # Volta a arrancar em vez de so avisar. O processo pode morrer por algo
+        # que nao volta a acontecer, e um icone que diz "parado" ate alguem
+        # reparar significa que o servidor esteve em baixo a noite toda.
+        #
+        # Com um tecto: se ele morre outra vez e outra vez, arrancar em ciclo
+        # esconde a avaria e enche o log. Ao fim de $maxRestarts o icone para e
+        # diz, que e o comportamento antigo - mas so depois de tentar.
         $script:ready = $false
-        Set-Tip 'Stremio4Manga - parado'
-        Show-Error 'O servidor terminou inesperadamente. Ve o log.'
+        $now = Get-Date
+        if (($now - $script:restartWindow).TotalMinutes -gt 10) {
+            $script:restartWindow = $now
+            $script:restarts = 0
+        }
+        if ($script:restarts -ge $script:maxRestarts) {
+            $script:timer.Stop()
+            Set-Tip 'Stremio4Manga - parado'
+            Show-Error "O servidor terminou $($script:restarts) vezes em poucos minutos. Nao volto a arrancar sozinho - ve o log."
+            return
+        }
+        $script:restarts++
+        Set-Tip 'Stremio4Manga - a reiniciar'
+        if (-not (Start-Server)) {
+            $script:timer.Stop()
+            Set-Tip 'Stremio4Manga - parado'
+            return
+        }
+        Show-Balloon 'Stremio4Manga' 'O servidor terminou inesperadamente e foi reiniciado. Ve o log.' ([System.Windows.Forms.ToolTipIcon]::Warning)
         return
     }
 

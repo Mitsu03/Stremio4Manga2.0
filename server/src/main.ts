@@ -99,6 +99,27 @@ async function main(): Promise<void> {
     log.error(`Uncaught: ${error.stack ?? error.message}`);
     shutdown('uncaughtException');
   });
+
+  /**
+   * A rejected promise nobody awaited must not take the server with it.
+   *
+   * Node's default is to turn one into an uncaught exception, which here means a
+   * shutdown — so a single source misbehaving in a background task could end a
+   * reading session for everybody on the server. Every such task in this process
+   * is one request to one site; none of them is worth the process.
+   *
+   * Logged in full rather than swallowed: this is how the next one gets found.
+   */
+  process.on('unhandledRejection', (reason) => {
+    const error = reason instanceof Error ? (reason.stack ?? reason.message) : String(reason);
+    log.error(`Unhandled rejection (continuing): ${error}`);
+  });
+
+  // Whatever ends this process says so on the way out. An exit with no line in
+  // the log at all is the one failure that cannot be investigated afterwards.
+  process.on('exit', (code) => {
+    if (code !== 0) log.error(`Exiting with code ${code}.`);
+  });
 }
 
 main().catch((error: unknown) => {
