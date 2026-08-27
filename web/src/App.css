@@ -1,0 +1,1473 @@
+#root { min-height: 100vh; }
+.app-header { min-height: 108px; padding: 0 4vw 0 3vw; display: flex; align-items: center; justify-content: space-between; gap: 2rem; background: var(--header-bg); backdrop-filter: blur(18px); position: sticky; top: 0; z-index: 20; }
+.brand { display: flex; align-self: stretch; align-items: flex-end; flex: none; text-decoration: none; }
+.brand-mark { display: block; width: 128px; height: 108px; }
+.brand-mark img { display: block; width: 100%; height: 100%; object-fit: contain; object-position: left bottom; filter: drop-shadow(0 10px 10px rgba(16, 23, 42, 0.2)); }
+.topnav { position: absolute; left: 50%; display: flex; align-items: center; gap: 0.15rem; padding: 0.32rem; background: color-mix(in srgb, var(--surface) 88%, transparent); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 8px 22px rgba(32, 48, 78, 0.08); transform: translateX(-50%); }
+.topnav a { padding: 0.62rem 0.82rem; border-radius: 11px; color: var(--ink-soft); text-decoration: none; font-size: 0.87rem; font-weight: 700; transition: color 160ms ease, background 160ms ease; }
+.topnav a:hover { color: var(--ink); background: color-mix(in srgb, var(--surface) 65%, transparent); }
+.topnav a.active { color: var(--ink); background: var(--aqua-soft); box-shadow: inset 0 -2px 0 var(--aqua); }
+.content { width: min(1240px, 92vw); margin: 0 auto; padding: clamp(2rem, 6vw, 5rem) 0 6rem; }
+
+.page-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; margin-bottom: clamp(2rem, 5vw, 4rem); }
+.page-heading h1 { margin-bottom: 0; }
+.page-heading > p { color: var(--ink-soft); font: 700 0.8rem/1 ui-monospace, monospace; }
+.heading-actions { display: flex; align-items: center; gap: 1.2rem; }
+.heading-actions p { color: var(--ink-soft); font: 700 0.8rem/1 ui-monospace, monospace; }
+.library-header { margin-bottom: clamp(2rem, 5vw, 3.5rem); }
+.library-titlebar { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; }
+.library-titlebar h1 { margin-bottom: 0; }
+.library-toolbar { display: flex; align-items: center; gap: 0.7rem; padding-bottom: 0.45rem; }
+.library-count { color: var(--ink-soft); font: 700 0.8rem/1 ui-monospace, monospace; white-space: nowrap; }
+/* Quieter than the search pill on Discover: that one is the point of its page, this one sits in a
+   toolbar of glyphs and must not outweigh them. */
+.library-search { position: relative; display: inline-flex; align-items: center; }
+.library-search > svg { position: absolute; left: 0.62rem; width: 15px; height: 15px; color: var(--ink-soft); pointer-events: none; }
+.library-search input { width: clamp(130px, 17vw, 220px); min-width: 0; padding: 0.44rem 1.75rem 0.44rem 2rem; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 999px; font: 700 0.82rem/1.2 inherit; }
+.library-search input::placeholder { color: var(--ink-soft); font-weight: 600; }
+.library-search input:focus { border-color: var(--aqua); outline-offset: 1px; }
+/* The browser's own clear glyph is unlabelled and disappears on some platforms, so the field paints
+   its own and hides that one rather than showing two. */
+.library-search input::-webkit-search-cancel-button { display: none; }
+.library-search-clear { position: absolute; right: 0.38rem; display: grid; place-items: center; width: 20px; height: 20px; padding: 0; color: var(--ink-soft); background: none; border: 0; border-radius: 50%; cursor: pointer; transition: color 160ms ease; }
+.library-search-clear svg { width: 13px; height: 13px; }
+.library-search-clear:hover { color: var(--bookmark); }
+.library-sync-button { display: inline-flex; align-items: center; justify-content: center; padding: 0.3rem; color: var(--ink-soft); background: none; border: 0; cursor: pointer; transition: color 160ms ease; }
+.library-sync-button:hover:not(:disabled) { color: var(--aqua); }
+.library-sync-button svg { flex: none; }
+.library-sync-button.loading { color: var(--aqua); }
+.library-sync-button.loading svg { animation: library-sync-spin 0.9s linear infinite; }
+.library-sync-button:disabled { cursor: default; }
+@keyframes library-sync-spin { to { transform: rotate(360deg); } }
+.library-sort { position: relative; display: inline-flex; }
+/* Right-aligned to the trigger: the toolbar sits at the right edge of the page, so a menu growing
+   rightwards would hang off it. */
+/* Clamped rather than fixed: the toolbar sits at the right edge with three more buttons beside it,
+   and a rigid 232px menu runs off a phone. min-width has to be the clamped one — it beats
+   max-width when the two disagree. */
+.library-sort-menu { position: absolute; top: calc(100% + 0.5rem); right: 0; z-index: 15; display: flex; flex-direction: column; min-width: min(232px, calc(100vw - 2.5rem)); max-width: calc(100vw - 2.5rem); padding: 0.3rem; background: var(--surface); border: 1px solid var(--line); border-radius: 4px 4px 14px 4px; box-shadow: 0 12px 28px rgba(32, 48, 78, 0.14); }
+.library-sort-option { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; padding: 0.5rem 0.6rem; color: var(--ink-soft); background: none; border: 0; border-radius: 8px; cursor: pointer; text-align: left; white-space: nowrap; font: 700 0.85rem/1.3 inherit; transition: color 160ms ease, background 160ms ease; }
+.library-sort-option small { display: inline-flex; align-items: center; gap: 0.32rem; color: var(--aqua-ink); white-space: nowrap; font: 700 0.68rem/1 ui-monospace, monospace; }
+.library-sort-option small svg { flex: none; transition: transform 160ms ease; }
+.library-sort-option.ascending small svg { transform: rotate(180deg); }
+/* Hover is --paper, not --aqua-soft: aqua is what marks the chosen order, and a hover that borrows
+   it makes every row look chosen as the cursor crosses it. */
+.library-sort-option:hover { color: var(--ink); background: var(--paper); }
+.library-sort-option.active, .library-sort-option.active:hover { color: var(--ink); background: var(--aqua-soft); box-shadow: inset 3px 0 0 var(--aqua); }
+.library-filterbar { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.5rem 1.6rem; margin-top: 1.2rem; padding-top: 1.1rem; border-top: 1px solid var(--line); }
+.library-sync-error { margin-left: auto; align-self: center; }
+.library-filter-tab { padding: 0.25rem 0; color: var(--ink-soft); background: none; border: 0; border-bottom: 3px solid transparent; cursor: pointer; font: 700 0.95rem/1.5 inherit; transition: color 160ms ease, border-color 160ms ease; }
+.library-filter-tab small { margin-left: 0.25rem; color: var(--ink-soft); font: 700 0.68rem/1 ui-monospace, monospace; }
+.library-filter-tab:hover { color: var(--ink); }
+.library-filter-tab.active { color: var(--ink); border-bottom-color: var(--aqua); }
+.library-filter-tab.active small { color: var(--aqua); }
+/* Pills rather than the shelf tabs' underlines: these narrow what a shelf shows instead of choosing
+   which shelves there are, and two rows of the same control would say they do the same thing. */
+.library-genres { display: flex; gap: 0.42rem; margin-top: 0.9rem; padding-bottom: 0.35rem; overflow-x: auto; scrollbar-width: thin; }
+.library-genre-chip { flex: none; padding: 0.28rem 0.72rem; color: var(--ink-soft); background: var(--paper); border: 1px solid var(--line); border-radius: 999px; cursor: pointer; white-space: nowrap; font: 700 0.74rem/1.35 inherit; transition: color 160ms ease, background 160ms ease, border-color 160ms ease; }
+.library-genre-chip:hover { color: var(--ink); border-color: var(--aqua); }
+.library-genre-chip.active { color: var(--aqua-ink); background: var(--aqua-soft); border-color: var(--aqua); }
+.state-panel { min-height: 52vh; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; max-width: 700px; }
+.state-panel p { color: var(--ink-soft); font-size: 1.05rem; line-height: 1.65; }
+.state-panel .button { margin-top: 1.4rem; }
+.state-panel.compact { min-height: 150px; }
+.state-panel.error, .notice.error, .inline-error { color: var(--error); }
+.notice { margin: 1rem 0; padding: 0.9rem 1rem; border-left: 4px solid var(--aqua); background: var(--surface); }
+.carry-notice, .recent-undo { display: flex; align-items: center; gap: 0.6rem; }
+.carry-notice span, .recent-undo span { flex: 1; min-width: 0; font-size: 0.9rem; }
+.carry-notice .button, .recent-undo .button { flex: none; display: inline-grid; place-items: center; width: 34px; height: 34px; padding: 0; }
+.carry-notice svg, .recent-undo svg { width: 17px; height: 17px; }
+.notice.error { border-left-color: var(--bookmark); }
+
+.shelf { margin-bottom: 4rem; }
+.shelf-heading { display: flex; align-items: baseline; gap: 0.65rem; padding-bottom: 0.85rem; border-bottom: 1px solid var(--line); margin-bottom: 1.2rem; }
+.shelf-heading h2 { margin: 0; }
+.shelf-heading span { color: var(--ink-soft); font: 700 0.75rem/1 ui-monospace, monospace; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: clamp(1rem, 2.2vw, 1.7rem); }
+.card { min-width: 0; text-decoration: none; }
+.cover-wrap { position: relative; aspect-ratio: 2 / 3; border-radius: 5px 5px 18px 5px; overflow: hidden; background: var(--cover-bg); box-shadow: 0 14px 30px rgba(34, 49, 77, 0.11); transition: transform 180ms ease, box-shadow 180ms ease; }
+.card:hover .cover-wrap { transform: translateY(-5px) rotate(-0.5deg); box-shadow: var(--shadow); }
+.cover-wrap img, .cover-placeholder { width: 100%; height: 100%; object-fit: cover; background: linear-gradient(135deg, var(--cover-start), var(--cover-end)); }
+.progress-chip { position: absolute; left: 0.6rem; bottom: 0.6rem; padding: 0.28rem 0.48rem; color: white; background: var(--chip-bg); border-radius: 4px; backdrop-filter: blur(8px); font: 700 0.68rem/1 ui-monospace, monospace; }
+/* The catalogue the chapters come from, reading as a caption to the title above it. */
+.card-source { display: flex; align-items: center; gap: 0.32rem; padding: 0.2rem 0.1rem 0; color: var(--ink-soft); font-size: 0.74rem; }
+.card-source img { width: 13px; height: 13px; flex: none; object-fit: contain; border-radius: 2px; }
+.card-source span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.unread-chip { position: absolute; right: 0.6rem; top: 0.6rem; min-width: 1.35rem; padding: 0.24rem 0.4rem; text-align: center; color: white; background: var(--bookmark-dark); border-radius: 999px; box-shadow: 0 3px 8px rgba(34, 49, 77, 0.28); font: 800 0.7rem/1 ui-monospace, monospace; }
+.card .title { padding: 0.75rem 0.1rem 0; font-weight: 700; font-size: 0.9rem; line-height: 1.35; }
+
+.library-select-button.active { color: var(--aqua); }
+.library-batch-bar { display: flex; align-items: center; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 2rem; padding: 0.7rem 0.9rem; background: var(--surface); border: 1px solid var(--line); border-radius: 4px 4px 18px 4px; box-shadow: 0 8px 22px rgba(32, 48, 78, 0.06); }
+.library-batch-count { color: var(--aqua-ink); font: 700 0.75rem/1 ui-monospace, monospace; }
+.library-batch-question { flex: 1; min-width: 0; font-size: 0.9rem; font-weight: 700; }
+.library-batch-bar .button { min-height: 36px; padding: 0.45rem 0.9rem; font-size: 0.85rem; }
+.library-batch-bar .button.quiet:first-of-type { margin-left: auto; }
+.library-batch-close { width: 36px; min-width: 36px; padding: 0; }
+.library-batch-close svg { flex: none; width: 16px; height: 16px; }
+.library-batch-select { min-height: 36px; max-width: 220px; padding: 0 0.7rem; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 4px 4px 12px 4px; font: 700 0.85rem/1 inherit; }
+.library-batch-notice { margin-bottom: 2rem; }
+.library-migrate-panel { margin: -1.4rem 0 2rem; padding: 0.9rem 1rem 1rem; background: var(--surface); border: 1px solid var(--line); border-radius: 4px 4px 18px 4px; }
+.library-migrate-panel > p { max-width: 68ch; margin: 0 0 0.9rem; color: var(--ink-soft); font-size: 0.85rem; line-height: 1.55; }
+.library-migrate-panel ul { display: flex; flex-direction: column; gap: 0.15rem; margin: 0; padding: 0; list-style: none; }
+.library-migrate-panel li { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.42rem 0.5rem; border-radius: 8px; }
+.library-migrate-panel li:nth-child(odd) { background: var(--paper); }
+.library-migrate-panel label { display: flex; align-items: center; gap: 0.6rem; min-width: 0; cursor: pointer; }
+.library-migrate-panel input { flex: none; width: 17px; height: 17px; accent-color: var(--aqua); cursor: pointer; }
+.library-migrate-title { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; font-size: 0.88rem; font-weight: 700; }
+.library-migrate-title small { color: var(--ink-soft); font: 700 0.66rem/1 ui-monospace, monospace; }
+.library-migrate-match { display: flex; align-items: center; gap: 0.5rem; min-width: 0; text-align: right; font-size: 0.85rem; }
+.library-migrate-match strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
+.library-migrate-match em { color: var(--ink-soft); font-style: normal; }
+/* Named rather than merely unticked: an unticked row with no reason on it reads as an oversight. */
+.library-migrate-loose { flex: none; padding: 0.16rem 0.4rem; color: var(--bookmark-dark); background: var(--aqua-soft); border-radius: 999px; font: 800 0.62rem/1 ui-monospace, monospace; }
+.library-migrate-empty .library-migrate-title { color: var(--ink-soft); }
+.library-migrate-actions { display: flex; align-items: center; gap: 0.6rem; margin-top: 0.9rem; }
+.library-migrate-actions .button { min-height: 36px; padding: 0.45rem 0.9rem; font-size: 0.85rem; }
+.card-selectable { display: block; width: 100%; padding: 0; text-align: left; color: inherit; background: none; border: 0; font: inherit; cursor: pointer; }
+.card-selectable .cover-wrap { outline: 2px solid transparent; outline-offset: 3px; transition: outline-color 160ms ease, transform 180ms ease, box-shadow 180ms ease; }
+.card-selectable.selected .cover-wrap { outline-color: var(--aqua); }
+.card-selectable.selected .cover-wrap img { opacity: 0.72; }
+.select-marker { position: absolute; left: 0.6rem; top: 0.6rem; display: grid; place-items: center; width: 1.55rem; height: 1.55rem; color: #ffffff; background: var(--chip-bg); border: 2px solid rgba(255, 255, 255, 0.85); border-radius: 50%; }
+.card-selectable.selected .select-marker { background: var(--aqua); border-color: var(--aqua); }
+.select-marker svg { width: 13px; height: 13px; }
+
+/* The continue-reading cards are full 2/3 posters in a wrapping grid rather than a horizontal
+   strip of thumbnails: same covers as the shelves below, so the section reads as the top of the
+   page instead of a toolbar above it. Chapter name and page count live in the link's tooltip. */
+.recent-shelf { margin-bottom: 3.5rem; }
+.recent-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 1.5rem; padding-bottom: 0.85rem; border-bottom: 2px solid var(--bookmark); margin-bottom: 1.4rem; }
+.recent-heading h2 { margin: 0; }
+.recent-heading .eyebrow { margin-bottom: 0.5rem; }
+.recent-heading > span { color: var(--ink-soft); font: 700 0.75rem/1 ui-monospace, Consolas, monospace; }
+
+.recent-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: clamp(1rem, 2.2vw, 1.5rem); }
+.recent-item { position: relative; display: block; aspect-ratio: 2 / 3; overflow: hidden; border-radius: 5px 5px 20px 5px; background: var(--cover-bg); box-shadow: 0 16px 34px rgba(34, 49, 77, 0.16); text-decoration: none; transition: box-shadow 180ms ease; }
+/* The tilt lives on the cell so the hide chip travels with the card; the shadow stays on the link,
+   which is the element carrying the card's rounded silhouette. */
+.recent-cell { position: relative; transition: transform 180ms ease; }
+.recent-cell:hover { transform: translateY(-5px) rotate(-0.5deg); }
+.recent-cell:hover .recent-item { box-shadow: var(--shadow); }
+.recent-item img, .recent-item .cover-placeholder { width: 100%; height: 100%; object-fit: cover; background: linear-gradient(135deg, var(--cover-start), var(--cover-end)); }
+
+.recent-copy { position: absolute; inset: auto 0 0; padding: 2.75rem 1rem 1rem; background: linear-gradient(to top, rgba(5, 9, 17, 0.94), rgba(5, 9, 17, 0.72) 46%, rgba(5, 9, 17, 0)); }
+.recent-copy strong { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; color: #ffffff; font-size: 1.02rem; line-height: 1.25; text-wrap: pretty; }
+.recent-progress { height: 6px; margin-top: 0.85rem; overflow: hidden; background: rgba(255, 255, 255, 0.22); border-radius: 999px; }
+.recent-progress i { display: block; height: 100%; background: var(--aqua); transition: width 220ms ease; }
+/* A caught-up title has no bar left to fill, so the colour is what carries the news. */
+.recent-progress.caught-up i { background: var(--caught-up); }
+
+/* The right corner belongs to the hide chip on these cards, so the count takes the left one. */
+.recent-unread { right: auto; left: 0.55rem; top: 0.55rem; }
+
+/* The sweep's answer wears the continue-reading card, with the progress bar's slot given over to
+   the chapter and its date: this card is about one chapter, not about how far the series has got. */
+.found-shelf .recent-heading { border-bottom-color: var(--aqua); }
+.found-shelf .recent-copy { padding-top: 3.1rem; }
+.found-shelf .recent-copy small { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; margin-top: 0.34rem; color: rgba(255, 255, 255, 0.86); font: 700 0.8rem/1.3 inherit; }
+.found-shelf .recent-copy time { display: block; margin-top: 0.34rem; color: rgba(255, 255, 255, 0.66); font: 700 0.66rem/1 ui-monospace, Consolas, monospace; }
+
+/* Always visible, never hover-revealed: a chip that materialises under a travelling cursor is the
+   classic moving target, and hover does not exist on touch at all. --chip-bg is the app's token for
+   a chip floating on artwork, so it reads over a white cover and a black one alike. */
+.recent-dismiss {
+  position: absolute; top: 0.5rem; right: 0.5rem; z-index: 2;
+  display: grid; place-items: center;
+  width: 34px; height: 34px; padding: 0;
+  color: #ffffff; background: var(--chip-bg);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 50% 50% 12px 50%;
+  backdrop-filter: blur(8px);
+  opacity: 0.82; cursor: pointer;
+  transition: opacity 160ms ease, color 160ms ease, transform 120ms ease;
+}
+/* 44x44 hit area without a 44px chip. */
+.recent-dismiss::before { content: ""; position: absolute; inset: -5px; border-radius: inherit; }
+.recent-dismiss svg { flex: none; width: 16px; height: 16px; }
+.recent-dismiss:hover, .recent-dismiss:focus-visible { opacity: 1; color: var(--bookmark); }
+/* The global focus ring is too weak over a photograph, so this control paints a solid one. */
+.recent-dismiss:focus-visible { outline: 3px solid var(--aqua); outline-offset: 2px; }
+.recent-dismiss:active { transform: scale(0.92); }
+@media (pointer: coarse) {
+  .recent-dismiss { width: 38px; height: 38px; opacity: 0.9; }
+  .recent-dismiss::before { inset: -3px; }
+  .library-sort-option { padding: 0.62rem 0.6rem; }
+}
+/* One removal vocabulary on screen at a time: the batch bar owns removal while it is up. */
+.recent-shelf[data-selecting="true"] .recent-dismiss { display: none; }
+.recent-undo { margin: 0 0 1.4rem; }
+
+@media (max-width: 720px) {
+  .recent-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .recent-copy { padding: 2rem 0.7rem 0.7rem; }
+  .recent-copy strong { font-size: 0.88rem; }
+  /* Two of these cards to a row leaves the chapter line and its date fighting the title for the
+     gradient, so both give up a little rather than the title losing its second line. */
+  .found-shelf .recent-copy { padding-top: 2.4rem; }
+  .found-shelf .recent-copy small { font-size: 0.72rem; }
+  /* A field plus four glyphs no longer share a line with the heading on a phone, so the toolbar
+     takes a line of its own and the field takes what the glyphs leave of it. */
+  .library-titlebar { align-items: flex-start; flex-direction: column; gap: 1rem; }
+  .library-toolbar { width: 100%; padding-bottom: 0; }
+  .library-search { flex: 1; }
+  .library-search input { width: 100%; }
+}
+
+.discover-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; margin-bottom: clamp(1.5rem, 4vw, 2.8rem); }
+.discover-header h1 { margin-bottom: 0; }
+.discover-icon-button { width: 42px; min-width: 42px; height: 42px; display: inline-grid; place-items: center; padding: 0; color: var(--ink-soft); background: var(--surface); border: 1px solid var(--line); border-radius: 50% 50% 14px 50%; box-shadow: 0 7px 18px rgba(32, 48, 78, 0.08); cursor: pointer; transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease; }
+.discover-icon-button:hover:not(:disabled), .discover-icon-button[aria-expanded="true"] { color: var(--aqua-ink); border-color: var(--aqua); background: var(--aqua-soft); box-shadow: 0 9px 22px rgba(37, 168, 166, 0.14); transform: translateY(-1px); }
+.discover-icon-button:disabled { opacity: 0.52; cursor: wait; }
+.discover-icon-button svg, .discover-modes svg, .discover-search-button svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.discover-sync-button { color: var(--aqua-ink); background: var(--aqua-soft); border-color: transparent; }
+.discover-sync-button.loading svg { animation: library-sync-spin 0.9s linear infinite; }
+.discover-console { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.9rem; align-items: center; padding: 0.72rem 0.78rem 0.72rem 0.9rem; margin-bottom: 1rem; background: linear-gradient(110deg, var(--aqua-soft), var(--surface) 45%); border: 1px solid var(--line); border-radius: 8px 8px 24px 8px; box-shadow: 0 10px 28px rgba(32, 48, 78, 0.06); position: relative; }
+.discover-console::before { width: 4px; content: ""; position: absolute; inset: 0 auto 0 0; background: var(--aqua); border-radius: 8px 0 0 8px; }
+.discover-source { min-width: 0; display: grid; grid-template-columns: 44px minmax(0, 1fr) 42px; align-items: center; gap: 0.75rem; }
+.discover-source-mark { width: 44px; height: 44px; display: grid; place-items: center; overflow: hidden; color: var(--aqua-ink); background: var(--surface); border: 1px solid rgba(37, 168, 166, 0.24); border-radius: 6px 6px 14px 6px; font: 900 1rem/1 Bahnschrift, sans-serif; }
+.discover-source-mark img, .discover-source-picker img { width: 100%; height: 100%; object-fit: contain; }
+.discover-source-copy { min-width: 0; }
+.discover-source-copy .eyebrow { margin-bottom: 0.18rem; font-size: 0.62rem; }
+.discover-source-copy strong, .discover-source-copy small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.discover-source-copy strong { font: 800 1rem/1.18 Bahnschrift, "Arial Narrow", sans-serif; }
+.discover-source-copy small { margin-top: 0.18rem; color: var(--ink-soft); font: 700 0.68rem/1 ui-monospace, Consolas, monospace; letter-spacing: 0.08em; text-transform: uppercase; }
+.discover-modes { display: flex; align-items: center; gap: 0.38rem; padding: 0.3rem; background: color-mix(in srgb, var(--surface) 78%, transparent); border: 1px solid var(--line); border-radius: 999px; }
+.discover-modes button { width: 36px; height: 36px; display: grid; place-items: center; padding: 0; color: var(--ink-soft); background: transparent; border: 0; border-radius: 50%; cursor: pointer; transition: color 160ms ease, background-color 160ms ease, transform 160ms ease; }
+.discover-modes button:hover { color: var(--ink); background: var(--paper); }
+.discover-modes button.active { color: var(--aqua-ink); background: var(--aqua-soft); box-shadow: inset 0 -2px 0 var(--aqua); }
+.discover-source-picker { grid-column: 1 / -1; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 1rem; align-items: center; padding: 0.75rem 0.2rem 0.05rem; border-top: 1px solid var(--line); animation: discover-picker-in 160ms ease-out; }
+.discover-source-picker > p { margin: 0; color: var(--ink-soft); font: 700 0.68rem/1 ui-monospace, Consolas, monospace; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; }
+.discover-source-picker > div { display: flex; min-width: 0; gap: 0.48rem; padding: 0.12rem 0.1rem 0.28rem; overflow-x: auto; }
+.discover-source-picker button { width: 40px; min-width: 40px; height: 40px; display: grid; place-items: center; overflow: hidden; padding: 0; color: var(--ink-soft); background: var(--surface); border: 1px solid var(--line); border-radius: 5px 5px 12px 5px; cursor: pointer; font: 800 0.82rem/1 Bahnschrift, sans-serif; transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease; }
+.discover-source-picker button:hover, .discover-source-picker button.active { border-color: var(--aqua); box-shadow: 0 5px 14px rgba(37, 168, 166, 0.15); transform: translateY(-1px); }
+.discover-source-picker button.active { box-shadow: inset 0 -3px 0 var(--aqua), 0 5px 14px rgba(37, 168, 166, 0.12); }
+@keyframes discover-picker-in { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+.source-select { display: grid; gap: 0.4rem; }
+.source-select .eyebrow { margin: 0; }
+.source-select select { padding: 0.6rem 0.9rem; border: 1px solid var(--line); border-radius: 7px; background: var(--surface); color: var(--ink); font-weight: 700; min-width: 180px; }
+.source-select.compact-select select { min-width: 145px; }
+.discover-search { margin-bottom: 2.4rem; }
+.discover-search-button { width: 42px; min-width: 42px; height: 42px; display: grid; place-items: center; padding: 0; color: #fff; background: var(--bookmark); border: 0; border-radius: 50%; box-shadow: 0 7px 16px rgba(239, 91, 91, 0.22); cursor: pointer; transition: background-color 160ms ease, transform 160ms ease; }
+.discover-search-button:hover { background: var(--bookmark-dark); transform: scale(1.04); }
+/* Saving a search sits beside searching it, in the same pill: the same shape as the search button so the
+   pair reads as one control, but quiet until it is on — this one remembers rather than acts. */
+.discover-save-search { color: var(--ink-soft); background: var(--surface); border: 1px solid var(--line); box-shadow: none; }
+.discover-save-search:hover { color: var(--aqua-ink); background: var(--aqua-soft); border-color: var(--aqua); }
+.discover-save-search.active { color: #fff; background: var(--aqua); border-color: var(--aqua); }
+.discover-save-search .solid { fill: currentColor; stroke: currentColor; }
+.discover-icon-button.small { width: 34px; min-width: 34px; height: 34px; box-shadow: none; }
+.discover-icon-button.small svg { width: 16px; height: 16px; }
+/* The dials the source itself named. The control that opens them is a symbol like the rest of the
+   pill; the rows behind it are words, because "Status" and "Content rating" are not drawable. */
+.discover-filter-button { position: relative; box-shadow: none; }
+.discover-filter-button.active { color: var(--aqua-ink); background: var(--aqua-soft); border-color: var(--aqua); }
+.source-filter-count { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; display: grid; place-items: center; padding: 0 4px; color: #fff; background: var(--bookmark); border-radius: 999px; font: 800 0.66rem/1 Bahnschrift, sans-serif; }
+.source-filter-panel { padding: 1.1rem 1.2rem; margin: -1.4rem 0 2.4rem; background: var(--surface); border: 1px solid var(--line); border-radius: 8px 8px 24px 8px; box-shadow: var(--shadow); }
+.source-filter-rows { display: grid; gap: 0.55rem; max-height: 22rem; overflow-y: auto; padding-right: 0.3rem; }
+.source-filter-header { margin: 0.6rem 0 0; color: var(--ink-soft); font: 700 0.68rem/1 ui-monospace, Consolas, monospace; letter-spacing: 0.08em; text-transform: uppercase; }
+.source-filter-separator { width: 100%; height: 1px; margin: 0.4rem 0; border: 0; background: var(--line); }
+.source-filter-group { display: grid; gap: 0.45rem; padding: 0.7rem 0.85rem; margin: 0; border: 1px solid var(--line); border-radius: 7px; }
+.source-filter-group legend { padding: 0 0.4rem; color: var(--ink-soft); font-weight: 800; font-size: 0.78rem; }
+.source-filter-row { min-height: 34px; color: var(--ink); font-size: 0.9rem; }
+.source-filter-row.check { display: flex; align-items: center; gap: 0.6rem; cursor: pointer; }
+.source-filter-row.field { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.6rem; align-items: center; }
+.source-filter-row.field select, .source-filter-row.field input { min-width: 0; padding: 0.4rem 0.7rem; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 7px; }
+.source-filter-row.field.sort { grid-template-columns: minmax(0, 1fr) auto; }
+.source-filter-row.field.sort > label { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.6rem; align-items: center; }
+.source-filter-row.tri { display: flex; align-items: center; gap: 0.6rem; width: 100%; padding: 0.3rem 0.5rem; text-align: left; background: transparent; border: 1px solid transparent; border-radius: 7px; cursor: pointer; }
+.source-filter-row.tri:hover { border-color: var(--line); background: var(--paper); }
+.source-filter-mark { width: 22px; min-width: 22px; height: 22px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 6px; color: var(--ink-soft); font-size: 0.78rem; }
+.source-filter-row.tri.include .source-filter-mark { color: #fff; background: var(--aqua); border-color: var(--aqua); }
+.source-filter-row.tri.exclude .source-filter-mark { color: #fff; background: var(--bookmark); border-color: var(--bookmark); }
+.source-filter-actions { display: flex; justify-content: flex-end; gap: 0.6rem; margin-top: 1rem; }
+.source-filter-actions .button { min-height: 36px; padding: 0.45rem 0.95rem; font-size: 0.85rem; }
+/* The sources that had nothing, and the ones that fell over. A line each rather than an empty shelf:
+   a dozen headings with nothing under them is noise, and the answer "not here" is worth one line. */
+.all-sources > .shelf-heading { margin-bottom: 1.6rem; }
+.all-sources-line { margin: 0 0 0.6rem; color: var(--ink-soft); font-size: 0.85rem; }
+.all-sources-line.failed { color: var(--bookmark-dark); }
+/* The feed. Its own heading row, so collapsing it leaves one line rather than a gap where shelves were. */
+.feed { margin-bottom: 3rem; }
+.feed-heading { margin-bottom: 1.6rem; }
+.feed-shelf { margin-bottom: 2.4rem; }
+.feed-shelf .shelf-heading h2 { font-size: 1.15rem; }
+.feed-shelf .state-panel.compact { min-height: 90px; }
+/* One row per saved search, scrolled sideways rather than wrapped: several shelves of eight would
+   otherwise each spill an orphan onto a second row and push the next shelf off the screen. */
+.feed-shelf .grid { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(140px, 1fr); overflow-x: auto; padding-bottom: 0.4rem; scrollbar-width: thin; }
+.feed-shelf .card .title { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.load-more-button { border-radius: 50% 50% 50% 14px; }
+.load-more { display: flex; justify-content: center; margin-top: 2rem; }
+.reading-source-card { display: grid; grid-template-columns: 54px minmax(0, 1fr) auto; align-items: center; gap: 1rem; padding: 1rem 1.1rem 1rem 1.25rem; margin-bottom: 1.5rem; background: linear-gradient(110deg, var(--aqua-soft), var(--surface) 34%); border: 1px solid var(--line); border-radius: 7px 7px 22px 7px; box-shadow: 0 10px 28px rgba(32, 48, 78, 0.07); position: relative; overflow: hidden; }
+.reading-source-card::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 5px; background: var(--aqua); }
+.reading-source-icon { width: 54px; height: 54px; display: grid; place-items: center; overflow: hidden; color: var(--aqua-ink); background: var(--surface); border: 1px solid rgba(37, 168, 166, 0.24); border-radius: 6px 6px 16px 6px; box-shadow: 0 6px 16px rgba(32, 48, 78, 0.09); }
+.reading-source-icon img { width: 100%; height: 100%; object-fit: contain; }
+.reading-source-icon svg { width: 28px; height: 28px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.reading-source-copy { min-width: 0; }
+.reading-source-copy .eyebrow { margin-bottom: 0.28rem; }
+.reading-source-copy strong, .reading-source-copy small { display: block; }
+.reading-source-copy strong { overflow: hidden; font: 800 1.05rem/1.25 Bahnschrift, "Arial Narrow", sans-serif; text-overflow: ellipsis; white-space: nowrap; }
+.reading-source-copy small { margin-top: 0.28rem; color: var(--ink-soft); line-height: 1.35; }
+.source-change-button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.anilist-tracking-control { --anilist-blue: #02a9ff; display: inline-flex; align-items: center; position: relative; }
+.anilist-tracking-button { width: 48px; min-width: 48px; height: 48px; padding: 0; color: var(--ink-soft); background: var(--surface); border-color: var(--line); border-radius: 50% 50% 50% 16px; box-shadow: 0 8px 22px rgba(32, 48, 78, 0.09); position: relative; }
+.anilist-tracking-button:hover:not(:disabled) { border-color: var(--anilist-blue); background: var(--surface); box-shadow: 0 10px 26px rgba(2, 169, 255, 0.16); }
+.anilist-tracking-button img { width: 27px; height: 27px; object-fit: contain; filter: grayscale(1); opacity: 0.58; transition: filter 160ms ease, opacity 160ms ease, transform 160ms ease; }
+.anilist-tracking-button > span { font: 900 0.72rem/1 Bahnschrift, sans-serif; }
+.anilist-tracking-button.active { color: #ffffff; background: #162b4d; border-color: var(--anilist-blue); box-shadow: 0 9px 24px rgba(2, 169, 255, 0.2); }
+.anilist-tracking-button.active img { filter: none; opacity: 1; }
+.anilist-tracking-button.loading img { animation: page-count-pulse 900ms ease-in-out infinite alternate; }
+.tracking-status-dot { width: 9px; height: 9px; position: absolute; right: 1px; bottom: 2px; background: #9ca8bb; border: 2px solid var(--surface); border-radius: 50%; }
+.anilist-tracking-button.active .tracking-status-dot { background: var(--anilist-blue); border-color: #162b4d; box-shadow: 0 0 0 2px rgba(2, 169, 255, 0.22); }
+.tracking-control-error { max-width: 240px; margin-left: 0.75rem; font-size: 0.78rem; }
+/* The AniList picker and the duplicate warning are the same thing on screen — one panel over a
+   dimmed page — so they share the shell and differ only inside it. */
+.anilist-modal-backdrop, .duplicate-modal-backdrop { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; padding: 4vw; background: rgba(7, 13, 26, 0.72); backdrop-filter: blur(8px); }
+.anilist-modal, .duplicate-modal { width: min(880px, 100%); max-height: 88vh; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px 8px 26px 8px; box-shadow: 0 30px 90px rgba(0, 0, 0, 0.4); overflow: auto; }
+.anilist-modal-header { display: grid; grid-template-columns: 56px minmax(0, 1fr) 42px; align-items: center; gap: 1rem; padding: 1.35rem 1.4rem; }
+.anilist-modal-header h2, .anilist-modal-header p { margin: 0; }
+.anilist-modal-header p { margin-top: 0.3rem; color: var(--ink-soft); }
+.anilist-modal-header .eyebrow { color: var(--anilist-blue); margin-bottom: 0.25rem; }
+.anilist-modal-mark { width: 56px; height: 56px; display: grid; place-items: center; color: #ffffff; background: #162b4d; border-radius: 6px 6px 16px 6px; font: 900 0.8rem/1 Bahnschrift, sans-serif; }
+.anilist-modal-mark img { width: 100%; height: 100%; object-fit: contain; }
+.anilist-modal-close { width: 42px; height: 42px; display: grid; place-items: center; padding: 0; color: var(--ink-soft); background: transparent; border: 1px solid var(--line); border-radius: 50%; cursor: pointer; }
+.anilist-modal-close:hover { color: var(--ink); background: var(--paper); }
+.anilist-modal-close svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
+.anilist-picker { padding: 1.25rem 1.4rem 1.5rem; border-top: 1px solid var(--line); background: linear-gradient(120deg, rgba(2, 169, 255, 0.07), transparent 38%); }
+.anilist-search { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 0.65rem; margin-bottom: 1rem; }
+.anilist-search label { display: grid; gap: 0.35rem; }
+.anilist-search .eyebrow { color: var(--anilist-blue); margin: 0; }
+.anilist-search input { width: 100%; min-height: 42px; padding: 0.6rem 0.85rem; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 7px; }
+.anilist-match-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.65rem; }
+.anilist-match { display: grid; grid-template-columns: 44px minmax(0, 1fr) 20px; align-items: center; gap: 0.8rem; min-width: 0; padding: 0.6rem; color: var(--ink); text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 6px 6px 16px 6px; cursor: pointer; transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease; }
+.anilist-match:hover:not(:disabled) { transform: translateY(-1px); border-color: var(--anilist-blue); box-shadow: 0 7px 18px rgba(2, 169, 255, 0.12); }
+.anilist-match:disabled { opacity: 0.5; cursor: wait; }
+.anilist-match > img, .anilist-match > .cover-placeholder { width: 44px; height: 62px; object-fit: cover; border-radius: 3px 3px 9px 3px; }
+.anilist-match span { min-width: 0; }
+.anilist-match strong, .anilist-match small { display: block; }
+.anilist-match strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.anilist-match small { margin-top: 0.3rem; overflow: hidden; color: var(--ink-soft); font-size: 0.72rem; text-overflow: ellipsis; text-transform: capitalize; white-space: nowrap; }
+.anilist-match svg { width: 20px; height: 20px; fill: none; stroke: var(--anilist-blue); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.anilist-tracking-error { display: block; margin-top: 1rem; }
+.duplicate-modal { width: min(560px, 100%); }
+.duplicate-modal-header { padding: 1.35rem 1.4rem 0.9rem; }
+.duplicate-modal-header h2, .duplicate-modal-header p { margin: 0; }
+.duplicate-modal-header p { margin-top: 0.45rem; color: var(--ink-soft); font-size: 0.9rem; line-height: 1.55; }
+.duplicate-modal-header .eyebrow { color: var(--bookmark); }
+.duplicate-list { list-style: none; padding: 0 1.4rem; margin: 0; }
+.duplicate-list li { display: grid; grid-template-columns: 46px minmax(0, 1fr) auto; align-items: center; gap: 0.9rem; padding: 0.75rem; background: var(--paper); border: 1px solid var(--line); border-radius: 6px 6px 16px 6px; }
+.duplicate-list li + li { margin-top: 0.6rem; }
+.duplicate-list img, .duplicate-list .cover-placeholder { width: 46px; height: 65px; object-fit: cover; border-radius: 3px 3px 9px 3px; }
+.duplicate-list strong, .duplicate-list small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.duplicate-list small { margin-top: 0.3rem; color: var(--ink-soft); font-size: 0.74rem; }
+.duplicate-list .button { min-height: 36px; padding: 0.45rem 0.85rem; font-size: 0.82rem; white-space: nowrap; }
+.duplicate-actions { display: flex; justify-content: flex-end; gap: 0.6rem; padding: 1.25rem 1.4rem 1.4rem; }
+button.result-row { width: 100%; text-align: left; cursor: pointer; font: inherit; appearance: none; }
+
+.sources-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; margin-bottom: clamp(1.5rem, 4vw, 2.8rem); }
+.sources-header h1 { margin-bottom: 0; }
+.sources-header-actions { display: flex; align-items: center; gap: 0.7rem; padding-bottom: 0.1rem; }
+.sources-header-actions > span { color: var(--ink-soft); font: 700 0.72rem/1 ui-monospace, Consolas, monospace; white-space: nowrap; }
+.source-icon-button { width: 42px; min-width: 42px; height: 42px; display: inline-grid; place-items: center; padding: 0; color: var(--ink-soft); background: var(--surface); border: 1px solid var(--line); border-radius: 50% 50% 14px 50%; box-shadow: 0 7px 18px rgba(32, 48, 78, 0.08); cursor: pointer; transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease; }
+.source-icon-button:hover:not(:disabled), .source-icon-button.active { color: var(--aqua-ink); border-color: var(--aqua); background: var(--aqua-soft); box-shadow: 0 9px 22px rgba(37, 168, 166, 0.14); transform: translateY(-1px); }
+.source-icon-button:disabled { opacity: 0.5; cursor: wait; }
+.source-icon-button svg, .source-search-mark svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.source-icon-button.loading svg { animation: library-sync-spin 0.9s linear infinite; }
+.catalogue-callout { display: flex; align-items: center; justify-content: space-between; gap: 2rem; padding: 1.5rem; margin-bottom: 1.5rem; background: linear-gradient(110deg, var(--aqua-soft), var(--surface) 44%); border: 1px solid var(--line); border-radius: 8px 8px 24px 8px; position: relative; overflow: hidden; }
+.catalogue-callout::before { width: 4px; content: ""; position: absolute; inset: 0 auto 0 0; background: var(--aqua); }
+.catalogue-callout h2 { margin-bottom: 0.45rem; }
+.catalogue-callout p { color: var(--ink-soft); }
+.source-catalogue-add, .source-install-button { color: #ffffff; background: var(--bookmark); border-color: var(--bookmark); box-shadow: 0 8px 20px rgba(239, 91, 91, 0.22); }
+.source-catalogue-add:hover:not(:disabled), .source-install-button:hover:not(:disabled) { color: #fff; background: var(--bookmark-dark); border-color: var(--bookmark-dark); }
+.source-update-button { color: var(--aqua-ink); background: var(--aqua-soft); border-color: transparent; }
+.source-update-all:not(:disabled) { color: var(--aqua-ink); background: var(--aqua-soft); border-color: var(--aqua); }
+.source-update-all:disabled:not(.loading) { cursor: default; }
+.source-remove-button:hover:not(:disabled) { color: var(--bookmark-dark); border-color: var(--bookmark); background: rgba(239, 91, 91, 0.08); }
+.source-toolbar { display: grid; grid-template-columns: minmax(260px, 1fr) auto; gap: 0.75rem; align-items: center; margin-bottom: 1.5rem; }
+.source-toolbar .search-box { margin: 0; }
+.source-search-box { align-items: center; }
+.source-search-mark { width: 34px; height: 34px; display: grid; place-items: center; color: var(--ink-soft); background: var(--paper); border-radius: 50%; }
+.adult-toggle { min-height: 42px; display: flex; align-items: center; gap: 0.55rem; color: var(--ink-soft); font-size: 0.85rem; font-weight: 700; }
+.adult-toggle input { accent-color: var(--bookmark); }
+.adult-filter-button.active { color: var(--bookmark-dark); background: rgba(239, 91, 91, 0.1); border-color: rgba(239, 91, 91, 0.28); box-shadow: 0 8px 20px rgba(239, 91, 91, 0.12); }
+.extension-list { display: grid; gap: 0.65rem; }
+.extension-row { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; gap: 1rem; align-items: center; padding: 0.85rem 1rem; background: var(--surface); border: 1px solid var(--line); border-radius: 6px 6px 16px 6px; }
+.extension-row.installed { border-left: 3px solid var(--aqua); padding-left: calc(1rem - 2px); }
+.extension-row img { width: 48px; height: 48px; object-fit: contain; border-radius: 8px; background: var(--paper); }
+.extension-copy h2 { margin: 0; font-size: 1rem; }
+.extension-copy p { margin: 0.3rem 0 0; color: var(--ink-soft); font: 700 0.72rem/1 ui-monospace, monospace; }
+.extension-actions { display: flex; gap: 0.5rem; }
+
+.search-box { display: flex; gap: 0.75rem; padding: 0.7rem; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; box-shadow: var(--shadow); margin-bottom: 2rem; }
+.search-box.compact { margin-top: 1.5rem; box-shadow: none; }
+.search-box input { min-width: 0; flex: 1; border: 0; outline: 0; padding: 0 1rem; background: transparent; color: var(--ink); }
+.search-results { display: grid; gap: 0.75rem; }
+.source-result-groups { display: grid; gap: 2rem; margin-top: 1.5rem; }
+.source-result-group .shelf-heading { margin-bottom: 0.75rem; }
+.source-result-group .shelf-heading h3 { margin: 0; }
+.source-search-progress { display: grid; gap: 0.65rem; padding: 0.85rem 1rem; margin-top: 1.15rem; background: var(--paper); border: 1px solid var(--line); border-radius: 6px 6px 16px 6px; }
+.source-search-progress > div:first-child { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+.source-search-progress strong { font: 800 0.84rem/1.2 Bahnschrift, "Arial Narrow", sans-serif; }
+.source-search-progress span { color: var(--ink-soft); font: 700 0.68rem/1.2 ui-monospace, Consolas, monospace; }
+.source-search-progress-track { height: 6px; overflow: hidden; background: var(--line); border-radius: 999px; }
+.source-search-progress-track i { display: block; height: 100%; background: linear-gradient(90deg, var(--aqua), var(--bookmark)); border-radius: inherit; transition: width 180ms ease; }
+.source-cache-status { display: inline-flex; margin-left: 0.6rem; vertical-align: middle; }
+.shelf-heading .nsfw-tag { padding: 0.24rem 0.42rem; color: #fff; background: var(--bookmark); border-radius: 999px; font: 900 0.58rem/1 ui-monospace, Consolas, monospace; letter-spacing: 0.08em; }
+.loose-match-toggle { margin-top: 1.25rem; }
+.search-all-sources { display: inline-flex; align-items: center; gap: 0.55rem; margin: 0.3rem 0 0.9rem; }
+.search-all-sources svg { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.search-all-sources small { color: var(--ink-soft); font-weight: 600; }
+.result-row { display: grid; grid-template-columns: 82px minmax(0, 1fr) auto; gap: 1.2rem; align-items: center; padding: 1rem; background: var(--surface); border: 1px solid var(--line); border-radius: 6px 6px 18px 6px; }
+.result-row img { width: 82px; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 3px 3px 10px 3px; }
+.result-copy h2 { margin-bottom: 0.5rem; }
+.summary { color: var(--ink-soft); line-height: 1.6; }
+.result-copy .summary { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+.settings-card { display: grid; grid-template-columns: minmax(180px, 0.8fr) minmax(260px, 1.2fr); gap: 2rem; align-items: center; padding: 1.7rem 0; border-top: 1px solid var(--line); }
+.settings-card p { color: var(--ink-soft); line-height: 1.55; }
+.connection-action { display: flex; align-items: center; justify-content: flex-end; gap: 0.75rem; }
+/* The AniList connection, as a banner heading the page rather than a row inside it. */
+.anilist-banner { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 1.4rem; position: relative; overflow: hidden; padding: 1.35rem 1.5rem; margin-bottom: 2.5rem; background: linear-gradient(105deg, var(--aqua-soft), var(--surface) 46%); border: 1px solid var(--line); border-radius: 9px 9px 26px 9px; box-shadow: 0 14px 34px rgba(32, 48, 78, 0.09); }
+.anilist-banner::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 5px; background: var(--aqua); }
+.tracker-avatar { width: 84px; height: 84px; flex: none; object-fit: cover; background: var(--cover-bg); border: 1px solid var(--line); border-radius: 7px 7px 20px 7px; box-shadow: 0 8px 20px rgba(32, 48, 78, 0.12); }
+.tracker-avatar-blank { display: grid; place-items: center; color: var(--ink-soft); font: 800 2rem/1 Bahnschrift, "Arial Narrow", sans-serif; text-transform: uppercase; }
+.anilist-banner-copy { min-width: 0; }
+.anilist-banner-status { display: flex; align-items: center; gap: 0.5rem; color: var(--aqua-ink); font: 700 0.72rem/1 ui-monospace, Consolas, monospace; letter-spacing: 0.14em; text-transform: uppercase; }
+.anilist-banner-status .status-dot { width: 8px; height: 8px; box-shadow: none; }
+.anilist-banner h2 { margin: 0.5rem 0 0.55rem; overflow: hidden; font-size: clamp(1.5rem, 3vw, 1.95rem); text-overflow: ellipsis; white-space: nowrap; }
+.anilist-banner-actions { display: flex; align-items: center; gap: 0.6rem; }
+.settings-icon-button { width: 42px; min-width: 42px; height: 42px; display: inline-grid; place-items: center; padding: 0; color: var(--ink-soft); background: var(--surface); border: 1px solid var(--line); border-radius: 50% 50% 14px 50%; box-shadow: 0 7px 18px rgba(32, 48, 78, 0.08); cursor: pointer; transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease; }
+.settings-icon-button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 9px 22px rgba(37, 168, 166, 0.14); }
+.settings-icon-button:disabled { opacity: 0.5; cursor: wait; }
+.settings-icon-button svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.settings-icon-button.loading svg { animation: library-sync-spin 0.9s linear infinite; }
+.settings-connect-button { color: #fff; background: var(--bookmark); border-color: var(--bookmark); box-shadow: 0 8px 20px rgba(239, 91, 91, 0.22); }
+.settings-connect-button:hover:not(:disabled) { color: #fff; background: var(--bookmark-dark); border-color: var(--bookmark-dark); }
+.settings-disconnect-button:hover:not(:disabled) { color: var(--bookmark-dark); border-color: var(--bookmark); background: rgba(239, 91, 91, 0.08); }
+.settings-import-button { color: var(--aqua-ink); background: var(--aqua-soft); border-color: transparent; box-shadow: 0 8px 20px rgba(37, 168, 166, 0.18); }
+.settings-import-button:hover:not(:disabled) { color: var(--aqua-ink); border-color: var(--aqua); background: var(--aqua-soft); }
+.settings-export-button:hover:not(:disabled) { color: var(--aqua-ink); border-color: var(--aqua); background: var(--aqua-soft); }
+.settings-restore-button:hover:not(:disabled) { color: var(--bookmark-dark); border-color: var(--bookmark); background: rgba(239, 91, 91, 0.08); }
+/* The confirmation is a third child of the two-column settings grid, so it has to span both. */
+.restore-confirm { grid-column: 1 / -1; margin-top: 1.2rem; padding: 1.1rem 1.3rem; background: var(--surface); border: 1px solid var(--line); border-radius: 6px 6px 16px 6px; }
+.restore-confirm p { margin: 0 0 0.6rem; }
+.restore-confirm ul { margin: 0 0 0.8rem; padding-left: 1.2rem; color: var(--ink-soft); line-height: 1.7; }
+.restore-confirm small { color: var(--ink-soft); }
+.restore-confirm-actions { display: flex; justify-content: flex-end; gap: 0.6rem; }
+.restore-confirm-actions button { padding: 0.5rem 1rem; color: var(--ink); background: transparent; border: 1px solid var(--line); border-radius: 4px 4px 12px 4px; cursor: pointer; transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease; }
+.restore-confirm-actions button:hover:not(:disabled) { border-color: var(--ink-soft); }
+.restore-confirm-actions button:disabled { opacity: 0.5; cursor: wait; }
+.restore-confirm-actions .danger { color: #fff; background: var(--bookmark); border-color: var(--bookmark); }
+.restore-confirm-actions .danger:hover:not(:disabled) { background: var(--bookmark-dark); border-color: var(--bookmark-dark); }
+/* The nightly backups: a status line, the schedule, and what is kept. Sits in the grid's second
+   column like every other card's controls, and lets .restore-confirm span the row underneath. */
+.auto-backup-panel { display: grid; gap: 0.7rem; }
+.auto-backup-status { margin: 0; color: var(--ink-soft); font-size: 0.85rem; line-height: 1.5; }
+.auto-backup-status.warn { color: var(--bookmark-dark); }
+.auto-backup-schedule { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+.auto-backup-schedule label { display: inline-flex; align-items: center; gap: 0.35rem; color: var(--ink-soft); font-size: 0.85rem; }
+.auto-backup-schedule input { min-height: 38px; padding: 0.4rem 0.55rem; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 7px; font: inherit; font-size: 0.85rem; }
+.auto-backup-schedule input[type="number"] { width: 62px; }
+.auto-backup-schedule .settings-icon-button { width: 38px; min-width: 38px; height: 38px; margin-left: auto; }
+.auto-backup-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.4rem; }
+.auto-backup-list li { display: flex; align-items: center; gap: 0.6rem; padding: 0.45rem 0.5rem 0.45rem 0.7rem; background: var(--surface); border: 1px solid var(--line); border-radius: 5px 5px 14px 5px; }
+.auto-backup-list li > span { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 0.5rem; font-size: 0.85rem; }
+.auto-backup-list small { color: var(--ink-soft); font: 700 0.72rem/1 ui-monospace, Consolas, monospace; }
+/* Which row the confirmation below is about — the question names a date, the list shows which one. */
+.auto-backup-list li.chosen { border-color: var(--aqua); background: var(--aqua-soft); }
+.auto-backup-list .settings-icon-button { width: 34px; min-width: 34px; height: 34px; box-shadow: none; }
+.auto-backup-list .settings-icon-button svg { width: 16px; height: 16px; }
+/* A third child of the two-column settings grid, like .restore-confirm, so it spans both. */
+.category-manager { grid-column: 1 / -1; margin-top: 1.2rem; }
+.category-add { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.6rem; max-width: 460px; }
+.category-add input, .category-rename { min-height: 42px; padding: 0.6rem 0.85rem; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 7px; font: inherit; }
+.category-manager .inline-error { margin: 0.7rem 0 0; }
+.category-rows { list-style: none; margin: 1rem 0 0; padding: 0; display: grid; gap: 0.5rem; }
+.category-rows li { display: flex; align-items: center; gap: 0.5rem; padding: 0.55rem 0.7rem 0.55rem 0.9rem; background: var(--surface); border: 1px solid var(--line); border-radius: 5px 5px 14px 5px; }
+.category-rows li strong, .category-rename, .category-question { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.category-rows li strong { font-size: 0.95rem; }
+.category-rows .settings-icon-button { flex: none; width: 36px; min-width: 36px; height: 36px; box-shadow: none; }
+.category-rows .settings-icon-button svg { width: 17px; height: 17px; }
+.category-count { flex: none; min-width: 2rem; text-align: right; color: var(--ink-soft); font: 700 0.72rem/1 ui-monospace, Consolas, monospace; }
+.category-question { font-size: 0.85rem; font-weight: 700; }
+/* The virtual category: a row so the count of unfiled titles has somewhere to live, with the reason
+   it carries no controls said out loud rather than left as a missing button. */
+.category-default { background: var(--paper); }
+.category-default strong { flex: none; color: var(--ink-soft); }
+.category-default small { flex: 1 1 auto; min-width: 0; }
+.category-default small { color: var(--ink-soft); font-size: 0.75rem; line-height: 1.45; white-space: normal; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+.theme-options { display: flex; justify-content: flex-end; gap: 0.65rem; }
+.theme-option { width: 82px; height: 58px; display: grid; place-items: center; padding: 4px; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 6px 6px 16px 6px; cursor: pointer; transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease; }
+.theme-option:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(25, 37, 62, 0.1); }
+.theme-option.active { border-color: var(--aqua); box-shadow: 0 0 0 3px var(--aqua-soft); }
+.theme-preview { width: 100%; height: 100%; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 12px 1fr; gap: 4px; padding: 5px; border-radius: 3px 3px 11px 3px; overflow: hidden; }
+.theme-preview i { display: block; border-radius: 2px; }
+.theme-preview i:first-child { grid-column: 1 / -1; }
+.theme-preview.light { background: #eef1f7; border: 1px solid #d7deea; }
+.theme-preview.light i { background: #ffffff; }
+.theme-preview.light i:first-child { background: #26334e; }
+.theme-preview.dark { background: #0d1424; border: 1px solid #2a3954; }
+.theme-preview.dark i { background: #202d47; }
+.theme-preview.dark i:first-child { background: #ff6971; }
+.theme-preview.system { background: linear-gradient(90deg, #eef1f7 0 50%, #0d1424 50%); border: 1px solid var(--line); }
+.theme-preview.system i:first-child { background: linear-gradient(90deg, #26334e 0 50%, #ff6971 50%); }
+.theme-preview.system i:nth-child(2) { background: #ffffff; }
+.theme-preview.system i:nth-child(3) { background: #202d47; }
+
+/* The language is one of the few settings that can be drawn as the word for itself, so the control
+   is the two-letter tag, sized and framed like the theme swatches beside it. */
+.language-options { display: flex; justify-content: flex-end; gap: 0.65rem; }
+.language-option { width: 58px; height: 58px; display: grid; place-items: center; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.08em; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 6px 6px 16px 6px; cursor: pointer; transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease; }
+.language-option:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(25, 37, 62, 0.1); }
+.language-option.active { border-color: var(--aqua); box-shadow: 0 0 0 3px var(--aqua-soft); }
+
+.manga-hero { display: grid; grid-template-columns: minmax(180px, 250px) minmax(0, 1fr); gap: clamp(2rem, 6vw, 5rem); align-items: end; margin-bottom: 4rem; }
+.manga-hero > img, .manga-hero > .cover-placeholder { width: 100%; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 6px 6px 28px 6px; box-shadow: var(--shadow); }
+.manga-hero .summary { max-width: 760px; }
+.genre-chips { display: flex; flex-wrap: wrap; gap: 0.45rem; max-width: 760px; padding: 0; margin: 0.2rem 0 0; list-style: none; }
+.genre-chip { display: inline-block; padding: 0.34rem 0.66rem; color: var(--ink-soft); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; text-decoration: none; font-size: 0.78rem; font-weight: 700; transition: color 160ms ease, border-color 160ms ease, background-color 160ms ease; }
+.genre-chip:hover { color: var(--aqua-ink); background: var(--aqua-soft); border-color: var(--aqua); }
+.pipeline-panel, .chapters-panel { padding: clamp(1.2rem, 3vw, 2rem); margin-bottom: 1.5rem; background: var(--surface); border: 1px solid var(--line); border-radius: 8px 8px 24px 8px; }
+.section-heading { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.chapter-controls { display: flex; align-items: flex-end; gap: 1rem; flex-wrap: wrap; }
+.source-picker-controls { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; justify-content: flex-end; }
+.source-picker-close { width: 42px; min-width: 42px; padding: 0; color: var(--ink-soft); }
+.source-picker-close svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.chapter-icon-button { width: 42px; min-width: 42px; padding: 0; color: var(--ink-soft); background: var(--surface); }
+.chapter-icon-button:hover:not(:disabled) { color: var(--ink); background: var(--surface); box-shadow: 0 7px 18px rgba(32, 48, 78, 0.1); }
+.chapter-icon-button svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.chapter-filter-button.filter-all { color: var(--ink-soft); }
+.chapter-filter-button.filter-unread { color: var(--bookmark-dark); background: rgba(239, 91, 91, 0.1); border-color: transparent; }
+.chapter-filter-button.filter-unread circle { fill: currentColor; stroke: currentColor; }
+.chapter-filter-button.filter-read { color: var(--aqua-ink); background: var(--aqua-soft); border-color: transparent; }
+.chapter-filter-button.filter-bookmarked { color: var(--bookmark); background: rgba(239, 91, 91, 0.1); border-color: transparent; }
+.chapter-filter-button.filter-bookmarked .ribbon { fill: currentColor; }
+.sort-order-button { color: var(--aqua-ink); background: var(--aqua-soft); border-color: transparent; }
+/* Armed, the button reads as the deletion it is about to confirm — before the notice below says so. */
+.chapter-cleanup-read:hover:not(:disabled) { color: var(--bookmark-dark); }
+.chapter-cleanup-read.armed { color: var(--bookmark-dark); background: rgba(239, 91, 91, 0.1); border-color: transparent; }
+.refresh-chapters-button.loading svg { animation: refresh-chapters-spin 800ms linear infinite; }
+@keyframes refresh-chapters-spin { to { transform: rotate(360deg); } }
+.page-count-button { width: 42px; min-width: 42px; padding: 0; color: var(--aqua); background: var(--aqua-soft); border-color: transparent; box-shadow: inset 0 0 0 1px rgba(37, 168, 166, 0.2); }
+.page-count-button:hover:not(:disabled) { color: var(--aqua-ink); background: var(--aqua-soft); box-shadow: inset 0 0 0 1px var(--aqua), 0 7px 18px rgba(37, 168, 166, 0.14); }
+.page-count-button svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.65; stroke-linecap: round; stroke-linejoin: round; }
+.page-count-button .page-stack { opacity: 0.55; }
+.page-count-button.loading svg { animation: page-count-pulse 900ms ease-in-out infinite alternate; }
+@keyframes page-count-pulse { to { opacity: 0.35; transform: scale(0.88); } }
+.continue-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 1.25rem; margin: 1.5rem 0 0.5rem; padding: 1.15rem 1.25rem 1.15rem 1.55rem; color: var(--continue-text); background: var(--continue-bg); border-radius: 7px 7px 20px 7px; position: relative; overflow: hidden; }
+.continue-card::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 6px; background: var(--bookmark); }
+.continue-card::after { content: ""; position: absolute; width: 110px; height: 110px; right: 18%; bottom: -88px; border: 16px solid var(--continue-ring); border-radius: 50%; }
+.continue-card > div, .continue-card .continue-button { position: relative; z-index: 1; }
+.continue-card .eyebrow { color: #7fd7d4; margin-bottom: 0.35rem; }
+.continue-card strong, .continue-card small { display: block; }
+.continue-card strong { font-family: Bahnschrift, "Arial Narrow", sans-serif; font-size: 1.15rem; }
+.continue-card small { color: var(--continue-muted); margin-top: 0.3rem; }
+.continue-card.caught-up { color: var(--ink); background: var(--aqua-soft); }
+.continue-card.caught-up .eyebrow { color: var(--aqua-ink); }
+.continue-card.caught-up small { color: var(--ink-soft); }
+.bound-torrent { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 0.85rem; align-items: center; padding: 1rem 0; }
+.bound-torrent strong, .bound-torrent small, .torrent-row strong, .torrent-row small { display: block; }
+.bound-torrent small, .torrent-row small { color: var(--ink-soft); margin-top: 0.3rem; }
+.torrent-results { display: grid; }
+.torrent-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 1rem; padding: 1rem 0; border-top: 1px solid var(--line); }
+.hero-actions { display: flex; align-items: center; gap: 1rem; margin-top: 1.5rem; }
+.library-heart-button { width: 48px; min-width: 48px; height: 48px; padding: 0; color: var(--ink-soft); background: var(--surface); border-color: var(--line); border-radius: 50% 50% 16px 50%; box-shadow: 0 8px 22px rgba(32, 48, 78, 0.09); }
+.library-heart-button:hover:not(:disabled) { color: var(--bookmark); border-color: var(--bookmark); background: var(--surface); box-shadow: 0 10px 26px rgba(239, 91, 91, 0.17); }
+.library-heart-button svg { width: 23px; height: 23px; fill: transparent; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: fill 160ms ease, transform 160ms ease; }
+.library-heart-button.in-library { color: #fff; background: var(--bookmark); border-color: var(--bookmark); box-shadow: 0 9px 24px rgba(239, 91, 91, 0.26); }
+.library-heart-button.in-library svg { fill: currentColor; }
+.library-heart-button.loading svg { animation: library-heart-beat 600ms ease-in-out infinite alternate; }
+.share-source-button { width: 48px; min-width: 48px; height: 48px; padding: 0; color: var(--ink-soft); background: var(--surface); border-color: var(--line); border-radius: 50% 50% 16px 50%; box-shadow: 0 8px 22px rgba(32, 48, 78, 0.09); }
+.share-source-button:hover:not(:disabled) { color: var(--aqua); border-color: var(--aqua); background: var(--surface); box-shadow: 0 10px 26px rgba(37, 168, 166, 0.17); }
+.share-source-button svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+@keyframes library-heart-beat { to { opacity: 0.45; transform: scale(0.82); } }
+.chapter-list { list-style: none; padding: 0; margin: 1rem 0 0; }
+/* The row is a link plus a sibling button, so the link takes the space and the button sits at its
+   end rather than inside it. */
+.chapter-list li { display: flex; align-items: center; gap: 0.4rem; border-top: 1px solid var(--line); transition: opacity 160ms ease, background-color 160ms ease; }
+.chapter-list li > a { flex: 1; min-width: 0; }
+.chapter-download-button, .chapter-bookmark-button { flex: none; width: 36px; height: 36px; display: grid; place-items: center; padding: 0; color: var(--ink-soft); background: transparent; border: 1px solid transparent; border-radius: 50% 50% 12px 50%; cursor: pointer; transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease; }
+.chapter-download-button:hover { color: var(--aqua-ink); background: var(--aqua-soft); border-color: var(--aqua); }
+.chapter-download-button svg, .chapter-bookmark-button svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+/* Kept visible on every row rather than revealed on hover: half these rows are read on a phone,
+   where there is no hover to reveal anything with. */
+.chapter-bookmark-button:hover { color: var(--bookmark-dark); background: rgba(239, 91, 91, 0.08); border-color: var(--bookmark); }
+.chapter-bookmark-button.marked { color: var(--bookmark); }
+.chapter-bookmark-button.marked svg { fill: currentColor; }
+.chapter-download-button.downloaded { color: var(--aqua); }
+.chapter-download-button.downloaded:hover { color: var(--bookmark-dark); background: rgba(239, 91, 91, 0.08); border-color: var(--bookmark); }
+.chapter-download-button.queued { color: var(--aqua-ink); background: var(--aqua-soft); }
+.chapter-download-button.queued.failed { color: var(--bookmark-dark); background: rgba(239, 91, 91, 0.1); }
+.download-percent { font: 800 0.68rem/1 ui-monospace, Consolas, monospace; }
+
+.chapter-list li.read { opacity: 0.48; background: linear-gradient(90deg, var(--read-wash), transparent 70%); }
+.chapter-list li.read:hover { opacity: 0.72; }
+.chapter-list li.read a > span { color: var(--ink-soft); }
+.chapter-list a { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.9rem 0.2rem; text-decoration: none; }
+.chapter-list a:hover span { color: var(--bookmark-dark); }
+.chapter-list small { color: var(--ink-soft); }
+/* Sits with the chapter name, not with the page count: it says something about the chapter itself. */
+.chapter-date { margin-left: 0.55rem; color: var(--ink-soft); font: 600 0.74rem/1 ui-monospace, Consolas, monospace; white-space: nowrap; }
+.chapter-date::before { content: "· "; }
+.chapter-list a:hover span .chapter-date { color: var(--ink-soft); }
+.chapter-meta { display: inline-flex; align-items: center; justify-content: flex-end; gap: 0.65rem; white-space: nowrap; }
+.read-marker { padding: 0.2rem 0.42rem; color: var(--ink-soft); background: var(--read-marker-bg); border-radius: 999px; font: 800 0.62rem/1 ui-monospace, Consolas, monospace; letter-spacing: 0.07em; text-transform: uppercase; }
+
+.downloads-page .shelf { margin-bottom: 3rem; }
+.download-icon-button { width: 42px; min-width: 42px; height: 42px; display: inline-grid; place-items: center; padding: 0; color: var(--ink-soft); background: var(--surface); border: 1px solid var(--line); border-radius: 50% 50% 14px 50%; box-shadow: 0 7px 18px rgba(32, 48, 78, 0.08); cursor: pointer; transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease, transform 160ms ease; }
+.download-icon-button:hover:not(:disabled) { color: var(--aqua-ink); border-color: var(--aqua); background: var(--aqua-soft); transform: translateY(-1px); }
+.download-icon-button:disabled { opacity: 0.45; cursor: default; }
+.download-icon-button svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.download-icon-button.active { color: var(--aqua-ink); background: var(--aqua-soft); border-color: var(--aqua); }
+.download-icon-button.danger:hover:not(:disabled) { color: var(--bookmark-dark); border-color: var(--bookmark); background: rgba(239, 91, 91, 0.08); }
+.download-icon-button.small { width: 34px; min-width: 34px; height: 34px; box-shadow: none; }
+.download-icon-button.small svg { width: 16px; height: 16px; }
+/* The question a cleanup asks before it deletes anything, on both surfaces that offer one. */
+.cleanup-notice { display: flex; align-items: center; gap: 0.6rem; }
+.cleanup-notice span { flex: 1; min-width: 0; font-size: 0.9rem; }
+.cleanup-notice .button { flex: none; min-height: 34px; padding: 0.4rem 0.85rem; font-size: 0.85rem; }
+/* A shelf heading is baseline-aligned copy; an action in it has to be pushed off the end of that. */
+.shelf-heading-action { margin-left: auto; }
+.download-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+.download-row { display: flex; align-items: center; gap: 0.9rem; padding: 0.7rem 0.85rem 0.7rem 0.7rem; background: var(--surface); border: 1px solid var(--line); border-radius: 6px 6px 18px 6px; }
+.download-row.failed { border-color: var(--bookmark); }
+.download-row > img, .download-row > .cover-placeholder { flex: none; width: 42px; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 3px 3px 9px 3px; }
+.download-copy { flex: 1; min-width: 0; }
+.download-copy a { color: inherit; text-decoration: none; }
+.download-copy a:hover strong { color: var(--bookmark-dark); }
+.download-copy strong { display: block; overflow: hidden; font-size: 0.92rem; text-overflow: ellipsis; white-space: nowrap; }
+.download-copy small { display: block; margin-top: 0.2rem; overflow: hidden; color: var(--ink-soft); font-size: 0.75rem; text-overflow: ellipsis; white-space: nowrap; }
+.download-progress { height: 4px; margin-top: 0.5rem; overflow: hidden; background: var(--line); border-radius: 999px; }
+.download-progress i { display: block; height: 100%; background: var(--aqua); transition: width 240ms ease; }
+.download-state { flex: none; min-width: 4.5rem; text-align: right; color: var(--ink-soft); font: 700 0.72rem/1 ui-monospace, Consolas, monospace; }
+.download-row.failed .download-state { color: var(--bookmark-dark); }
+
+.reader-active { min-height: 100vh; background: #242629; }
+.content.reader-content { width: 100%; margin: 0; padding: 0; }
+.reader-content > .state-panel { min-width: 100%; min-height: 100vh; padding: 6vw; color: #f5f7fb; background: #242629; }
+.reader-content > .state-panel p { color: #aeb4bf; }
+/* The progress bar is furniture the page has to fit around, and it moves: --reader-bar-block is the
+   room it takes at the top or bottom, --reader-bar-inline the room it takes down a side. Every page
+   measurement below is written against these two rather than against a fixed 30px, so switching the
+   bar to another edge — or off — resizes the page instead of leaving a gap where it used to be. */
+.reader-shell { --reader-panel-width: 320px; --reader-bar-block: 30px; --reader-bar-inline: 0px; min-height: 100vh; color: #f3f5f8; background: #242629; }
+.reader-shell.bar-left, .reader-shell.bar-right { --reader-bar-block: 0px; --reader-bar-inline: 30px; }
+.reader-shell.bar-off { --reader-bar-block: 0px; }
+/* --reader-bg is set per page when the background follows the page; the fallback is the surround the
+   reader has always had. The transition keeps a page turn from strobing. */
+.reader-stage { width: calc(100vw - var(--reader-panel-width)); height: 100vh; min-height: 100vh; background: var(--reader-bg, #242629); overflow: auto; transition: width 220ms ease, background-color 180ms ease; position: relative; }
+.reader-shell.panel-closed .reader-stage { width: 100vw; }
+/* Padding rather than a smaller stage: the scroller keeps its 100vh so the strip still measures the
+   screen, and the page simply starts below (or beside) the bar. */
+.reader-shell.bar-top .reader-stage { padding-top: var(--reader-bar-block); }
+.reader-shell.bar-left .reader-stage { padding-left: var(--reader-bar-inline); }
+.reader-shell.bar-right .reader-stage { padding-right: var(--reader-bar-inline); }
+.paged-reader { min-height: calc(100vh - var(--reader-bar-block)); display: grid; grid-template-columns: minmax(54px, 1fr) minmax(0, auto) minmax(54px, 1fr); align-items: start; position: relative; }
+/* Row 1 explicitly, on both the page and the pair: the tap overlay spans every column of that row,
+   so an auto-placed page finds no free cell there and drops into a second row below the screen. */
+.paged-reader img { grid-column: 2; grid-row: 1; display: block; max-width: calc(100vw - var(--reader-panel-width) - var(--reader-bar-inline) - 108px); max-height: calc(100vh - var(--reader-bar-block)); object-fit: contain; box-shadow: 0 18px 55px rgba(0, 0, 0, 0.3); }
+.reader-shell.panel-closed .paged-reader img { max-width: calc(100vw - var(--reader-bar-inline) - 108px); }
+.fit-width .paged-reader { align-items: start; }
+.fit-width .paged-reader img { width: min(100%, 1100px); max-height: none; }
+/* A pair has to share the budget one page had, or fit-height overflows sideways: the height cap
+   stays on each image and the width cap moves to the pair, which then splits it. row-reverse rather
+   than reversing the array, so the DOM keeps reading order for a screen reader. */
+.paged-reader .page-spread { grid-column: 2; grid-row: 1; display: flex; align-items: flex-start; justify-content: center; gap: 1px; max-width: calc(100vw - var(--reader-panel-width) - var(--reader-bar-inline) - 108px); }
+.paged-reader .page-spread.rtl { flex-direction: row-reverse; }
+.paged-reader .page-spread img { max-width: 50%; }
+.reader-shell.panel-closed .paged-reader .page-spread { max-width: calc(100vw - var(--reader-bar-inline) - 108px); }
+/* Except that splitting the pair's box evenly only holds while both sheets are the same shape. A page
+   wider than it is tall reaches the half-width cap long before it reaches the height cap, so it came
+   out at *half* its partner's height — on the same page turn, at the same zoom, one sheet filling the
+   screen and the other sitting at half size with empty stage under it. It reads as a page that
+   refused to zoom, and it is the reason only some pages looked wrong: it needs a wide page to happen
+   at all, and most chapters have none.
+   So under fit-height the height is the only cap. The sheets keep a common height, the pair is as
+   wide as its two pages need to be, and the stage's own `overflow: auto` supplies the sideways
+   scrolling — which is what fitting the *height* meant in the first place. `safe center` so a pair
+   wider than the stage stays reachable from its left edge instead of being centred past it.
+   fit-width is untouched: there the width is the promise, and two sheets of different shapes ending
+   at different heights is that promise being kept. */
+.reader-stage.fit-height .paged-reader .page-spread { max-width: none; justify-content: safe center; }
+.reader-stage.fit-height .paged-reader .page-spread img { max-width: none; flex-shrink: 0; }
+.reader-stage.fit-height .paged-reader .page-spread .page-crop { width: calc(var(--crop-tall) * var(--crop-aspect)); flex-shrink: 0; }
+/* The turn animation. It runs on the element the page turn has just mounted, so the page arrives
+   from the side it was turned from; `from-left`/`from-right` are the edge, already mirrored for
+   right-to-left by the reader. Transform and opacity only — nothing here can reflow the artwork.
+   The keyframes carry the zoom and the pan themselves rather than sliding a bare `translateX`: an
+   animation outranks the rule below it for the whole 260ms, so a page turned while zoomed used to
+   arrive at fit size and only snap to its zoom when the slide finished. Both properties are always
+   written on the stage, so at rest the extra terms compute to the identity the plain slide had. */
+.paged-reader img.sliding, .paged-reader .page-spread.sliding, .paged-reader .page-crop.sliding { animation: reader-slide-in 260ms cubic-bezier(0.22, 0.68, 0.3, 1); }
+.paged-reader .from-left { --reader-slide-from: -7%; }
+.paged-reader .from-right { --reader-slide-from: 7%; }
+@keyframes reader-slide-in {
+  from {
+    opacity: 0.35;
+    transform: translate(calc(var(--pan-x, 0px) + var(--reader-slide-from, 7%)), var(--pan-y, 0px)) scale(var(--page-zoom, 1));
+  }
+  to {
+    opacity: 1;
+    transform: translate(var(--pan-x, 0px), var(--pan-y, 0px)) scale(var(--page-zoom, 1));
+  }
+}
+/* The same three the animation is set on, or a trimmed page keeps sliding for a reader who asked
+   for less movement — the crop wrapper takes the animation over from the image it wraps. */
+@media (prefers-reduced-motion: reduce) {
+  .paged-reader img.sliding, .paged-reader .page-spread.sliding, .paged-reader .page-crop.sliding { animation: none; }
+}
+.fit-width .paged-reader .page-spread { width: min(100%, 1700px); }
+.fit-width .paged-reader .page-spread img { width: 50%; max-height: none; }
+/* The tap map lies over the page rather than in the grid margins beside it, which is what lets a
+   region be shaped like a bottom band or an L. Sticky rather than absolute: a fit-width page can be
+   taller than the screen, and the map has to stay on the viewport instead of scrolling off with the
+   artwork. The container passes clicks through so the region buttons are the only targets. */
+.page-hits { grid-column: 1 / -1; grid-row: 1; position: sticky; top: 0; height: calc(100vh - var(--reader-bar-block)); z-index: 2; pointer-events: none; }
+/* A trimmed page. The wrapper is the sized element — same caps an image gets, shaped to the kept
+   region — so the layout reserves the space the trimmed page needs rather than the untrimmed one's.
+   The image inside is blown up by the inverse of the trim and pulled up and left, so the kept region
+   fills the wrapper exactly; `overflow: hidden` takes the margin off the screen.
+
+   Sized by **width** in viewport maths, with the height left to `aspect-ratio`, for two reasons found
+   the hard way: a percentage width inside the `auto` grid column is circular for a box with no
+   intrinsic size and collapses it to 0×0, and a definite height plus a clamping `max-width` breaks the
+   ratio instead of shrinking — which stretched the page. An image survives both because it brings its
+   own size to the negotiation; a shaped box has none to bring. */
+/* Shape and clipping belong to every trimmed page; only the sizing differs by layout — a strip page is
+   not inside `.paged-reader`, and scoping the shared half there left it 1040×0. */
+.page-crop { position: relative; overflow: hidden; aspect-ratio: var(--crop-aspect); }
+.paged-reader .page-crop {
+  --crop-room: calc(100vw - var(--reader-panel-width) - var(--reader-bar-inline) - 108px);
+  --crop-tall: calc(100vh - var(--reader-bar-block));
+  grid-column: 2; grid-row: 1;
+  width: min(var(--crop-room), calc(var(--crop-tall) * var(--crop-aspect)));
+  box-shadow: 0 18px 55px rgba(0, 0, 0, 0.3);
+}
+.reader-shell.panel-closed .paged-reader .page-crop { --crop-room: calc(100vw - var(--reader-bar-inline) - 108px); }
+.fit-width .paged-reader .page-crop { width: min(var(--crop-room), 1100px); }
+.paged-reader .page-spread .page-crop { width: min(calc(var(--crop-room) / 2), calc(var(--crop-tall) * var(--crop-aspect))); }
+.fit-width .paged-reader .page-spread .page-crop { width: min(calc(var(--crop-room) / 2), 850px); }
+.strip-page .page-crop { width: 100%; margin: 0 auto; }
+/* `fill` rather than `contain`: the box is already the kept region's exact shape, so letterboxing
+   could only fight it. Later than `.paged-reader img` on purpose — same specificity, and this wins. */
+.paged-reader .page-crop img, .strip-page .page-crop img { position: absolute; width: var(--crop-width); height: var(--crop-height); left: var(--crop-left); top: var(--crop-top); max-width: none; max-height: none; object-fit: fill; box-shadow: none; }
+/* Zoom and pan. One rule over the three things a page can be — an image, a trimmed page or a pair —
+   driven by custom properties on the stage, and only while zoomed: a permanent `scale(1)` would put
+   every page on its own raster layer for nothing. `touch-action: none` for the same window, so a pinch
+   is ours rather than the browser's; a fit-width page still scrolls at rest. */
+/* Paged only: a long strip zooms by width (below) and is still scrolled by finger and by scrollbar,
+   so taking `touch-action` off it would leave it unscrollable on a touchscreen. */
+.reader-shell.paged .reader-stage.zoomed { touch-action: none; cursor: grab; }
+/* Above the tap map and the dimmer, below the footer: it is the way out of a zoom nobody meant. */
+.reader-zoom-badge { position: fixed; top: 12px; left: 12px; z-index: 16; padding: 0.35rem 0.6rem; color: #f3f5f8; background: rgba(29, 31, 34, 0.92); border: 1px solid #40444a; border-radius: 6px; cursor: pointer; font: 700 0.72rem/1 ui-monospace, Consolas, monospace; backdrop-filter: blur(8px); }
+.reader-zoom-badge:hover { background: #34373b; }
+.reader-stage.zoomed .paged-reader > img,
+.reader-stage.zoomed .paged-reader > .page-crop,
+.reader-stage.zoomed .paged-reader > .page-spread {
+  transform: translate(var(--pan-x, 0px), var(--pan-y, 0px)) scale(var(--page-zoom, 1));
+  transform-origin: center center;
+  will-change: transform;
+}
+/* The dimmer: fixed over the reading surface, stopping at the panel (z-index 30) and under the footer
+   (15), so the controls and the page counter stay readable enough to turn it back down. Fixed rather
+   than in-flow, so a long strip dims the screen instead of dimming its own first screenful. */
+.reader-dim { position: fixed; top: 0; bottom: 0; left: 0; right: var(--reader-panel-width); z-index: 3; background: #000; pointer-events: none; transition: opacity 160ms ease; }
+.reader-shell.panel-closed .reader-dim { right: 0; }
+.page-hit { position: absolute; display: grid; place-items: center; padding: 0; color: rgba(255, 255, 255, 0); border: 0; background: transparent; cursor: pointer; pointer-events: auto; transition: color 160ms ease, background-color 160ms ease; }
+.page-hit:hover:not(:disabled), .page-hit:focus-visible { color: rgba(255, 255, 255, 0.8); background: rgba(255, 255, 255, 0.035); }
+.page-hit:disabled { cursor: default; }
+.page-hit svg { width: 32px; height: 32px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.page-hit.panel-hit svg { width: 26px; height: 26px; }
+/* The strip's own zoom. Multiplying the width it would otherwise have keeps the two ends honest —
+   at 1 the rule computes exactly what the unzoomed strip is — and past 100% the stage's own
+   `overflow: auto` supplies the horizontal scrolling, so panning needs no code at all. */
+.strip-reader { width: calc(min(100%, 1040px) * var(--strip-zoom, 1)); min-height: 100vh; margin: 0 auto; background: #111317; box-shadow: 0 0 60px rgba(0, 0, 0, 0.25); }
+.strip-page { min-height: 100vh; background: #111317; }
+.strip-page img { display: block; width: 100%; height: auto; }
+/* Grayscale and invert land on the artwork alone. --page-filter is always written, never dropped:
+   React does not reliably remove a custom property when the style prop goes away, which is how the
+   auto background once got stuck on an element after being switched off. */
+.paged-reader img, .strip-page img { filter: var(--page-filter, none); }
+/* Stands in for a page the source would not serve. In the paged grid it has to name row 1 and
+   column 2 the way the page does, or the tap overlay spanning that row pushes it into a second one;
+   it also holds roughly a page's worth of space, so a page that recovers does not jolt the reader. */
+.page-error { display: grid; align-content: center; justify-items: center; gap: 0.75rem; padding: 2rem 1.25rem; color: #aeb4bf; text-align: center; background: #1d1f22; border: 1px solid #34373c; border-radius: 10px; }
+/* Above the tap overlay (z-index 2), or the region covering that part of the screen takes the click
+   and turns the page instead of retrying. Only the panel's own box is lifted, so the zones around it
+   still work. */
+.paged-reader .page-error { grid-column: 2; grid-row: 1; width: min(72vw, 420px); min-height: min(72vh, 560px); position: relative; z-index: 3; }
+.page-spread .page-error { width: 50%; }
+.strip-page .page-error { width: 100%; min-height: 100vh; border: 0; border-radius: 0; }
+.page-error svg { width: 30px; height: 30px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.page-error p { margin: 0; font-size: 0.8rem; }
+.page-error button { padding: 0.55rem 1.15rem; color: #f2f3f5; background: #34373b; border: 1px solid #41454b; border-radius: 6px; cursor: pointer; font: 700 0.76rem/1 inherit; }
+.page-error button:hover { background: #44484e; }
+.strip-end { min-height: 55vh; display: grid; align-content: center; justify-items: center; gap: 0.85rem; padding: 3rem 1.5rem 5rem; text-align: center; background: #111317; }
+.strip-end .eyebrow { color: #ff6469; font-size: 0.64rem; }
+.strip-end p { margin: 0; color: #8f969f; font-size: 0.8rem; }
+.strip-end-next { display: inline-flex; align-items: center; gap: 0.7rem; padding: 0.7rem 1.1rem; color: #f3f5f8; text-align: left; background: #1d1f22; border: 1px solid #34373c; border-radius: 12px; cursor: pointer; }
+.strip-end-next:hover { background: #24272c; border-color: #4a4f57; }
+.strip-end-next svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.strip-end-next strong { display: block; font-size: 0.84rem; }
+.strip-end-next small { display: block; color: #8f969f; font-size: 0.68rem; }
+.reader-footer { width: calc(100vw - var(--reader-panel-width)); height: 30px; display: grid; grid-template-columns: auto minmax(100px, 1fr) auto; align-items: center; gap: 0.8rem; padding: 0 0.8rem; color: #aeb4bf; background: rgba(24, 26, 29, 0.96); position: fixed; left: 0; z-index: 15; font: 700 0.68rem/1 ui-monospace, Consolas, monospace; transition: width 220ms ease; }
+.reader-footer.at-bottom { bottom: 0; }
+.reader-footer.at-top { top: 0; }
+.reader-shell.panel-closed .reader-footer { width: 100vw; }
+/* The same three parts stood on end. It hugs the edge of the stage — on the right that is the inner
+   edge of the controls panel, which slides away with it. */
+.reader-rail { width: 30px; display: flex; flex-direction: column; align-items: center; gap: 0.6rem; padding: 0.55rem 0; color: #aeb4bf; background: rgba(24, 26, 29, 0.96); position: fixed; top: 0; bottom: 0; z-index: 15; font: 700 0.62rem/1 ui-monospace, Consolas, monospace; transition: right 220ms ease; }
+.reader-rail.at-left { left: 0; }
+.reader-rail.at-right { right: var(--reader-panel-width); }
+.reader-shell.panel-closed .reader-rail.at-right { right: 0; }
+/* The bar is one segment per page rather than a filled line. At rest it is a 3px run of ticks: the
+   chapter's length is legible without reading a number, and how far in you are is where the colour
+   stops. Hovering anywhere along the track thickens every segment to the full bar, which is what
+   turns a 3px line into a row of targets big enough to click — the page number rides above the one
+   under the pointer, drawn from a CSS counter so no page number ever reaches the DOM.
+
+   --track-thick is the grown size and the bar's own thickness; the two are the same on purpose. */
+.reader-track { --track-thick: 22px; display: flex; counter-reset: seg; }
+/* The divisions are a 1px semi-transparent black *border*, not a gap. A gap would let the near-black
+   bar behind show through, and at rest that reads as a dashed line with holes punched in it rather
+   than as one run marked off into pages. The segment's own colour paints under its border, so each
+   division comes out as a darker shade of whatever that segment is — visible up close, invisible at
+   a glance, and it stays that way over the read colour as much as the unread one. */
+.reader-track-seg { flex: 1 1 0; min-width: 0; min-height: 0; padding: 0; counter-increment: seg; background: rgba(255, 255, 255, 0.15); border: 0 solid rgba(0, 0, 0, 0.34); cursor: pointer; position: relative; transition: background-color 120ms ease, width 180ms ease, height 180ms ease; }
+.reader-track-seg.is-visited { background: rgba(255, 91, 97, 0.5); }
+.reader-track-seg.is-active, .reader-track-seg:hover { background: #ff5b61; }
+/* Past a few hundred pages a division per page is finer than the pixels available; the run closes up
+   rather than dissolving into a texture. */
+.reader-track.dense .reader-track-seg { border-width: 0; }
+/* The page number, on the segment under the pointer. */
+.reader-track-seg::before { content: counter(seg); position: absolute; z-index: 1; padding: 0 6px; color: #16181b; background: #e6e9ee; border-radius: 4px; font: 700 11px/1.6 ui-monospace, Consolas, monospace; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 180ms ease; }
+.reader-track-seg:hover::before { opacity: 1; }
+/* Horizontal: the track lies along the footer, and mirrors with the reading direction so the read
+   end of the bar is the side the pages have been turned from. */
+.reader-footer .reader-track { height: var(--track-thick); align-items: center; }
+.reader-footer.rtl .reader-track { flex-direction: row-reverse; }
+.reader-footer .reader-track-seg { height: 3px; border-right-width: 1px; }
+.reader-footer .reader-track:hover .reader-track-seg { height: var(--track-thick); }
+.reader-footer .reader-track-seg::before { left: 50%; transform: translateX(-50%); bottom: calc(100% + 7px); }
+.reader-footer.at-top .reader-track-seg::before { bottom: auto; top: calc(100% + 7px); }
+/* Vertical: the same track stood on end. Reading down a strip is top-to-bottom whichever way the
+   pages turn, so this one never mirrors. */
+.reader-rail .reader-track { flex: 1; flex-direction: column; width: var(--track-thick); align-items: center; }
+.reader-rail .reader-track-seg { width: 3px; border-bottom-width: 1px; }
+.reader-rail .reader-track:hover .reader-track-seg { width: var(--track-thick); }
+.reader-rail .reader-track-seg::before { top: 50%; transform: translateY(-50%); }
+.reader-rail.at-left .reader-track-seg::before { left: calc(100% + 7px); }
+.reader-rail.at-right .reader-track-seg::before { right: calc(100% + 7px); }
+@media (prefers-reduced-motion: reduce) {
+  .reader-track-seg { transition: background-color 120ms ease; }
+}
+.reader-panel { width: var(--reader-panel-width); height: 100vh; color: #f4f5f7; background: #1d1f22; border-left: 1px solid #34373c; position: fixed; top: 0; right: 0; z-index: 30; overflow: auto; transition: transform 220ms ease; }
+.reader-shell.panel-closed .reader-panel { transform: translateX(100%); }
+.reader-panel-header { height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 0.7rem; border-bottom: 1px solid #34373c; }
+.reader-panel-header-actions { display: flex; align-items: center; gap: 0.15rem; }
+.reader-panel-icon { width: 38px; height: 38px; display: grid; place-items: center; padding: 0; color: #b8bec7; background: transparent; border: 0; border-radius: 8px; cursor: pointer; text-decoration: none; }
+.reader-panel-icon:hover { color: #ffffff; background: #2b2e33; }
+.reader-panel-icon svg, .reader-panel-reveal svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+/* AniList's mark is a solid glyph, not a line drawing — outlined at 19px it turns to mush. It sits
+   a shade smaller than the stroked icons so the two read as the same weight beside each other. */
+.reader-panel-icon.anilist-link svg { width: 17px; height: 17px; fill: currentColor; stroke: none; }
+.reader-panel-icon.anilist-link:hover { color: #02a9ff; }
+.reader-panel-body { padding: 0.9rem 0.9rem 1.5rem; }
+.reader-title-block { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 0.65rem; align-items: start; padding: 0.45rem 0; }
+.reader-title-block .eyebrow { margin: 0 0 0.25rem; color: #ff6469; font-size: 0.62rem; }
+.reader-title-block strong, .reader-title-block small { display: block; }
+.reader-title-block strong { overflow: hidden; font-size: 0.82rem; line-height: 1.35; text-overflow: ellipsis; white-space: nowrap; }
+.reader-title-block small { margin-bottom: 0.15rem; color: #8f969f; font-size: 0.68rem; }
+.reader-title-block.with-action { grid-template-columns: 24px minmax(0, 1fr) 34px; }
+.reader-options-toggle { width: 34px; height: 34px; display: grid; place-items: center; margin-top: -0.2rem; padding: 0; color: #b8bec7; background: transparent; border: 1px solid transparent; border-radius: 8px; cursor: pointer; transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease; }
+.reader-options-toggle:hover { color: #ffffff; background: #2b2e33; }
+.reader-options-toggle[aria-expanded="true"] { color: #ffffff; background: #2b2e33; border-color: #4a4e55; }
+.reader-options-toggle svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; transition: transform 220ms ease; }
+/* The gear has eight lobes, so an eighth of a turn lands back on itself — the fold reads as a click
+   rather than as the icon changing. */
+.reader-options-toggle[aria-expanded="true"] svg { transform: rotate(45deg); }
+.reader-detail-icon { color: #aab0b9; }
+.reader-detail-icon svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.45; stroke-linecap: round; stroke-linejoin: round; }
+.reader-control-group { margin-top: 0.8rem; }
+.reader-control-label { display: block; margin-bottom: 0.35rem; color: #9198a2; font: 700 0.62rem/1 ui-monospace, Consolas, monospace; letter-spacing: 0.08em; text-transform: uppercase; }
+/* Floated rather than flexed: the label is shared with every other group in the panel, and only this
+   one carries a live value to sit at its right. */
+.reader-control-value { float: right; color: #f2f3f5; letter-spacing: 0.04em; text-transform: none; }
+.reader-stepper { display: grid; grid-template-columns: 36px minmax(0, 1fr) 36px; gap: 0.35rem; }
+.reader-stepper button, .reader-stepper select { min-width: 0; height: 40px; color: #f2f3f5; background: #34373b; border: 1px solid #41454b; border-radius: 5px; }
+.reader-stepper button { padding: 0; cursor: pointer; font-size: 1.35rem; }
+.reader-stepper button:hover:not(:disabled) { background: #44484e; }
+.reader-stepper button:disabled { opacity: 0.32; cursor: default; }
+.reader-stepper select { padding: 0 0.65rem; font-size: 0.76rem; font-weight: 700; text-overflow: ellipsis; }
+.reader-panel-rule { height: 1px; margin: 1rem 0; background: #34373c; }
+/* Page-shaped swatches, in the reader panel's own palette: forward carries the accent, back the
+   muted grey, and the controls region the panel's surface colour. */
+.tap-layout-options { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.tap-layout-option { width: 46px; height: 60px; padding: 3px; background: #16181b; border: 1px solid #34373c; border-radius: 5px; cursor: pointer; transition: border-color 160ms ease, box-shadow 160ms ease; }
+.tap-layout-option:hover { border-color: #535860; }
+.tap-layout-option.active { border-color: #ff5b61; box-shadow: 0 0 0 2px rgba(255, 91, 97, 0.22); }
+.tap-layout-option svg { display: block; width: 100%; height: 100%; }
+.tap-layout-option rect { stroke: #16181b; stroke-width: 1; }
+.tap-layout-option .zone-empty { fill: #26292d; }
+.tap-layout-option .zone-forward { fill: #ff5b61; }
+.tap-layout-option .zone-back { fill: #575d66; }
+.tap-layout-option .zone-panel { fill: #2f333a; }
+/* The options popup. Compact and centred over the page, in the reader panel's own palette so the
+   two read as one surface; the reader keeps working behind it, which is why the backdrop is only a
+   wash rather than a blackout. */
+.reader-options-backdrop { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: 1.2rem; background: rgba(9, 10, 12, 0.6); }
+.reader-options-backdrop[hidden] { display: none; }
+.reader-options-dialog { width: min(360px, 100%); max-height: min(760px, 88vh); overflow: auto; color: #f4f5f7; background: #1d1f22; border: 1px solid #3a3e44; border-radius: 10px 10px 22px 10px; box-shadow: 0 26px 70px rgba(0, 0, 0, 0.55); }
+.reader-options-head { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; padding: 0.55rem 0.6rem; border-bottom: 1px solid #34373c; position: sticky; top: 0; z-index: 1; background: #1d1f22; }
+/* The tabs are the dialog's title: two words that say what it holds, so a heading above them would
+   only repeat itself. */
+.reader-options-tabs { display: flex; align-items: center; gap: 0.2rem; }
+.reader-options-tab { padding: 0.42rem 0.75rem; color: #9aa1ab; background: transparent; border: 0; border-radius: 6px; cursor: pointer; font: 700 0.82rem/1.2 inherit; transition: color 160ms ease, background-color 160ms ease; }
+.reader-options-tab:hover { color: #ffffff; background: #2b2e32; }
+.reader-options-tab[aria-selected="true"] { color: #ff9298; background: rgba(255, 91, 97, 0.16); }
+.reader-options-body[hidden] { display: none; }
+.reader-options-body { padding: 0.35rem 1rem 1.1rem; }
+.reader-options-group { margin-top: 1rem; }
+.reader-options-hint { display: block; margin-top: 0.4rem; color: #8f969f; font-size: 0.66rem; line-height: 1.45; }
+/* Equal columns, so a row of two choices splits the dialog down the middle whatever the labels say. */
+.reader-choices { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 0.4rem; }
+.reader-choice { display: flex; align-items: center; justify-content: center; gap: 0.4rem; min-height: 40px; padding: 0.5rem 0.55rem; color: #aeb4bd; background: #2b2e32; border: 1px solid transparent; border-radius: 6px; cursor: pointer; font: 700 0.74rem/1.25 inherit; transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease; }
+.reader-choices.tiles .reader-choice { flex-direction: column; gap: 0.35rem; padding: 0.7rem 0.5rem; }
+/* Five icons in a row need every pixel of the dialog's width, so they drop the label and the side
+   padding and keep only the drawing. */
+.reader-choices.icons { gap: 0.3rem; }
+.reader-choices.icons .reader-choice { padding: 0.5rem 0.2rem; }
+.reader-choice svg { flex: none; width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.55; stroke-linecap: round; stroke-linejoin: round; }
+/* The filled part of an icon — the bar inside the frame. */
+.reader-choice svg .solid { fill: currentColor; stroke: none; }
+.reader-choice:hover:not(:disabled) { color: #ffffff; background: #35383d; }
+.reader-choice[aria-pressed="true"] { color: #ff9298; background: rgba(255, 91, 97, 0.13); border-color: rgba(255, 91, 97, 0.55); }
+/* Shown rather than hidden when a layout has no use for it, so the menu keeps the same shape
+   whichever layout is on — see the reader's own note on this. */
+.reader-choice:disabled, .reader-check:disabled { opacity: 0.42; cursor: default; }
+/* Booleans read as a ticked line rather than a switch: at this width the label and its one-line
+   explanation are the control, and the box only has to say on or off. */
+.reader-check { width: 100%; display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 0.6rem; align-items: start; margin-top: 0.4rem; padding: 0.6rem 0.7rem; color: #d5d9df; text-align: left; background: #2b2e32; border: 1px solid transparent; border-radius: 6px; cursor: pointer; transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease; }
+.reader-check:hover:not(:disabled) { background: #35383d; }
+/* A row that is only a label — nothing to explain underneath, so the box and the words sit level. */
+.reader-check.plain { align-items: center; margin-top: 0; padding-block: 0.7rem; }
+.reader-check[aria-pressed="true"] { background: rgba(255, 91, 97, 0.13); border-color: rgba(255, 91, 97, 0.55); }
+.reader-check-box { width: 18px; height: 18px; display: grid; place-items: center; margin-top: 1px; background: #1d1f22; border: 1px solid #545962; border-radius: 4px; }
+.reader-check-box svg { width: 13px; height: 13px; fill: none; stroke: #1d1f22; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; opacity: 0; }
+.reader-check[aria-pressed="true"] .reader-check-box { background: #ff5b61; border-color: #ff5b61; }
+.reader-check[aria-pressed="true"] .reader-check-box svg { opacity: 1; }
+.reader-check strong, .reader-check small { display: block; }
+.reader-check strong { font-size: 0.76rem; }
+.reader-check small { margin-top: 0.15rem; color: #8f969f; font-size: 0.65rem; line-height: 1.45; }
+.reader-check[aria-pressed="true"] strong { color: #ff9298; }
+/* The panel's first slider. Its own control rather than a .reader-choices row, because a dimmer is a
+   quantity and a row of preset buttons would either be coarse or be twenty buttons wide. */
+.reader-range { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.5rem; align-items: center; }
+.reader-range input[type="range"] { width: 100%; height: 22px; margin: 0; background: transparent; accent-color: #ff5b61; cursor: pointer; }
+.reader-range-reset { width: 34px; height: 34px; display: grid; place-items: center; padding: 0; color: #aeb4bd; background: #2b2e32; border: 1px solid transparent; border-radius: 6px; cursor: pointer; transition: color 160ms ease, background-color 160ms ease; }
+.reader-range-reset:hover:not(:disabled) { color: #ffffff; background: #35383d; }
+.reader-range-reset:disabled { opacity: 0.42; cursor: default; }
+.reader-range-reset svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.reader-shortcuts { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.35rem 0.5rem; margin-top: 1rem; color: #777e88; font: 700 0.6rem/1 ui-monospace, Consolas, monospace; text-transform: uppercase; }
+/* The middle cell of the zoom stepper is a button rather than the stepper's usual <select>, so it
+   needs the font the number deserves and the "nothing to undo" state the two arrows already have. */
+
+/* --- The keys tab --------------------------------------------------------------------------------
+   One row per action: its name on the left, its chords and the way to add another on the right. The
+   chords wrap rather than scroll — an action can hold as many keys as the reader gives it. */
+.keybind-rows { display: grid; gap: 0.4rem; }
+.keybind-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.5rem 0.75rem; align-items: center; }
+.keybind-name { color: #c8cdd5; font-size: 0.78rem; }
+.keybind-chords { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.3rem; }
+/* A chord is its own remove button: the × only appears on hover or focus, so a row at rest reads as
+   a list of keys rather than as a row of controls. */
+.keybind-chord { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.4rem; color: #f2f3f5; background: #34373b; border: 1px solid #4a4f56; border-radius: 5px; cursor: pointer; }
+.keybind-chord:hover, .keybind-chord:focus-visible { border-color: var(--bookmark); background: #3d4046; }
+.keybind-chord kbd { font: 700 0.7rem/1 ui-monospace, Consolas, monospace; }
+.keybind-chord svg { width: 11px; height: 11px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; opacity: 0; transition: opacity 120ms ease; }
+.keybind-chord:hover svg, .keybind-chord:focus-visible svg { opacity: 0.85; }
+.keybind-empty { color: #777e88; font: 700 0.68rem/1.6 ui-monospace, Consolas, monospace; }
+.keybind-add { padding: 0.25rem 0.5rem; color: #aeb4bf; background: transparent; border: 1px dashed #4a4f56; border-radius: 5px; cursor: pointer; font: 700 0.7rem/1.25 ui-monospace, Consolas, monospace; }
+.keybind-add:hover { color: #f2f3f5; border-color: #6b727b; }
+/* Listening. The dashed outline goes solid and takes the accent, so it is obvious which of sixteen
+   rows the next press will land on. */
+.keybind-add.listening { color: #fff; background: var(--bookmark); border-style: solid; border-color: var(--bookmark); }
+.reader-choice.wide { width: 100%; justify-content: center; }
+.reader-panel-reveal { width: 44px; height: 44px; display: grid; place-items: center; padding: 0; color: #d9dde3; background: rgba(29, 31, 34, 0.9); border: 1px solid #40444a; border-radius: 6px 0 0 6px; position: fixed; top: 12px; right: 0; z-index: 25; cursor: pointer; backdrop-filter: blur(8px); }
+.reader-panel-reveal:hover { background: #34373b; }
+
+@media (max-width: 720px) {
+  .app-header { min-height: 82px; padding: 0.2rem 4vw; gap: 0.65rem; align-items: center; }
+  .brand { align-self: center; }
+  .brand-mark { width: 80px; height: 78px; }
+  .topnav { position: static; gap: 0; padding: 0.22rem; border-radius: 12px; transform: none; }
+  .topnav a { padding: 0.5rem 0.38rem; border-radius: 8px; font-size: 0.73rem; }
+  .content { width: 92vw; padding-top: 2.5rem; }
+  .page-heading { align-items: flex-start; flex-direction: column; gap: 1rem; }
+  .discover-header { align-items: flex-end; margin-bottom: 1.5rem; }
+  .sources-header { align-items: flex-end; margin-bottom: 1.5rem; }
+  .discover-console { gap: 0.55rem; padding: 0.65rem 0.6rem 0.65rem 0.8rem; }
+  .discover-source { grid-template-columns: 40px minmax(0, 1fr) 40px; gap: 0.55rem; }
+  .discover-source-mark { width: 40px; height: 40px; }
+  .discover-icon-button { width: 40px; min-width: 40px; height: 40px; }
+  .discover-modes { gap: 0.2rem; padding: 0.2rem; }
+  .discover-modes button { width: 34px; height: 34px; }
+  .discover-source-picker { grid-template-columns: 1fr; gap: 0.6rem; }
+  .library-filter { width: 100%; align-items: flex-start; }
+  .library-filter-options { justify-content: flex-start; }
+  .library-filter-options legend { text-align: left; }
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .search-box { border-radius: 10px; flex-direction: column; }
+  .search-box input { min-height: 44px; }
+  .catalogue-callout { align-items: flex-start; flex-direction: column; }
+  .source-toolbar { grid-template-columns: 1fr; align-items: stretch; }
+  .sources-page .source-toolbar { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+  .source-toolbar .source-select select { width: 100%; }
+  .reading-source-card { grid-template-columns: 46px minmax(0, 1fr); padding-right: 0.85rem; }
+  .reading-source-icon { width: 46px; height: 46px; }
+  .reading-source-copy small { display: none; }
+  .source-change-button { grid-column: 2; justify-self: start; min-height: 36px; padding: 0.45rem 0.75rem; }
+  .anilist-modal-backdrop, .duplicate-modal-backdrop { padding: 1rem; place-items: end center; }
+  .anilist-modal, .duplicate-modal { width: 100%; max-height: 90vh; border-radius: 14px 14px 24px 14px; }
+  /* The action row is the whole point of this dialog, so the buttons get the width rather than the
+     "open it instead" link they would otherwise be squeezed against. */
+  .duplicate-list li { grid-template-columns: 46px minmax(0, 1fr); }
+  .duplicate-list .button { grid-column: 2; justify-self: start; }
+  .duplicate-actions .button { flex: 1; }
+  .anilist-modal-header { grid-template-columns: 46px minmax(0, 1fr) 38px; padding: 1rem; }
+  .anilist-modal-mark { width: 46px; height: 46px; }
+  .anilist-modal-header p { display: none; }
+  .anilist-modal-close { width: 38px; height: 38px; }
+  .anilist-picker { padding: 1rem; }
+  .anilist-search { grid-template-columns: 1fr; }
+  .anilist-match-grid { grid-template-columns: 1fr; }
+  .extension-row { grid-template-columns: 42px minmax(0, 1fr); }
+  .extension-row img { width: 42px; height: 42px; }
+  .extension-actions { grid-column: 2; }
+  .sources-page .extension-row { grid-template-columns: 42px minmax(0, 1fr) auto; gap: 0.65rem; }
+  .sources-page .extension-actions { grid-column: auto; gap: 0.35rem; }
+  .sources-page .source-icon-button { width: 40px; min-width: 40px; height: 40px; }
+  .result-row { grid-template-columns: 64px minmax(0, 1fr); }
+  .result-row img { width: 64px; }
+  .result-row > .button { grid-column: 2; justify-self: start; }
+  .source-search-progress > div:first-child { align-items: flex-start; flex-direction: column; gap: 0.3rem; }
+  .settings-card { grid-template-columns: 1fr; gap: 1rem; }
+  .connection-action { justify-content: flex-start; flex-wrap: wrap; }
+  /* The actions drop under the account rather than squeezing the name off the banner. Matched on
+     `.anilist-pane .anilist-banner` because that is the specificity the pane's own rule carries; on
+     `.anilist-banner` alone this loses and the three-column grid survives into the phone layout. */
+  .anilist-pane .anilist-banner { grid-template-columns: auto minmax(0, 1fr); gap: 1rem; padding: 1.1rem 1.15rem; }
+  .tracker-avatar { width: 62px; height: 62px; }
+  .anilist-banner-actions { grid-column: 2; justify-content: flex-start; }
+  .theme-options, .language-options { justify-content: flex-start; }
+  .manga-hero { grid-template-columns: 110px minmax(0, 1fr); gap: 1.2rem; align-items: start; }
+  .manga-hero h1 { font-size: 2rem; }
+  .manga-hero .summary { grid-column: 1 / -1; }
+  .section-heading { align-items: flex-start; flex-direction: column; }
+  .chapter-controls { width: 100%; }
+  .source-select.compact-select { flex: 1; }
+  .source-select.compact-select select { width: 100%; min-width: 0; }
+  .continue-card { grid-template-columns: 1fr; }
+  .continue-card .continue-button { justify-self: stretch; }
+  .chapter-list a { align-items: flex-start; }
+  .chapter-meta { align-items: flex-end; flex-direction: column; gap: 0.35rem; }
+  .torrent-row { grid-template-columns: minmax(0, 1fr) auto; }
+  .torrent-row > .button { grid-column: 1 / -1; justify-self: start; }
+  .reader-shell { --reader-panel-width: min(330px, 90vw); }
+  .reader-stage, .reader-shell.panel-open .reader-stage { width: 100vw; }
+  .reader-panel { box-shadow: -18px 0 55px rgba(0, 0, 0, 0.35); }
+  /* Touch targets, on the one panel that is used with a thumb mid-chapter. */
+  .reader-options-toggle { width: 38px; height: 38px; }
+  .reader-title-block.with-action { grid-template-columns: 24px minmax(0, 1fr) 38px; }
+  /* The popup meets the bottom edge, where the thumb already is. */
+  .reader-options-backdrop { place-items: end center; padding: 0.8rem; }
+  .reader-options-dialog { width: 100%; max-height: 86vh; border-radius: 12px 12px 22px 12px; }
+  .reader-choice { min-height: 44px; }
+  .reader-shell.panel-open::after { content: ""; position: fixed; inset: 0 var(--reader-panel-width) 0 0; z-index: 20; background: rgba(0, 0, 0, 0.38); pointer-events: none; }
+  .paged-reader { min-height: calc(100vh - var(--reader-bar-block)); grid-template-columns: 34px minmax(0, auto) 34px; }
+  .paged-reader img, .reader-shell.panel-closed .paged-reader img { max-width: calc(100vw - var(--reader-bar-inline) - 68px); }
+  /* No chevron on touch: there is no hover to reveal it, and a permanent one sits on the artwork. */
+  .page-hit { color: transparent; }
+  .page-hit svg { width: 22px; height: 22px; }
+  .reader-footer, .reader-shell.panel-closed .reader-footer { width: 100vw; }
+  /* The panel covers the whole screen on a phone, so a right-hand rail underneath it would be a rail
+     nobody can see. It stays on the edge of the viewport instead. */
+  .reader-rail.at-right, .reader-shell.panel-closed .reader-rail.at-right { right: 0; }
+  .fit-width .paged-reader img { width: 100%; }
+  .strip-reader { width: 100%; }
+}
+
+@media (max-width: 520px) {
+  .app-header { padding-top: 0.35rem; padding-bottom: 0.45rem; flex-wrap: wrap; justify-content: center; }
+  .brand { width: 100%; justify-content: center; }
+  .brand-mark { width: 92px; height: 78px; }
+  .topnav { width: 100%; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .topnav a { padding-inline: 0.2rem; text-align: center; }
+}
+
+@media (max-width: 360px) {
+  .app-header { gap: 0.3rem; }
+  .brand-mark { width: 62px; height: 64px; }
+  .topnav a { padding-inline: 0.15rem; font-size: 0.68rem; }
+}
+
+/* Settings — the rail-and-pane layout. One section shows at a time, the account sits in the rail as
+   a chip, and AniList is a pane of its own rather than a card in a stack.
+   Everything below uses the existing theme variables, so light and dark follow automatically. */
+
+/* The one colour this patch introduces: readable ink on an aqua fill, which flips with the theme.
+   Everything else is an existing token from index.css. */
+.settings-page { --on-aqua: #ffffff; }
+:root[data-theme="dark"] .settings-page { --on-aqua: #0d1424; }
+
+/* Shell ---------------------------------------------------------------------------------------- */
+
+.settings-page.settings-shell {
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  gap: 0;
+  /* start, not stretch: the rail is as tall as its own contents, so the account chip sits under the
+     section list instead of being pushed to the floor of whichever pane is showing. */
+  align-items: start;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.settings-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  min-width: 0;
+  padding: 36px 0 48px 38px;
+  /* The divider belongs to the pane, so it runs the full height of the page's content even though the
+     rail beside it is short. */
+  border-left: 1px solid var(--line);
+}
+
+.settings-pane-header .eyebrow {
+  display: block;
+  margin-bottom: 9px;
+  color: var(--aqua);
+  font: 700 0.68rem/1.2 ui-monospace, Consolas, monospace;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.settings-pane-header h1 {
+  margin: 0;
+  font-family: Bahnschrift, "Arial Narrow", sans-serif;
+  font-stretch: condensed;
+  letter-spacing: -0.035em;
+  font-size: 2.4rem;
+  line-height: 0.96;
+}
+
+/* Rail ----------------------------------------------------------------------------------------- */
+
+.settings-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 36px 14px 20px 0;
+  /* Sticky, so a long pane — the backup list runs to a couple of thousand pixels — scrolls past the
+     rail rather than dragging it out of reach. */
+  position: sticky;
+  top: 24px;
+  align-self: start;
+}
+
+.settings-rail-label {
+  padding: 0 12px 12px;
+  color: var(--ink-soft);
+  font: 700 0.66rem/1 ui-monospace, Consolas, monospace;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.settings-rail-item {
+  padding: 11px 12px;
+  border: 0;
+  border-radius: 5px 5px 14px 5px;
+  background: none;
+  color: var(--ink-soft);
+  font: 600 0.92rem/1.2 inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.settings-rail-item:hover { background: var(--surface); color: var(--ink); }
+
+.settings-rail-item.active {
+  background: var(--aqua-soft);
+  box-shadow: inset 3px 0 0 var(--aqua);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* Identity chip in the rail -------------------------------------------------------------------- */
+
+/* A measured gap, not `margin-top: auto`: the chip belongs to the rail, and pinning it to the bottom
+   of the viewport-tall column is what made it drift with the pane's height. */
+.account-rail { margin-top: 28px; }
+
+.account-rail-chip {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 11px;
+  align-items: center;
+  padding: 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px 6px 16px 6px;
+}
+
+.account-rail-chip .account-monogram {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--aqua);
+  color: var(--on-aqua);
+  font: 800 1rem/1 Bahnschrift, "Arial Narrow", sans-serif;
+}
+
+.account-rail-who { min-width: 0; }
+
+.account-rail-who strong {
+  display: block;
+  font-size: 0.88rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-rail-who small {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+  color: var(--aqua);
+  font: 700 0.62rem/1 ui-monospace, Consolas, monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.account-rail-signout { width: 30px; height: 30px; border-radius: 8px; }
+
+/* AniList pane --------------------------------------------------------------------------------- */
+
+.anilist-pane { display: flex; flex-direction: column; gap: 26px; }
+
+/* The banner keeps its class so the existing avatar and status-dot rules still apply; only the
+   grid and the actions column change. */
+.anilist-pane .anilist-banner {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 20px;
+  align-items: center;
+  padding: 20px 22px;
+}
+
+.anilist-pane .anilist-banner h2 {
+  margin: 0;
+  font: 800 1.5rem/1.05 Bahnschrift, "Arial Narrow", sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.anilist-banner-note { color: var(--ink-soft); font: 700 0.74rem/1.2 ui-monospace, Consolas, monospace; }
+
+.anilist-banner-actions { display: flex; align-items: center; gap: 10px; }
+
+/* Import is the one slow, whole-library action on this pane, so it carries its word. */
+.settings-text-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 16px;
+  border: 0;
+  border-radius: 6px 6px 16px 6px;
+  background: var(--aqua);
+  color: var(--on-aqua);
+  font: 700 0.88rem/1 inherit;
+  cursor: pointer;
+}
+
+.settings-text-button:hover { filter: brightness(1.08); }
+.settings-text-button:disabled { opacity: 0.6; cursor: default; }
+.settings-text-button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+
+.anilist-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+
+.anilist-stats > div {
+  padding: 18px 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px 6px 18px 6px;
+}
+
+.anilist-stats strong {
+  display: block;
+  font: 800 2rem/1 Bahnschrift, "Arial Narrow", sans-serif;
+  letter-spacing: -0.03em;
+}
+
+.anilist-stats small {
+  display: block;
+  margin-top: 8px;
+  color: var(--ink-soft);
+  font: 700 0.7rem/1 ui-monospace, Consolas, monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Shelf split ---------------------------------------------------------------------------------- */
+
+.anilist-split-heading { padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+
+.anilist-split-heading h2 {
+  margin: 0;
+  font-family: Bahnschrift, "Arial Narrow", sans-serif;
+  font-stretch: condensed;
+  letter-spacing: -0.035em;
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.anilist-split-bar {
+  display: flex;
+  height: 12px;
+  margin-top: 18px;
+  background: var(--surface);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.anilist-split-part.part-0 { background: var(--aqua); }
+.anilist-split-part.part-1 { background: color-mix(in oklab, var(--aqua) 55%, var(--paper)); }
+.anilist-split-part.part-2 { background: var(--line); }
+
+.anilist-split-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  margin-top: 14px;
+  color: var(--ink-soft);
+  font: 700 0.75rem/1.2 ui-monospace, Consolas, monospace;
+}
+
+.anilist-split-legend span { display: inline-flex; align-items: center; gap: 8px; }
+.anilist-split-legend i { width: 9px; height: 9px; border-radius: 2px; }
+.anilist-split-legend i.part-0 { background: var(--aqua); }
+.anilist-split-legend i.part-1 { background: color-mix(in oklab, var(--aqua) 55%, var(--paper)); }
+.anilist-split-legend i.part-2 { background: var(--line); }
+
+/* Library statistics ---------------------------------------------------------------------------
+   The tiles borrow the connection pane's numerals so a count reads the same wherever it is shown,
+   but in threes: six numbers in two columns would run the card down the page. */
+
+.library-stats {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 1.2rem;
+}
+
+.library-stats > div {
+  padding: 18px 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px 6px 18px 6px;
+}
+
+.library-stats strong {
+  display: block;
+  font: 800 1.85rem/1 Bahnschrift, "Arial Narrow", sans-serif;
+  letter-spacing: -0.03em;
+}
+
+.library-stats small {
+  display: block;
+  margin-top: 8px;
+  color: var(--ink-soft);
+  font: 700 0.7rem/1.3 ui-monospace, Consolas, monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.library-stats-note {
+  grid-column: 1 / -1;
+  margin: 1rem 0 0;
+  color: var(--ink-soft);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+/* Narrow ---------------------------------------------------------------------------------------
+   Under 820px the rail lays out as a scrolling row of sections and the chip goes back to the top,
+   because a 230px column beside content is not a layout a phone has room for. */
+
+@media (max-width: 820px) {
+  .settings-page.settings-shell { grid-template-columns: minmax(0, 1fr); }
+
+  .settings-rail {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    padding: 20px 0 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .settings-rail-label { display: none; }
+  .settings-pane { border-left: 0; }
+  .account-rail { order: -1; margin: 0 0 18px; padding: 0; }
+  .settings-pane { padding: 26px 0 40px; }
+  .anilist-stats { grid-template-columns: minmax(0, 1fr); }
+  .library-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* — Source catalogue dialog —
+   The Sources tab lists the sources you have installed; finding new ones is a different errand, and
+   it happens here. A dialog rather than a second page: you come back to the same list you left,
+   with one more row on it. */
+
+.catalogue-modal-backdrop { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; padding: 4vw; background: rgba(7, 13, 26, 0.72); backdrop-filter: blur(8px); }
+
+/* A column, not a scrolling block: the search field and the footer count stay put and only the list
+   of results moves, so the filters you are working with never scroll off the top. */
+.catalogue-modal { width: min(720px, 100%); max-height: 88vh; display: flex; flex-direction: column; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px 8px 26px 8px; box-shadow: 0 30px 90px rgba(0, 0, 0, 0.4); overflow: hidden; }
+.catalogue-modal-header { display: grid; grid-template-columns: minmax(0, 1fr) 42px; align-items: center; gap: 1rem; padding: 1.35rem 1.4rem 0.9rem; }
+.catalogue-modal-header h2 { margin: 0; }
+.catalogue-modal .source-toolbar { grid-template-columns: minmax(0, 1fr) auto auto; margin: 0; padding: 0 1.4rem 1rem; }
+.catalogue-modal .catalogue-callout { margin: 0 1.4rem 1.4rem; }
+.catalogue-results { padding: 0 1.4rem 0.4rem; overflow-y: auto; }
+.catalogue-modal-foot { padding: 0.9rem 1.4rem 1.3rem; color: var(--ink-soft); font: 700 0.72rem/1.6 ui-monospace, Consolas, monospace; }
+.catalogue-modal-foot p { margin: 0; }
+.catalogue-modal-foot a { color: inherit; }
+
+/* Where the install button was, once the extension is installed: same footprint, so the row does not
+   reflow under the pointer the moment you click it. */
+.extension-installed-mark { width: 42px; min-width: 42px; height: 42px; display: inline-grid; place-items: center; color: var(--aqua-ink); background: var(--aqua-soft); border: 1px solid var(--aqua); border-radius: 50% 50% 14px 50%; }
+.extension-installed-mark svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Under 720px `.search-box` becomes a column so Discover's submit button can have a row of its own.
+   The source search boxes have no button — only the field and a decorative mark — so a column just
+   makes them twice as tall as they need to be. */
+.source-search-box { flex-direction: row; }
+
+/* The empty tab is itself the invitation: the sentence and the button that answers it, side by side
+   on one line, rather than the tall left-aligned column `.state-panel` lays out by default. */
+.sources-empty { min-height: 0; flex-direction: row; align-items: center; justify-content: flex-start; gap: 1.25rem; padding: 1.5rem 0; }
+.sources-empty p { margin: 0; }
+
+@media (max-width: 720px) {
+  .catalogue-modal-backdrop { padding: 1rem; place-items: end center; }
+  .catalogue-modal { width: 100%; max-height: 90vh; border-radius: 14px 14px 24px 14px; }
+  .catalogue-modal-header { padding: 1rem 1rem 0.8rem; }
+  .catalogue-modal .source-toolbar { padding: 0 1rem 0.8rem; }
+  .catalogue-modal .catalogue-callout { margin: 0 1rem 1rem; }
+  .catalogue-results { padding: 0 1rem 0.4rem; }
+  .catalogue-modal-foot { padding: 0.8rem 1rem 1.1rem; }
+  .sources-empty { flex-direction: column; align-items: flex-start; gap: 1rem; }
+}

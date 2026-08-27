@@ -1,0 +1,1020 @@
+"""
+The whole API the Inkstream UI speaks, and nothing else.
+
+This is deliberately not the Suwayomi schema. It is the subset that the client
+actually sends — every operation in web/src was read off and represented here —
+so that the surface to implement is finite and each resolver group can be built
+against a contract that is already fixed.
+
+Two conventions carried over from the server this replaces, because the client
+depends on both:
+
+  * `LongString` is a 64-bit integer serialised as a decimal string. Every
+    epoch-millisecond field uses it (lastReadAt, uploadDate, inLibraryAt), as do
+    source ids and tracker remote ids.
+  * List arguments accept a single object (GraphQL input coercion), which is why
+    `order: { by: SOURCE_ORDER }` and `order: [{ by: LAST_READ_AT, byType: DESC }]`
+    are both valid against the same field.
+"""
+
+scalar LongString
+scalar Upload
+
+# ------------------------------------------------------------------- enums --
+
+enum MangaStatus {
+  UNKNOWN
+  ONGOING
+  COMPLETED
+  LICENSED
+  PUBLISHING_FINISHED
+  CANCELLED
+  ON_HIATUS
+}
+
+enum ContentWarning {
+  SAFE
+  MIXED
+  NSFW
+}
+
+enum FetchSourceMangaType {
+  POPULAR
+  LATEST
+  SEARCH
+}
+
+enum TriState {
+  IGNORE
+  INCLUDE
+  EXCLUDE
+}
+
+enum SortOrder {
+  ASC
+  DESC
+}
+
+enum ChapterOrderBy {
+  ID
+  SOURCE_ORDER
+  CHAPTER_NUMBER
+  UPLOAD_DATE
+  LAST_READ_AT
+  FETCHED_AT
+}
+
+enum MangaOrderBy {
+  ID
+  TITLE
+  IN_LIBRARY_AT
+}
+
+enum ExtensionOrderBy {
+  PKG_NAME
+  NAME
+  LANG
+}
+
+enum DownloadState {
+  QUEUED
+  DOWNLOADING
+  FINISHED
+  ERROR
+}
+
+enum DownloaderState {
+  STARTED
+  STOPPED
+}
+
+enum BackupRestoreState {
+  IDLE
+  SUCCESS
+  FAILURE
+  RESTORING_CATEGORIES
+  RESTORING_MANGA
+  RESTORING_META
+  RESTORING_SETTINGS
+}
+
+# ------------------------------------------------------------------ source --
+
+type SourceType {
+  id: LongString!
+  name: String!
+  lang: String!
+  iconUrl: String
+  supportsLatest: Boolean!
+  contentWarning: ContentWarning!
+  isNsfw: Boolean!
+  displayName: String!
+  """The questions this source knows how to answer, in the order their position means."""
+  filters: [Filter!]!
+}
+
+type SourceNodeList {
+  nodes: [SourceType!]!
+  totalCount: Int!
+}
+
+"""
+A union rather than an interface: the eight shapes share only a name, and the
+three `default` fields have three different types, which the client aliases apart.
+"""
+union Filter =
+    HeaderFilter
+  | SeparatorFilter
+  | SelectFilter
+  | TextFilter
+  | CheckBoxFilter
+  | TriStateFilter
+  | SortFilter
+  | GroupFilter
+
+type HeaderFilter {
+  name: String!
+}
+
+type SeparatorFilter {
+  name: String!
+}
+
+type SelectFilter {
+  name: String!
+  values: [String!]!
+  default: Int!
+}
+
+type TextFilter {
+  name: String!
+  default: String!
+}
+
+type CheckBoxFilter {
+  name: String!
+  default: Boolean!
+}
+
+type TriStateFilter {
+  name: String!
+  default: TriState!
+}
+
+type SortSelection {
+  index: Int!
+  ascending: Boolean!
+}
+
+type SortFilter {
+  name: String!
+  values: [String!]!
+  """Null when the source ships no sort preference of its own."""
+  default: SortSelection
+}
+
+type GroupFilter {
+  name: String!
+  """One level deep only — a group inside a group could never be sent back."""
+  filters: [Filter!]!
+}
+
+"""
+Going the other way the shape is flat, not polymorphic: one input carries
+whichever state field belongs to the filter sitting at `position`.
+"""
+input FilterChangeInput {
+  position: Int!
+  selectState: Int
+  textState: String
+  checkBoxState: Boolean
+  triState: TriState
+  sortState: SortSelectionInput
+  groupChange: FilterChangeInput
+}
+
+input SortSelectionInput {
+  index: Int!
+  ascending: Boolean!
+}
+
+# ----------------------------------------------------------------- library --
+
+type MangaType {
+  id: Int!
+  sourceId: LongString!
+  url: String!
+  title: String!
+  """Server-relative and same-origin, so it rides the session cookie."""
+  thumbnailUrl: String
+  artist: String
+  author: String
+  description: String
+  genre: [String!]!
+  status: MangaStatus!
+  realUrl: String
+  inLibrary: Boolean!
+  inLibraryAt: LongString!
+  initialized: Boolean!
+  source: SourceType
+  chapters(
+    condition: ChapterConditionInput
+    filter: ChapterFilterInput
+    order: [ChapterOrderInput!]
+    first: Int
+  ): ChapterNodeList!
+  """Never includes the virtual Default category (id 0)."""
+  categories: CategoryNodeList!
+  meta: [MangaMetaType!]!
+  trackRecords: TrackRecordNodeList!
+}
+
+type MangaNodeList {
+  nodes: [MangaType!]!
+  totalCount: Int!
+}
+
+input MangaConditionInput {
+  id: Int
+  inLibrary: Boolean
+  sourceId: LongString
+}
+
+input MangaFilterInput {
+  id: IntFilterInput
+  inLibrary: BooleanFilterInput
+  sourceId: LongFilterInput
+}
+
+input MangaOrderInput {
+  by: MangaOrderBy!
+  byType: SortOrder
+}
+
+input UpdateMangaPatchInput {
+  inLibrary: Boolean
+}
+
+input UpdateMangaInput {
+  id: Int!
+  patch: UpdateMangaPatchInput!
+}
+
+input UpdateMangasInput {
+  ids: [Int!]!
+  patch: UpdateMangaPatchInput!
+}
+
+type UpdateMangaPayload {
+  manga: MangaType!
+}
+
+type UpdateMangasPayload {
+  mangas: [MangaType!]!
+}
+
+input FetchMangaAndChaptersInput {
+  id: Int!
+  fetchManga: Boolean
+  fetchChapters: Boolean
+}
+
+type FetchMangaAndChaptersPayload {
+  manga: MangaType!
+  chapters: [ChapterType!]!
+}
+
+# ---------------------------------------------------------------- chapters --
+
+type ChapterType {
+  id: Int!
+  mangaId: Int!
+  manga: MangaType!
+  url: String!
+  name: String!
+  scanlator: String
+  chapterNumber: Float!
+  """
+  Position in the list the source returned, 1-based. This — not the row id — is
+  what the reader's routes carry.
+  """
+  sourceOrder: Int!
+  uploadDate: LongString!
+  realUrl: String
+  isRead: Boolean!
+  isBookmarked: Boolean!
+  isDownloaded: Boolean!
+  lastPageRead: Int!
+  """
+  Stamped by the reader's progress PATCH only. updateChapters(isRead) leaves it
+  alone, so catching up on a backlog does not fill the continue-reading shelf.
+  """
+  lastReadAt: LongString!
+  pageCount: Int!
+  fetchedAt: LongString!
+}
+
+type ChapterNodeList {
+  nodes: [ChapterType!]!
+  totalCount: Int!
+}
+
+input ChapterConditionInput {
+  id: Int
+  mangaId: Int
+  isRead: Boolean
+  isDownloaded: Boolean
+  isBookmarked: Boolean
+}
+
+input ChapterFilterInput {
+  id: IntFilterInput
+  mangaId: IntFilterInput
+  isRead: BooleanFilterInput
+  isDownloaded: BooleanFilterInput
+  isBookmarked: BooleanFilterInput
+  lastReadAt: LongFilterInput
+}
+
+input ChapterOrderInput {
+  by: ChapterOrderBy!
+  byType: SortOrder
+}
+
+input UpdateChapterPatchInput {
+  isRead: Boolean
+  isBookmarked: Boolean
+  lastPageRead: Int
+}
+
+input UpdateChaptersInput {
+  ids: [Int!]!
+  patch: UpdateChapterPatchInput!
+}
+
+type UpdateChaptersPayload {
+  chapters: [ChapterType!]!
+}
+
+input FetchChaptersInput {
+  mangaId: Int!
+}
+
+type FetchChaptersPayload {
+  chapters: [ChapterType!]!
+}
+
+input FetchChapterPagesInput {
+  chapterId: Int!
+}
+
+type FetchChapterPagesPayload {
+  """Same-origin relative URLs, used directly as <img src>."""
+  pages: [String!]!
+  chapter: ChapterType!
+}
+
+# ------------------------------------------------------------------ filters --
+
+input IntFilterInput {
+  equalTo: Int
+  notEqualTo: Int
+  in: [Int!]
+  notIn: [Int!]
+  greaterThan: Int
+  lessThan: Int
+}
+
+input LongFilterInput {
+  equalTo: LongString
+  notEqualTo: LongString
+  in: [LongString!]
+  greaterThan: LongString
+  lessThan: LongString
+}
+
+input BooleanFilterInput {
+  equalTo: Boolean
+  notEqualTo: Boolean
+}
+
+input StringFilterInput {
+  equalTo: String
+  notEqualTo: String
+  in: [String!]
+  includesInsensitive: String
+}
+
+# -------------------------------------------------------- source browsing --
+
+input FetchSourceMangaInput {
+  source: LongString!
+  type: FetchSourceMangaType!
+  page: Int!
+  query: String
+  filters: [FilterChangeInput!]
+}
+
+type FetchSourceMangaPayload {
+  hasNextPage: Boolean!
+  mangas: [MangaType!]!
+}
+
+"""
+Search several sources in one request. The client fans out over the sources a
+person actually reads from, and a source that fails must not fail the others —
+hence a per-source error rather than a top-level one.
+"""
+input FetchSourceMangaBulkInput {
+  sources: [LongString!]!
+  type: FetchSourceMangaType!
+  page: Int!
+  query: String
+}
+
+type BulkSourceResult {
+  source: LongString!
+  error: String
+  mangas: [MangaType!]!
+}
+
+type FetchSourceMangaBulkPayload {
+  results: [BulkSourceResult!]!
+}
+
+# -------------------------------------------------------------- extensions --
+
+type ExtensionType {
+  pkgName: String!
+  name: String!
+  lang: String!
+  versionName: String!
+  iconUrl: String
+  contentWarning: ContentWarning!
+  isNsfw: Boolean!
+  isInstalled: Boolean!
+  hasUpdate: Boolean!
+  isObsolete: Boolean!
+  source: SourceNodeList!
+}
+
+type ExtensionNodeList {
+  nodes: [ExtensionType!]!
+  totalCount: Int!
+}
+
+input ExtensionOrderInput {
+  by: ExtensionOrderBy!
+  byType: SortOrder
+}
+
+input UpdateExtensionPatchInput {
+  install: Boolean
+  update: Boolean
+  uninstall: Boolean
+}
+
+input UpdateExtensionInput {
+  id: String!
+  patch: UpdateExtensionPatchInput!
+}
+
+type UpdateExtensionPayload {
+  extension: ExtensionType!
+}
+
+input FetchExtensionsInput {
+  clientMutationId: String
+}
+
+type FetchExtensionsPayload {
+  extensions: [ExtensionType!]!
+}
+
+type ExtensionStoreType {
+  name: String!
+  indexUrl: String!
+}
+
+type ExtensionStoreNodeList {
+  nodes: [ExtensionStoreType!]!
+  totalCount: Int!
+}
+
+input AddExtensionStoreInput {
+  indexUrl: String!
+}
+
+type AddExtensionStorePayload {
+  extensionStore: ExtensionStoreType!
+}
+
+# -------------------------------------------------------------- categories --
+
+"""
+Category id 0 ("Default") is virtual: everything filed nowhere else. It is never
+returned by `manga.categories`, and filing into it is refused rather than
+silently ignored.
+"""
+type CategoryType {
+  id: Int!
+  name: String!
+  order: Int!
+  default: Boolean!
+  mangas: MangaNodeList!
+}
+
+type CategoryNodeList {
+  nodes: [CategoryType!]!
+  totalCount: Int!
+}
+
+input CreateCategoryInput {
+  name: String!
+}
+
+type CreateCategoryPayload {
+  category: CategoryType!
+}
+
+input UpdateCategoryPatchInput {
+  name: String
+}
+
+input UpdateCategoryInput {
+  id: Int!
+  patch: UpdateCategoryPatchInput!
+}
+
+type UpdateCategoryPayload {
+  category: CategoryType!
+}
+
+input DeleteCategoryInput {
+  categoryId: Int!
+}
+
+type DeleteCategoryPayload {
+  category: CategoryType
+}
+
+input UpdateCategoryOrderInput {
+  id: Int!
+  position: Int!
+}
+
+type UpdateCategoryOrderPayload {
+  """The whole list, renumbered."""
+  categories: [CategoryType!]!
+}
+
+input UpdateMangasCategoriesPatchInput {
+  addToCategories: [Int!]
+  removeFromCategories: [Int!]
+  clearCategories: Boolean
+}
+
+input UpdateMangasCategoriesInput {
+  ids: [Int!]!
+  patch: UpdateMangasCategoriesPatchInput!
+}
+
+type UpdateMangasCategoriesPayload {
+  mangas: [MangaType!]!
+}
+
+# --------------------------------------------------------------- downloads --
+
+type DownloadType {
+  chapter: ChapterType!
+  manga: MangaType!
+  position: Int!
+  progress: Float!
+  state: DownloadState!
+  tries: Int!
+}
+
+type DownloadStatus {
+  state: DownloaderState!
+  queue: [DownloadType!]!
+}
+
+input EnqueueChapterDownloadsInput {
+  ids: [Int!]!
+}
+
+input DequeueChapterDownloadsInput {
+  ids: [Int!]!
+}
+
+input StartDownloaderInput {
+  clientMutationId: String
+}
+
+input StopDownloaderInput {
+  clientMutationId: String
+}
+
+input ClearDownloaderInput {
+  clientMutationId: String
+}
+
+input ReorderChapterDownloadInput {
+  chapterId: Int!
+  """Zero-based index in the queue."""
+  to: Int!
+}
+
+input DeleteDownloadedChaptersInput {
+  ids: [Int!]!
+}
+
+type DownloadStatusPayload {
+  downloadStatus: DownloadStatus!
+}
+
+type DeleteDownloadedChaptersPayload {
+  chapters: [ChapterType!]!
+}
+
+# ----------------------------------------------------------------- backups --
+
+type CreateBackupPayload {
+  """A same-origin relative path, downloaded through an anchor."""
+  url: String!
+}
+
+input CreateBackupInput {
+  includeManga: Boolean
+  includeCategories: Boolean
+  includeChapters: Boolean
+  includeTracking: Boolean
+  includeHistory: Boolean
+  includeClientData: Boolean
+  includeServerSettings: Boolean
+}
+
+input ValidateBackupInput {
+  backup: Upload!
+}
+
+type ValidateBackupSource {
+  id: LongString!
+  name: String!
+}
+
+type ValidateBackupTracker {
+  name: String!
+}
+
+type ValidateBackupResult {
+  missingSources: [ValidateBackupSource!]!
+  missingTrackers: [ValidateBackupTracker!]!
+}
+
+input RestoreBackupInput {
+  backup: Upload!
+}
+
+type BackupRestoreStatus {
+  state: BackupRestoreState!
+  totalManga: Int!
+  mangaProgress: Int!
+}
+
+type RestoreBackupPayload {
+  id: String!
+  status: BackupRestoreStatus
+}
+
+type AutomatedBackupFile {
+  filename: String!
+  sizeBytes: LongString!
+  createdAt: LongString!
+}
+
+type AutomatedBackupsType {
+  lastRun: LongString
+  files: [AutomatedBackupFile!]!
+}
+
+input RestoreAutomatedBackupInput {
+  filename: String!
+}
+
+# ---------------------------------------------------------------- settings --
+
+type SettingsType {
+  """Hours between automated backups; 0 disables them."""
+  backupInterval: Int!
+  """Local time of day, "HH:MM"."""
+  backupTime: String!
+  """Days an automated backup is kept; 0 keeps them forever."""
+  backupTTL: Int!
+  autoBackupIncludeManga: Boolean!
+  autoBackupIncludeCategories: Boolean!
+  autoBackupIncludeChapters: Boolean!
+  autoBackupIncludeTracking: Boolean!
+  autoBackupIncludeHistory: Boolean!
+  autoBackupIncludeClientData: Boolean!
+  autoBackupIncludeServerSettings: Boolean!
+}
+
+input PartialSettingsInput {
+  backupInterval: Int
+  backupTime: String
+  backupTTL: Int
+  autoBackupIncludeManga: Boolean
+  autoBackupIncludeCategories: Boolean
+  autoBackupIncludeChapters: Boolean
+  autoBackupIncludeTracking: Boolean
+  autoBackupIncludeHistory: Boolean
+  autoBackupIncludeClientData: Boolean
+  autoBackupIncludeServerSettings: Boolean
+}
+
+input SetSettingsInput {
+  settings: PartialSettingsInput!
+}
+
+type SetSettingsPayload {
+  settings: SettingsType!
+}
+
+# -------------------------------------------------------------------- meta --
+
+type GlobalMetaType {
+  key: String!
+  value: String!
+}
+
+type GlobalMetaNodeList {
+  nodes: [GlobalMetaType!]!
+  totalCount: Int!
+}
+
+type MangaMetaType {
+  mangaId: Int!
+  key: String!
+  value: String!
+}
+
+input MetaConditionInput {
+  key: String
+  value: String
+}
+
+input GlobalMetaInput {
+  key: String!
+  value: String!
+}
+
+input SetGlobalMetaInput {
+  meta: GlobalMetaInput!
+}
+
+type SetGlobalMetaPayload {
+  meta: GlobalMetaType!
+}
+
+input MangaMetaInput {
+  mangaId: Int!
+  key: String!
+  value: String!
+}
+
+input SetMangaMetaInput {
+  meta: MangaMetaInput!
+}
+
+type SetMangaMetaPayload {
+  meta: MangaMetaType!
+}
+
+input DeleteMangaMetaInput {
+  mangaId: Int!
+  key: String!
+}
+
+type DeleteMangaMetaPayload {
+  meta: MangaMetaType
+}
+
+# ---------------------------------------------------------------- tracking --
+
+type TrackerUserType {
+  name: String!
+  avatarUrl: String
+}
+
+type TrackerType {
+  id: Int!
+  name: String!
+  icon: String!
+  isLoggedIn: Boolean!
+  isTokenExpired: Boolean!
+  """Where to send the browser to start OAuth; the client rewrites `state`."""
+  authUrl: String
+  """Resolved from the tracker the first time it is asked for; null when unreachable."""
+  user: TrackerUserType
+}
+
+type TrackRecordType {
+  id: Int!
+  mangaId: Int!
+  trackerId: Int!
+  remoteId: LongString!
+  title: String!
+  lastChapterRead: Float!
+  totalChapters: Int!
+  status: Int!
+  """Non-null; 0 means never scored."""
+  score: Float!
+  remoteUrl: String!
+  startDate: LongString!
+  finishDate: LongString!
+}
+
+type TrackRecordNodeList {
+  nodes: [TrackRecordType!]!
+  totalCount: Int!
+}
+
+type TrackSearchType {
+  remoteId: LongString!
+  title: String!
+  coverUrl: String!
+  publishingStatus: String!
+  publishingType: String!
+  totalChapters: Int!
+  trackingUrl: String!
+  summary: String!
+}
+
+input SearchTrackerInput {
+  trackerId: Int!
+  query: String!
+}
+
+type SearchTrackerPayload {
+  trackSearches: [TrackSearchType!]!
+}
+
+input LoginTrackerOAuthInput {
+  trackerId: Int!
+  """The whole callback URL, fragment included — the token is in it."""
+  callbackUrl: String!
+}
+
+type LoginTrackerOAuthPayload {
+  isLoggedIn: Boolean!
+  tracker: TrackerType!
+}
+
+input LogoutTrackerInput {
+  trackerId: Int!
+}
+
+type LogoutTrackerPayload {
+  isLoggedIn: Boolean!
+  tracker: TrackerType!
+}
+
+input BindTrackInput {
+  mangaId: Int!
+  trackerId: Int!
+  remoteId: LongString!
+}
+
+"""
+Attach a record that already exists to a second manga row. A series read through
+a bound source has two rows — the library entry and the source manga — and both
+must point at one remote record rather than two.
+"""
+input BindTrackRecordInput {
+  mangaId: Int!
+  trackRecordId: Int!
+}
+
+input UnbindTrackInput {
+  recordId: Int!
+  deleteRemoteTrack: Boolean
+}
+
+input FetchTrackInput {
+  recordId: Int!
+}
+
+type TrackRecordPayload {
+  trackRecord: TrackRecordType!
+}
+
+type UnbindTrackPayload {
+  trackRecord: TrackRecordType
+}
+
+input ImportAnilistLibraryInput {
+  clientMutationId: String
+}
+
+"""
+Every title on the connected AniList account, as library shells with no chapters
+and a url of `anilist:<mediaId>`. Each is bound to a real source afterwards,
+which the client records in the manga's own meta.
+"""
+type ImportAnilistLibraryPayload {
+  manga: [MangaType!]!
+}
+
+# ------------------------------------------------------------------- roots --
+
+type Query {
+  mangas(
+    condition: MangaConditionInput
+    filter: MangaFilterInput
+    order: [MangaOrderInput!]
+    first: Int
+  ): MangaNodeList!
+  manga(id: Int!): MangaType
+
+  chapters(
+    condition: ChapterConditionInput
+    filter: ChapterFilterInput
+    order: [ChapterOrderInput!]
+    first: Int
+  ): ChapterNodeList!
+  chapter(id: Int!): ChapterType
+
+  categories: CategoryNodeList!
+  category(id: Int!): CategoryType
+
+  sources: SourceNodeList!
+  source(id: LongString!): SourceType
+
+  extensions(order: [ExtensionOrderInput!]): ExtensionNodeList!
+  extensionStores: ExtensionStoreNodeList!
+
+  downloadStatus: DownloadStatus!
+
+  metas(condition: MetaConditionInput): GlobalMetaNodeList!
+
+  settings: SettingsType!
+
+  tracker(id: Int!): TrackerType
+  searchTracker(input: SearchTrackerInput!): SearchTrackerPayload!
+
+  validateBackup(input: ValidateBackupInput!): ValidateBackupResult!
+  restoreStatus(id: String!): BackupRestoreStatus
+  automatedBackups: AutomatedBackupsType!
+  validateAutomatedBackup(filename: String!): ValidateBackupResult!
+}
+
+type Mutation {
+  updateManga(input: UpdateMangaInput!): UpdateMangaPayload!
+  updateMangas(input: UpdateMangasInput!): UpdateMangasPayload!
+  fetchMangaAndChapters(input: FetchMangaAndChaptersInput!): FetchMangaAndChaptersPayload!
+
+  fetchChapters(input: FetchChaptersInput!): FetchChaptersPayload!
+  fetchChapterPages(input: FetchChapterPagesInput!): FetchChapterPagesPayload!
+  updateChapters(input: UpdateChaptersInput!): UpdateChaptersPayload!
+
+  fetchSourceManga(input: FetchSourceMangaInput!): FetchSourceMangaPayload!
+  fetchSourceMangaBulk(input: FetchSourceMangaBulkInput!): FetchSourceMangaBulkPayload!
+
+  updateExtension(input: UpdateExtensionInput!): UpdateExtensionPayload!
+  fetchExtensions(input: FetchExtensionsInput!): FetchExtensionsPayload!
+  addExtensionStore(input: AddExtensionStoreInput!): AddExtensionStorePayload!
+
+  createCategory(input: CreateCategoryInput!): CreateCategoryPayload!
+  updateCategory(input: UpdateCategoryInput!): UpdateCategoryPayload!
+  deleteCategory(input: DeleteCategoryInput!): DeleteCategoryPayload!
+  updateCategoryOrder(input: UpdateCategoryOrderInput!): UpdateCategoryOrderPayload!
+  updateMangasCategories(input: UpdateMangasCategoriesInput!): UpdateMangasCategoriesPayload!
+
+  enqueueChapterDownloads(input: EnqueueChapterDownloadsInput!): DownloadStatusPayload!
+  dequeueChapterDownloads(input: DequeueChapterDownloadsInput!): DownloadStatusPayload!
+  startDownloader(input: StartDownloaderInput!): DownloadStatusPayload!
+  stopDownloader(input: StopDownloaderInput!): DownloadStatusPayload!
+  clearDownloader(input: ClearDownloaderInput!): DownloadStatusPayload!
+  reorderChapterDownload(input: ReorderChapterDownloadInput!): DownloadStatusPayload!
+  deleteDownloadedChapters(input: DeleteDownloadedChaptersInput!): DeleteDownloadedChaptersPayload!
+
+  createBackup(input: CreateBackupInput!): CreateBackupPayload!
+  restoreBackup(input: RestoreBackupInput!): RestoreBackupPayload!
+  restoreAutomatedBackup(input: RestoreAutomatedBackupInput!): RestoreBackupPayload!
+
+  setSettings(input: SetSettingsInput!): SetSettingsPayload!
+
+  setGlobalMeta(input: SetGlobalMetaInput!): SetGlobalMetaPayload!
+  setMangaMeta(input: SetMangaMetaInput!): SetMangaMetaPayload!
+  deleteMangaMeta(input: DeleteMangaMetaInput!): DeleteMangaMetaPayload!
+
+  loginTrackerOAuth(input: LoginTrackerOAuthInput!): LoginTrackerOAuthPayload!
+  logoutTracker(input: LogoutTrackerInput!): LogoutTrackerPayload!
+  bindTrack(input: BindTrackInput!): TrackRecordPayload!
+  bindTrackRecord(input: BindTrackRecordInput!): TrackRecordPayload!
+  unbindTrack(input: UnbindTrackInput!): UnbindTrackPayload!
+  fetchTrack(input: FetchTrackInput!): TrackRecordPayload!
+
+  importAnilistLibrary(input: ImportAnilistLibraryInput!): ImportAnilistLibraryPayload!
+}

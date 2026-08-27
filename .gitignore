@@ -1,0 +1,20 @@
+node_modules/
+dist/
+*.log
+
+# The live config carries a real origin and, on some deployments, a solver URL.
+# config.example.json is the one that is committed.
+server/config.json
+server/config.json.*
+
+# Runtime data: the database, downloads, backups, the page cache.
+state/
+data/
+*.db
+*.db-wal
+*.db-shm
+
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

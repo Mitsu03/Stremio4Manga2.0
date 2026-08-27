@@ -1,0 +1,101 @@
+# Stremio4Manga, as a systemd service.
+#
+# `install.sh` writes an adjusted copy of this file to
+# /etc/systemd/system/stremio4manga.service and substitutes the three paths
+# marked ADJUST. To install it by hand instead:
+#
+#   sudo cp deploy/stremio4manga.service /etc/systemd/system/
+#   sudo nano /etc/systemd/system/stremio4manga.service     # the ADJUST lines
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now stremio4manga
+#
+# docs/DEPLOY.md covers the rest: the config, TLS, backups, and moving a library
+# in from the old Suwayomi server.
+
+[Unit]
+Description=Stremio4Manga
+Documentation=https://github.com/Mitsu03/Stremio4Manga2.0
+# The server binds to loopback and needs nothing from the network to start, but
+# the first search reaches out to the scanlation sites, and a resolver that is
+# not up yet turns into a page of "source unreachable" rather than a retry.
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+
+# ADJUST: the account that owns the data. No login shell, no home of its own.
+User=stremio4manga
+Group=stremio4manga
+
+# ADJUST: where the tree was installed. config.json is read from server/ next to
+# dist/, so the working directory is not what finds it — but a relative path in
+# the config resolves against the config file, and a wrong WorkingDirectory is
+# still the fastest way to confuse a `node --inspect` session later.
+WorkingDirectory=/opt/stremio4manga
+
+# ADJUST: the output of `command -v node`. Absolute, because systemd's PATH is
+# /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin — not a login shell's, and
+# not whatever nvm or fnm put in front of it. Node 22 or newer: the database is
+# `node:sqlite`, which does not exist before 22.
+ExecStart=/usr/bin/node /opt/stremio4manga/server/dist/main.js
+
+Restart=always
+RestartSec=5
+
+# HOME and XDG_DATA_HOME are set explicitly because systemd sets NEITHER, and
+# the data directory derives from them: with no `dataDir` in config.json the
+# server falls back to $XDG_DATA_HOME/stremio4manga, and $XDG_DATA_HOME itself
+# falls back to $HOME/.local/share. A unit without these two lines writes the
+# database to whatever the process believes $HOME is — usually "/", where it
+# fails at the first write and not at start.
+#
+# install.sh also writes an explicit `dataDir` into config.json, so these are
+# the safety net rather than the mechanism: if that key is ever deleted, the
+# fallback lands in /var/lib/stremio4manga/stremio4manga, which is still inside
+# ReadWritePaths below and therefore degrades into a second directory instead of
+# a permission error nobody can read.
+Environment=HOME=/var/lib/stremio4manga
+Environment=XDG_DATA_HOME=/var/lib/stremio4manga
+
+# Creates /var/lib/stremio4manga owned by User= if it is missing, and adds it to
+# ReadWritePaths implicitly. Kept alongside the explicit entry below so the unit
+# still says out loud which directory it needs to write.
+StateDirectory=stremio4manga
+
+# SQLite closes on SIGTERM: the process stops the download worker and the backup
+# schedule, waits for open sockets, then closes the database. A reader mid-
+# chapter holds a socket, and a download in flight holds a write transaction, so
+# do not send SIGKILL after the usual 90 seconds either.
+TimeoutStopSec=120
+
+# There is deliberately no KillMode here.
+#
+# The deployment this replaces ran one JVM per account as a child process and
+# needed the whole control group taken down together. This is a single Node
+# process with no children, so the default (KillMode=control-group) is already
+# exactly right — adding a KillMode line now can only make shutdown worse, most
+# often by switching to `process` and leaving nothing behind to clean up anyway.
+
+# The server holds every account's library and sessions. It should be able to
+# touch its own data and nothing else on the machine.
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+
+# ProtectSystem=strict makes the entire filesystem read-only except for what is
+# listed here. ADJUST if the data directory moved. The install tree is
+# deliberately NOT writable: nothing in it is written at runtime, so a
+# compromised source parser cannot rewrite the server it runs inside.
+#
+# Anything else the deployment writes — a `logging.file` pointed outside the
+# data directory, a `dataDir` on another disk — has to be added here, or it
+# fails on first write rather than at start.
+ReadWritePaths=/var/lib/stremio4manga
+
+[Install]
+WantedBy=multi-user.target

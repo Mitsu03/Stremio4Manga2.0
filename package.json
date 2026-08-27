@@ -1,0 +1,21 @@
+{
+  "name": "stremio4manga",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "workspaces": [
+    "server",
+    "web"
+  ],
+  "scripts": {
+    "build": "npm run build -w server && npm run build -w web",
+    "lint": "npm run lint -w server && npm run lint -w web",
+    "start": "node server/dist/main.js",
+    "s4m": "node server/bin/s4m.js",
+    "test": "node test/smoke.mjs",
+    "test:offline": "node test/smoke.mjs --offline"
+  }
+}

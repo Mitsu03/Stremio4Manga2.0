@@ -1,0 +1,70 @@
+# TLS for Stremio4Manga.
+#
+# The server never terminates TLS. It speaks plain HTTP on 127.0.0.1:8080 and
+# expects something in front of it; Caddy obtains and renews the certificate on
+# its own, so this file plus a DNS record plus ports 80 and 443 is the whole of
+# it.
+#
+#   sudo cp deploy/Caddyfile.example /etc/caddy/Caddyfile
+#   sudo nano /etc/caddy/Caddyfile          # the domain, and the port if it moved
+#   sudo systemctl reload caddy
+#
+# Replace manga.example.com with the same host as `publicOrigin` in
+# server/config.json. They are compared on every state-changing request, so a
+# mismatch shows up as a CSRF rejection on sign-in, not as a redirect.
+
+manga.example.com {
+	reverse_proxy 127.0.0.1:8080 {
+		# Scanlation sites are slow, and the server is polite to them on purpose
+		# (one request at a time per host, spaced out — see the rate limits in
+		# server/src/sources/http.ts). A search across six catalogues, or a
+		# chapter whose pages come off a shared WordPress host, routinely takes
+		# longer than Caddy's default 0s/never-mind timeouts suggest.
+		#
+		# Without these the browser gets a 502 from Caddy while the server is
+		# still perfectly well waiting for the source, and the user learns to
+		# hammer reload — which is precisely the traffic pattern that gets this
+		# server's address banned.
+		transport http {
+			response_header_timeout 5m
+			read_timeout 5m
+		}
+	}
+
+	# The server sets its own security headers, but it cannot set this one: it
+	# has no way of knowing it is behind TLS. It sees http:// on loopback.
+	header Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+	# Page images are already compressed and gain nothing, but the GraphQL
+	# responses that drive the library are large JSON and gain a lot.
+	encode gzip
+
+	log {
+		output file /var/log/caddy/stremio4manga-access.log
+		format console
+	}
+}
+
+# ---------------------------------------------------------------------------
+# trustProxy, and why it is not a preference
+#
+# `trustProxy` in server/config.json decides whether X-Forwarded-For is believed.
+# It defaults to true, and it must match reality in both directions:
+#
+#   With this Caddyfile in front       trustProxy: true
+#       Every request reaches the server from 127.0.0.1. Without trust, the
+#       login rate limiter sees one client for the whole internet: eight failed
+#       attempts by anyone locks out everyone.
+#
+#   With nothing in front (loopback,   trustProxy: false
+#   LAN, a tunnel that does not
+#   rewrite the header)
+#       X-Forwarded-For is a header the client writes. Trusting it means an
+#       attacker sends a different one on every attempt, never fills a bucket,
+#       and the lockout is decoration. The whole point of the limiter is that
+#       an offline-grindable scrypt hash is not the only thing standing between
+#       a weak password and an account.
+#
+# The rule: trust the header only when something you control is guaranteed to
+# overwrite it. Caddy's reverse_proxy does. A raw port forward does not.
+# ---------------------------------------------------------------------------

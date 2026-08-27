@@ -1,0 +1,31 @@
+{
+  "name": "@stremio4manga/server",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
+  "main": "dist/main.js",
+  "bin": {
+    "s4m": "bin/s4m.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node build.js",
+    "dev": "node build.js --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint src bin",
+    "start": "node dist/main.js"
+  },
+  "dependencies": {
+    "cheerio": "^1.1.2",
+    "graphql": "^16.14.2",
+    "protobufjs": "^7.5.5"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.2",
+    "esbuild": "^0.25.12",
+    "oxlint": "^1.71.0",
+    "typescript": "~6.0.2"
+  }
+}

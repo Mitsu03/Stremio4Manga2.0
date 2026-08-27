@@ -1,0 +1,9 @@
+{
+  "publicOrigin": "https://manga.example.com",
+
+  "listen": { "host": "127.0.0.1", "port": 8080 },
+
+  "trustProxy": true,
+
+  "flaresolverr": { "url": "", "timeoutMs": 60000 }
+}

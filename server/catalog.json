@@ -1,0 +1,59 @@
+{
+  "$comment": "The built-in extension catalogue, replacing the keiyoushi APK index the old server downloaded at runtime. One entry per module in src/sources/sites; the GraphQL layer serves this list but ignores any entry whose pkgName the registry does not know, so drift can only ever hide a source, never invent one. Ids are decimal Longs as strings, stable forever: they are stored on every manga row and in the client's saved searches. Never reuse or renumber one. 1000000000000000007 (MANGA Plus) and 1000000000000000008 (Bato.to) are burnt, not free — see the notes at the end.",
+  "name": "Built-in",
+  "indexUrl": "builtin:stremio4manga",
+  "extensions": [
+    {
+      "pkgName": "mangadex",
+      "name": "MangaDex",
+      "lang": "en",
+      "versionName": "1.0.0",
+      "contentWarning": "MIXED",
+      "sources": [{ "id": "1000000000000000001", "name": "MangaDex", "lang": "en" }]
+    },
+    {
+      "pkgName": "comick",
+      "name": "ComicK",
+      "lang": "en",
+      "versionName": "1.0.0",
+      "contentWarning": "MIXED",
+      "sources": [{ "id": "1000000000000000002", "name": "ComicK", "lang": "en" }]
+    },
+    {
+      "pkgName": "weebcentral",
+      "name": "Weeb Central",
+      "lang": "en",
+      "versionName": "1.0.0",
+      "contentWarning": "SAFE",
+      "sources": [{ "id": "1000000000000000003", "name": "Weeb Central", "lang": "en" }]
+    },
+    {
+      "pkgName": "mangadistrict",
+      "name": "Manga District",
+      "lang": "en",
+      "versionName": "1.0.0",
+      "contentWarning": "NSFW",
+      "sources": [{ "id": "1000000000000000004", "name": "Manga District", "lang": "en" }]
+    },
+    {
+      "pkgName": "asurascans",
+      "name": "Asura Scans",
+      "lang": "en",
+      "versionName": "1.0.0",
+      "contentWarning": "SAFE",
+      "sources": [{ "id": "1000000000000000005", "name": "Asura Scans", "lang": "en" }]
+    },
+    {
+      "pkgName": "rizzfables",
+      "name": "RizzFables",
+      "lang": "en",
+      "versionName": "1.0.0",
+      "contentWarning": "SAFE",
+      "sources": [{ "id": "1000000000000000006", "name": "RizzFables", "lang": "en" }]
+    }
+  ],
+  "$reserved": {
+    "1000000000000000007": "MANGA Plus by SHUEISHA. Its API works (protobuf over HTTP, one SESSION-TOKEN header), but every page image is XOR-encrypted with a per-page key the viewer is expected to apply. Nothing in the Source contract can transform image bytes, and the reader/download pipeline that fetches them is a different module, so a shipped source would browse and list chapters and then show a blank reader. Deliberately not shipped.",
+    "1000000000000000008": "Bato.to. Every mirror serves a Cloudflare interstitial to plain requests, so its markup could not be read even once; writing selectors against a page nobody has seen is the exact silent-failure mode this catalogue avoids. Needs a FlareSolverr-backed session to be written at all."
+  }
+}

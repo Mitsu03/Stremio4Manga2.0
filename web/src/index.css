@@ -1,0 +1,110 @@
+:root {
+  --ink: #18233d;
+  --ink-soft: #526078;
+  --paper: #f4f6fb;
+  --surface: #ffffff;
+  --line: #dce2ee;
+  --bookmark: #ef5b5b;
+  --bookmark-dark: #c83f48;
+  --aqua: #25a8a6;
+  --aqua-soft: #dff4f2;
+  --aqua-ink: #126a68;
+  --caught-up: #46b25c;
+  --brand-bg: #18233d;
+  --header-bg: rgba(244, 246, 251, 0.92);
+  --cover-bg: #e5e9f1;
+  --cover-start: #e8ecf4;
+  --cover-end: #cfd8e8;
+  --chip-bg: rgba(24, 35, 61, 0.84);
+  --continue-bg: #18233d;
+  --continue-text: #ffffff;
+  --continue-muted: #b8c2d6;
+  --continue-ring: rgba(255, 255, 255, 0.055);
+  --read-wash: rgba(82, 96, 120, 0.055);
+  --read-marker-bg: #e8ecf3;
+  --reader-strip: #111827;
+  --error: #9f2937;
+  --status-ring: #edf0f5;
+  --shadow: 0 18px 50px rgba(32, 48, 78, 0.12);
+  font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+:root[data-theme="dark"] {
+  --ink: #e8edf7;
+  --ink-soft: #9da9bd;
+  --paper: #0d1424;
+  --surface: #151f32;
+  --line: #2a3954;
+  --bookmark: #ff6971;
+  --bookmark-dark: #ff858b;
+  --aqua: #52cbc6;
+  --aqua-soft: #16383a;
+  --aqua-ink: #87ddd9;
+  --caught-up: #6fdd88;
+  --brand-bg: #253654;
+  --header-bg: rgba(13, 20, 36, 0.9);
+  --cover-bg: #1b263c;
+  --cover-start: #22304a;
+  --cover-end: #111a2b;
+  --chip-bg: rgba(7, 11, 20, 0.86);
+  --continue-bg: #202d47;
+  --continue-text: #f8faff;
+  --continue-muted: #aebad0;
+  --continue-ring: rgba(122, 146, 185, 0.1);
+  --read-wash: rgba(123, 143, 177, 0.08);
+  --read-marker-bg: #25324a;
+  --reader-strip: #070b12;
+  --error: #ff9da7;
+  --status-ring: #202b42;
+  --shadow: 0 20px 55px rgba(0, 0, 0, 0.32);
+}
+
+* { box-sizing: border-box; }
+html { min-width: 320px; background: var(--paper); }
+body { margin: 0; min-width: 320px; min-height: 100vh; color: var(--ink); background: var(--paper); transition: color 180ms ease, background-color 180ms ease; }
+button, input, select { font: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid rgba(37, 168, 166, 0.35); outline-offset: 3px; }
+h1, h2, h3, p { margin-top: 0; }
+h1, h2 { font-family: Bahnschrift, "Arial Narrow", sans-serif; font-stretch: condensed; letter-spacing: -0.035em; }
+h1 { font-size: clamp(2.2rem, 6vw, 4.6rem); line-height: 0.94; margin-bottom: 0.75rem; }
+h2 { font-size: clamp(1.35rem, 3vw, 2rem); margin-bottom: 0.5rem; }
+a { color: inherit; }
+
+.button {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 42px;
+  padding: 0.65rem 1.1rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 160ms ease, background-color 160ms ease, border-color 160ms ease;
+}
+.button:hover:not(:disabled) { transform: translateY(-1px); }
+.button:disabled { opacity: 0.5; cursor: wait; }
+.button.primary { color: #ffffff; background: var(--bookmark); box-shadow: 0 8px 22px rgba(239, 91, 91, 0.2); }
+.button.primary:hover:not(:disabled) { background: var(--bookmark-dark); }
+.button.quiet { color: var(--ink); background: transparent; border-color: var(--line); }
+.button.quiet:hover:not(:disabled) { background: var(--surface); }
+.button.danger { color: #ffffff; background: var(--bookmark-dark); }
+.button.danger:hover:not(:disabled) { background: var(--bookmark); }
+
+.eyebrow { display: block; color: var(--aqua); font: 700 0.72rem/1.2 ui-monospace, Consolas, monospace; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.55rem; }
+.muted { color: var(--ink-soft); }
+.badge { border-radius: 999px; padding: 0.28rem 0.58rem; font: 700 0.72rem/1 ui-monospace, Consolas, monospace; white-space: nowrap; }
+.badge.cached { color: var(--aqua-ink); background: var(--aqua-soft); }
+.status-dot { width: 10px; height: 10px; border-radius: 50%; background: #aab3c3; box-shadow: 0 0 0 4px var(--status-ring); }
+.status-dot.online { background: var(--aqua); box-shadow: 0 0 0 4px var(--aqua-soft); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
