@@ -29,7 +29,7 @@ import {
   clean,
   dedupeChapters,
   parseChapterNumber,
-  parseDate,
+  parseDateWith,
   parseStatus,
 } from '../util.js';
 import { selector, widen, type ThemeSelectors } from './selectors.js';
@@ -54,6 +54,10 @@ export interface MangaThemesiaConfig {
   searchMode?: 'query' | 'client';
   usesCloudflare?: boolean;
   minIntervalMs?: number;
+  /** Java date pattern the site writes chapter dates in, e.g. `dd/MM/yyyy`. */
+  dateFormat?: string;
+  /** BCP-47 tag for that pattern's month names, e.g. `tr`, `pt-BR`. */
+  dateLocale?: string;
   /** Per-site markup differences, read off the extension's own Kotlin. */
   selectors?: ThemeSelectors;
   /** The reader's images, when the install does not use `div#readerarea img`. */
@@ -124,7 +128,12 @@ export function createMangaThemesiaSource(config: MangaThemesiaConfig, deps: Sou
       values: ['Default', 'A-Z', 'Z-A', 'Latest Update', 'Latest Added', 'Popular'],
       default: 0,
     },
-    { kind: 'select', name: 'Status', values: ['All', 'Ongoing', 'Completed', 'Hiatus'], default: 0 },
+    {
+      kind: 'select',
+      name: 'Status',
+      values: ['All', 'Ongoing', 'Completed', 'Hiatus'],
+      default: 0,
+    },
     {
       kind: 'select',
       name: 'Type',
@@ -174,7 +183,11 @@ export function createMangaThemesiaSource(config: MangaThemesiaConfig, deps: Sou
       if (url === '' || title === '') return;
       const img = card.find('img').first();
       const raw = img.attr('data-src') ?? img.attr('data-lazy-src') ?? img.attr('src');
-      items.push({ url, title, thumbnailUrl: raw ? absoluteUrl(baseUrl, raw) : null });
+      items.push({
+        url,
+        title,
+        thumbnailUrl: raw ? absoluteUrl(baseUrl, raw) : null,
+      });
     });
     // `.bsx` sits inside `.bs` on some installs and replaces it on others, so
     // the same title can be matched twice; the series URL is the identity.
@@ -303,7 +316,11 @@ export function createMangaThemesiaSource(config: MangaThemesiaConfig, deps: Sou
           url,
           name,
           chapterNumber: Number.isFinite(declared) ? declared : parseChapterNumber(name),
-          dateUpload: parseDate(row.find('span.chapterdate').text()),
+          dateUpload: parseDateWith(
+            row.find('span.chapterdate').text(),
+            config.dateFormat,
+            config.dateLocale,
+          ),
           realUrl: url,
         });
       });
@@ -316,7 +333,10 @@ export function createMangaThemesiaSource(config: MangaThemesiaConfig, deps: Sou
       const html = await http.text(chapter.url);
       const fromReader = extractTsReader(html);
       if (fromReader.length > 0) {
-        return fromReader.map((url, index) => ({ index, url: absoluteUrl(baseUrl, url) }));
+        return fromReader.map((url, index) => ({
+          index,
+          url: absoluteUrl(baseUrl, url),
+        }));
       }
 
       const $ = load(html);

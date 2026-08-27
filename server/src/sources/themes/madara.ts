@@ -36,7 +36,7 @@ import {
   dedupeChapters,
   form,
   parseChapterNumber,
-  parseDate,
+  parseDateWith,
   parseStatus,
 } from '../util.js';
 
@@ -74,6 +74,10 @@ export interface MadaraConfig {
   /** Extra headers, usually a Referer some installs demand on admin-ajax. */
   headers?: Record<string, string>;
   minIntervalMs?: number;
+  /** Java date pattern the site writes chapter dates in, e.g. `dd/MM/yyyy`. */
+  dateFormat?: string;
+  /** BCP-47 tag for that pattern's month names, e.g. `tr`, `pt-BR`. */
+  dateLocale?: string;
   /** Per-site markup differences, read off the extension's own Kotlin. */
   selectors?: ThemeSelectors;
 }
@@ -273,7 +277,7 @@ export function createMadaraSource(config: MadaraConfig, deps: SourceDeps): Sour
         url,
         name,
         chapterNumber: parseChapterNumber(name),
-        dateUpload: parseDate(dateText),
+        dateUpload: parseDateWith(dateText, config.dateFormat, config.dateLocale),
         realUrl: url,
       });
     });
@@ -380,19 +384,17 @@ export function createMadaraSource(config: MadaraConfig, deps: SourceDeps): Sour
     async getPageList(chapter) {
       const $ = load(await http.text(chapter.url));
       const pages: SourcePage[] = [];
-      $(PAGE_IMG).each(
-        (_, element) => {
-          const img = $(element);
-          for (const attr of IMAGE_ATTRS) {
-            const raw = img.attr(attr);
-            if (!raw || raw.startsWith('data:')) continue;
-            const url = absoluteUrl(baseUrl, attr === 'srcset' ? raw.split(',')[0].trim() : raw);
-            if (url === '') continue;
-            pages.push({ index: pages.length, url });
-            return;
-          }
-        },
-      );
+      $(PAGE_IMG).each((_, element) => {
+        const img = $(element);
+        for (const attr of IMAGE_ATTRS) {
+          const raw = img.attr(attr);
+          if (!raw || raw.startsWith('data:')) continue;
+          const url = absoluteUrl(baseUrl, attr === 'srcset' ? raw.split(',')[0].trim() : raw);
+          if (url === '') continue;
+          pages.push({ index: pages.length, url });
+          return;
+        }
+      });
       if (pages.length === 0) throw new NoResultsError('No pages found');
       return pages;
     },
