@@ -7,7 +7,7 @@ import { t } from '../utils/i18n'
 import { knownAvailability, queueSourceRequest, verifyChapters } from '../utils/availability'
 import { browsableSources, INITIAL_SOURCE_COUNT, preferredSourcePerName, prioritizedSources, recommendedSources, PREFERRED_LANG, PREFERRED_SOURCE } from '../utils/sources'
 import type { SourceNode } from '../utils/sources'
-import { readSourceSearchCache, useSourceSearch } from '../utils/sourceSearch'
+import { readSourceSearchCache, usePatience, useSourceSearch } from '../utils/sourceSearch'
 import {
   SAVED_SEARCHES_QUERY,
   SET_SAVED_SEARCHES_MUTATION,
@@ -444,19 +444,8 @@ export default function SearchPage() {
   // same batch the detail page's bind flow sweeps, for the same reason: MangaDex answers the same
   // question once, not once per language it is installed in.
   const [allSources, setAllSources] = useState(false)
-  /* Whether slow catalogues are waited for. Off, a source has a few seconds and the batch moves on
-     without it, which is what keeps the tail of a sweep from being the whole sweep. It is a property
-     of the reader rather than of the query, so it is remembered. */
-  const [waitLonger, setWaitLonger] = useState(() => {
-    try { return localStorage.getItem('stremio4manga.wait-longer') === 'true' } catch { return false }
-  })
-  const toggleWaitLonger = useCallback(() => {
-    setWaitLonger((on) => {
-      const next = !on
-      try { localStorage.setItem('stremio4manga.wait-longer', String(next)) } catch { /* private window */ }
-      return next
-    })
-  }, [])
+  // One setting for the whole app; see usePatience.
+  const [waitLonger, toggleWaitLonger] = usePatience()
   const globalBatch = useMemo(() => prioritizedSources(sourceChoices), [sourceChoices])
   /* Recommended catalogues first, the long tail after — the same two-stage shape the detail page's
      bind flow uses. Asking every installed catalogue in one go was fine when that meant six; with

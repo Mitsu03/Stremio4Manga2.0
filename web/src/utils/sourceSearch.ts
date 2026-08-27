@@ -133,6 +133,31 @@ export interface SourceSearch {
  * `slot` names the cache entry and `title` is the query; `searchSources` and `topSources` are the
  * two batches a completed sweep can have covered, and are what the cache records as its scope.
  */
+/**
+ * Whether slow catalogues are waited for, remembered across visits.
+ *
+ * One setting for the whole app rather than one per screen: it describes how
+ * patient the reader is, which does not change between Discover and a title's
+ * source picker. Wrapped in try/catch because a private window throws on the
+ * first read, and a search that will not run is a worse answer than an
+ * unremembered preference.
+ */
+const PATIENCE_KEY = 'stremio4manga.wait-longer'
+
+export function usePatience(): [boolean, () => void] {
+  const [waitLonger, setWaitLonger] = useState(() => {
+    try { return localStorage.getItem(PATIENCE_KEY) === 'true' } catch { return false }
+  })
+  const toggle = useCallback(() => {
+    setWaitLonger((on) => {
+      const next = !on
+      try { localStorage.setItem(PATIENCE_KEY, String(next)) } catch { /* private window */ }
+      return next
+    })
+  }, [])
+  return [waitLonger, toggle]
+}
+
 export function useSourceSearch(slot: string, title: string, searchSources: SourceNode[], topSources: SourceNode[]): SourceSearch {
   const [, fetchSourceMangaBulk] = useMutation<FetchSourceMangaBulkResult>(FETCH_SOURCE_MANGA_BULK_MUTATION)
   const [outcomes, setOutcomes] = useState<SourceSearchOutcome[]>([])
