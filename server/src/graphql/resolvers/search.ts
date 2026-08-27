@@ -186,6 +186,33 @@ async function inBatches<T, R>(items: T[], work: (item: T) => Promise<R>): Promi
   return results;
 }
 
+/**
+ * How long one source may hold up a bulk search.
+ *
+ * A single request already has its own budget, but a source is free to make
+ * several — a search, then a detail page — so its total can run well past that.
+ * In a sweep the results come back a batch at a time, which means one slow site
+ * holds every source beside it: the reader watches five finished catalogues wait
+ * on a sixth. Twelve seconds is longer than any source worth reading takes and
+ * short enough that the tail of a sweep stops being the whole experience.
+ *
+ * This bounds the wait only. The request underneath is left to finish or fail on
+ * its own terms, so its result still reaches the cache and its failure still
+ * reaches the breaker.
+ */
+const SOURCE_DEADLINE_MS = 12_000;
+
+function withDeadline<T>(work: Promise<T>, sourceName: string): Promise<T> {
+  let timer: NodeJS.Timeout;
+  const deadline = new Promise<never>((_resolve, reject) => {
+    timer = setTimeout(
+      () => reject(new Error(`${sourceName} took longer than ${SOURCE_DEADLINE_MS / 1000}s.`)),
+      SOURCE_DEADLINE_MS,
+    );
+  });
+  return Promise.race([work, deadline]).finally(() => clearTimeout(timer)) as Promise<T>;
+}
+
 export const group: ResolverGroup = {
   Mutation: {
     fetchSourceManga: async (
@@ -250,7 +277,10 @@ export const group: ResolverGroup = {
           };
         }
         try {
-          const answer = await browse(source, args.input.type, page, query, []);
+          const answer = await withDeadline(
+            browse(source, args.input.type, page, query, []),
+            source.name,
+          );
           return {
             source: sourceId,
             error: null,
