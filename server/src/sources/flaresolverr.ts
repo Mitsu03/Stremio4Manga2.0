@@ -72,8 +72,24 @@ export interface SolverConfig {
  */
 const HOST_COOLDOWN_MS = 15 * 60_000;
 
+/**
+ * FlareSolverr's API is `POST /v1`; its root answers a readiness banner on GET
+ * and 405 on POST. Every example anybody copies — this project's own installer
+ * help included — writes the URL as `http://127.0.0.1:8191`, so requiring the
+ * suffix means the documented value produces "FlareSolverr answered 405" on
+ * every challenged source, which reads as the solver being broken rather than
+ * as one missing path segment.
+ *
+ * Both spellings are therefore accepted, and a URL that already names a version
+ * is left alone.
+ */
+function apiEndpoint(url: string): string {
+  const trimmed = url.trim().replace(/\/+$/, '');
+  return trimmed === '' || /\/v\d+$/.test(trimmed) ? trimmed : `${trimmed}/v1`;
+}
+
 export function createSolver(config: SolverConfig): Solver {
-  const endpoint = config.url.trim();
+  const endpoint = apiEndpoint(config.url);
   if (endpoint === '') {
     return {
       available: false,
