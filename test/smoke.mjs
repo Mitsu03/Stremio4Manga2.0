@@ -237,7 +237,17 @@ async function run() {
   );
   const catalogue = extensions.data?.extensions?.nodes ?? [];
   check('the built-in catalogue lists sources', catalogue.length > 0, `${catalogue.length} entries`);
-  check('nothing is installed on a new account', catalogue.every((entry) => !entry.isInstalled));
+  // The opposite of what this asserted before the catalogue was seeded: an
+  // account that can reach nothing looks, on screen, exactly like an account
+  // whose server is broken.
+  check(
+    'the whole catalogue is installed on a new account',
+    catalogue.length > 0 && catalogue.every((entry) => entry.isInstalled),
+    catalogue
+      .filter((entry) => !entry.isInstalled)
+      .map((entry) => entry.pkgName)
+      .join(', ') || `${catalogue.length} installed`,
+  );
   check(
     'the extension store is the built-in one',
     (extensions.data?.extensionStores?.nodes ?? []).length === 1,
