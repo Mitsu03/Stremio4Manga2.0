@@ -24,6 +24,7 @@ import { GraphQLError } from 'graphql';
 import type { GraphQLContext } from '../../types.js';
 import type { ResolverGroup } from './index.js';
 import catalog from '../../../catalog.json' with { type: 'json' };
+import themed from '../../../sources.themed.json' with { type: 'json' };
 import { ANILIST_ICON } from '../../tracker/anilist.js';
 import { iconPath } from '../../sources/icons.js';
 import {
@@ -63,9 +64,29 @@ interface CatalogExtension {
  * the failure is a source missing from the list rather than an install button
  * that produces a source id nothing can resolve.
  */
-const EXTENSIONS: CatalogExtension[] = (catalog.extensions as CatalogExtension[]).filter(
-  (extension) => definitionByPkg(extension.pkgName) !== undefined,
-);
+const EXTENSIONS: CatalogExtension[] = [
+  ...(catalog.extensions as CatalogExtension[]),
+  // The themed sources describe themselves well enough to be catalogue entries
+  // without being written out twice: one source each, named after the site.
+  // Copying them into catalog.json would only create two files to keep in step.
+  ...(
+    themed.extensions as {
+      pkgName: string;
+      name: string;
+      lang: string;
+      versionName: string;
+      contentWarning: string;
+      id: string;
+    }[]
+  ).map((entry) => ({
+    pkgName: entry.pkgName,
+    name: entry.name,
+    lang: entry.lang,
+    versionName: entry.versionName,
+    contentWarning: entry.contentWarning,
+    sources: [{ id: entry.id, name: entry.name, lang: entry.lang }],
+  })),
+].filter((extension) => definitionByPkg(extension.pkgName) !== undefined);
 
 const isNsfw = (warning: string): boolean => warning === 'NSFW';
 
