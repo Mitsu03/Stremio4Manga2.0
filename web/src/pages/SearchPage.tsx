@@ -5,7 +5,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { friendlyError } from '../utils/errors'
 import { t } from '../utils/i18n'
 import { knownAvailability, queueSourceRequest, verifyChapters } from '../utils/availability'
-import { browsableSources, preferredSourcePerName, prioritizedSources, PREFERRED_LANG, PREFERRED_SOURCE } from '../utils/sources'
+import { browsableSources, INITIAL_SOURCE_COUNT, preferredSourcePerName, prioritizedSources, recommendedSources, PREFERRED_LANG, PREFERRED_SOURCE } from '../utils/sources'
 import type { SourceNode } from '../utils/sources'
 import { readSourceSearchCache, useSourceSearch } from '../utils/sourceSearch'
 import {
@@ -444,6 +444,19 @@ export default function SearchPage() {
   // question once, not once per language it is installed in.
   const [allSources, setAllSources] = useState(false)
   const globalBatch = useMemo(() => prioritizedSources(sourceChoices), [sourceChoices])
+  /* Recommended catalogues first, the long tail after — the same two-stage shape the detail page's
+     bind flow uses. Asking every installed catalogue in one go was fine when that meant six; with
+     several hundred it means the reader watches a spinner for minutes before the first answer, and
+     the answer they wanted was almost always in the first dozen. Falls back to the leading few when
+     none of the recommended ones are installed, so the first stage is never empty. */
+  const globalTop = useMemo(() => {
+    const recommended = recommendedSources(globalBatch)
+    return recommended.length > 0 ? recommended : globalBatch.slice(0, INITIAL_SOURCE_COUNT)
+  }, [globalBatch])
+  const globalRest = useMemo(() => {
+    const first = new Set(globalTop.map((source) => source.id))
+    return globalBatch.filter((source) => !first.has(source.id))
+  }, [globalBatch, globalTop])
   const {
     outcomes: globalOutcomes,
     results: globalResults,
@@ -469,8 +482,14 @@ export default function SearchPage() {
       applyGlobalCache(cached)
       return
     }
-    void runGlobalSearch(globalBatch, false, 'all')
-  }, [applyGlobalCache, globalBatch, runGlobalSearch, showingAllSources, submittedQuery])
+    // Recommended first so there is something on screen in seconds, then the rest appended as they
+    // answer. `append` is what makes the second stage add to the first rather than replace it, and
+    // the scope only becomes 'all' once the tail has actually been asked.
+    void runGlobalSearch(globalTop, false, globalRest.length === 0 ? 'all' : 'top').then(() => {
+      if (sweptFor.current !== key || globalRest.length === 0) return
+      return runGlobalSearch(globalRest, true, 'all')
+    })
+  }, [applyGlobalCache, globalBatch, globalRest, globalTop, runGlobalSearch, showingAllSources, submittedQuery])
 
   const globalQuiet = useMemo(() => globalOutcomes.filter((outcome) => !outcome.error && outcome.mangas.length === 0), [globalOutcomes])
   const globalBroken = useMemo(() => globalOutcomes.filter((outcome) => outcome.error), [globalOutcomes])
