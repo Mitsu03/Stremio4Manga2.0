@@ -28,15 +28,36 @@ import { createSolver, type Solver } from './flaresolverr.js';
 // These are ban-avoidance limits, not performance tuning. Lowering one makes
 // this server look more like a scraper and less like a reader.
 
-/** Floor between two requests to the same host. ~0.8 requests a second. */
+/**
+ * Floor between two requests to a host that has shown it is behind Cloudflare.
+ * ~0.8 requests a second.
+ *
+ * This is the number that must not be lowered. A host that has challenged us is
+ * one watching for exactly this pattern, and being challenged again right after
+ * a solve is how a solve turns into a block.
+ */
 const MIN_INTERVAL_MS = 1300;
+/**
+ * Floor for every other host.
+ *
+ * Applying the Cloudflare number everywhere cost far more than it bought: with
+ * hundreds of installed sources a sweep spent nearly all its time waiting on
+ * hosts that had never so much as rate-limited us. A quarter second is still an
+ * interval — no host is ever asked two things at once, and the jitter below
+ * still applies — but it is paced for a reader rather than for a challenge.
+ */
+const CALM_INTERVAL_MS = 250;
 /** ±30% noise on that floor, so the traffic has no machine-perfect period. */
 const INTERVAL_JITTER = 0.3;
 /**
- * Requests in flight across *all* hosts. A multi-source search fans out over
- * every installed catalogue at once; without this ceiling that is a burst.
+ * Requests in flight across *all* hosts.
+ *
+ * Four was chosen when a fan-out meant six catalogues. It now means several
+ * hundred, and the protection that matters is per host — an interval each, a
+ * breaker each — so a global ceiling this low mostly decides how long the reader
+ * waits, not how hard any one site is hit.
  */
-const MAX_IN_FLIGHT = 4;
+const MAX_IN_FLIGHT = 16;
 /** Total tries per request, first attempt included. */
 const MAX_ATTEMPTS = 3;
 /** First backoff; doubles per attempt, jittered, capped. */
@@ -296,6 +317,17 @@ export function createHttpClient(config: Pick<Config, 'flaresolverr'>): HttpClie
   const jar = new CookieJar();
   const queues = new HostQueues();
   const breaker = new Breaker();
+  /**
+   * Hosts that have answered with a Cloudflare challenge at least once.
+   *
+   * Membership is what earns the slow interval. It is learned rather than
+   * configured because a site turns Cloudflare on and off without telling
+   * anybody, and a list in a config file is wrong the day after it is written.
+   * Nothing removes a host once added: the cost of staying slow for a site that
+   * has relaxed is a slower sweep, and the cost of the opposite is a block.
+   */
+  const challenged = new Set<string>();
+
   const inFlight = new Semaphore(MAX_IN_FLIGHT);
   const solver: Solver = createSolver(config.flaresolverr);
 
@@ -345,7 +377,10 @@ export function createHttpClient(config: Pick<Config, 'flaresolverr'>): HttpClie
     wantBody: boolean,
   ): Promise<{ response: Response; body?: string }> {
     const host = new URL(url).hostname;
-    const interval = Math.max(MIN_INTERVAL_MS, options.minIntervalMs ?? MIN_INTERVAL_MS);
+    // A source may still ask for a slower floor than its tier gives it; nothing
+    // may ask for a faster one.
+    const floor = challenged.has(host) ? MIN_INTERVAL_MS : CALM_INTERVAL_MS;
+    const interval = Math.max(floor, options.minIntervalMs ?? 0);
     const attempts = Math.min(options.attempts ?? MAX_ATTEMPTS, MAX_ATTEMPTS);
 
     return queues.run(host, interval, async () => {
@@ -367,6 +402,9 @@ export function createHttpClient(config: Pick<Config, 'flaresolverr'>): HttpClie
 
         const { response, body } = result;
         if (isChallenge(response.status, response.headers, body)) {
+          // This host is behind Cloudflare, so every later request to it takes
+          // the slow interval — including the ones already queued behind this.
+          challenged.add(host);
           // Solving is a whole browser round-trip and the single most
           // ban-worthy thing this server does; never retry the plain request
           // first, and leave the loop either way.
@@ -440,7 +478,12 @@ export function createHttpClient(config: Pick<Config, 'flaresolverr'>): HttpClie
     init: SourceRequestInit,
     options: SourceHttpOptions,
   ): Promise<string> {
-    if (init.solveCloudflare) return solveOnce(url, options);
+    if (init.solveCloudflare) {
+      // Asking for a solve is itself proof the host is behind Cloudflare, and it
+      // is the only signal available before the first challenge is ever seen.
+      challenged.add(new URL(url).hostname);
+      return solveOnce(url, options);
+    }
     const { response, body } = await request(url, init, options, true);
     if (!response.ok && !isChallenge(response.status, response.headers, body)) {
       throw new Error(`${response.status} ${response.statusText} for ${url}`);
@@ -469,6 +512,7 @@ export function createHttpClient(config: Pick<Config, 'flaresolverr'>): HttpClie
           // so a chapter downloads one image at a time, spaced out.
           const { response } = await request(url, init, options, false);
           if (isChallenge(response.status, response.headers, undefined)) {
+            challenged.add(new URL(url).hostname);
             throw new CloudflareBlockedError(options.sourceName);
           }
           if (!response.ok) {
