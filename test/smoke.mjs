@@ -248,9 +248,14 @@ async function run() {
       .map((entry) => entry.pkgName)
       .join(', ') || `${catalogue.length} installed`,
   );
+  // Two stores, and which two matters: the sources are largely catalogued by
+  // keiyoushi, and a page that credits only "Built-in" cannot tell anyone where
+  // they came from.
+  const stores = extensions.data?.extensionStores?.nodes ?? [];
   check(
-    'the extension store is the built-in one',
-    (extensions.data?.extensionStores?.nodes ?? []).length === 1,
+    'both extension stores are listed, keiyoushi named among them',
+    stores.length === 2 && stores.some((store) => /keiyoushi/i.test(store.indexUrl)),
+    JSON.stringify(stores),
   );
 
   const categories = await gql(a, '{categories{nodes{id name default mangas{totalCount}}}}');

@@ -224,10 +224,17 @@ export const group: ResolverGroup = {
       return { nodes, totalCount: nodes.length };
     },
 
-    extensionStores: () => ({
-      nodes: [{ name: catalog.name, indexUrl: catalog.indexUrl }],
-      totalCount: 1,
-    }),
+    // Two, because there are two: the handful written here, and the ones taken
+    // from keiyoushi's catalogue. Listing only "Built-in" credited this server
+    // with 348 sources somebody else catalogued, and left the Sources page
+    // unable to point anyone at where they actually come from.
+    extensionStores: () => {
+      const nodes = [
+        { name: catalog.name, indexUrl: catalog.indexUrl },
+        { name: themed.store.name, indexUrl: themed.store.indexUrl },
+      ];
+      return { nodes, totalCount: nodes.length };
+    },
   },
 
   Mutation: {
