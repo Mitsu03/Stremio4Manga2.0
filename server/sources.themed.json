@@ -43,6 +43,10 @@
       "baseUrl": "https://allporncomic.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "porncomic",
+        "variant": "noajax"
+      },
       "id": "1000000000000000012"
     },
     {
@@ -53,6 +57,11 @@
       "baseUrl": "https://allporncomic.io",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "en"
+      },
       "id": "1000000000000000013"
     },
     {
@@ -63,6 +72,12 @@
       "baseUrl": "https://allporncomics.co",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "comic",
+        "variant": "noajax",
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "en"
+      },
       "id": "1000000000000000162"
     },
     {
@@ -73,6 +88,10 @@
       "baseUrl": "https://www.amangaplanet.com.tr",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "en"
+      },
       "id": "1000000000000000316"
     },
     {
@@ -83,6 +102,10 @@
       "baseUrl": "https://anikiga.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "dd MMMM yyyy"
+      },
       "id": "1000000000000000317"
     },
     {
@@ -93,6 +116,11 @@
       "baseUrl": "https://anisascans.in",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "minIntervalMs": 20000
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000014"
     },
     {
@@ -103,6 +131,22 @@
       "baseUrl": "https://anyonemanga.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "variant": "noajax",
+        "selectors": {
+          "status": ".am-manga-meta tr:has(td:matchesOwn(Status)) td:nth-child(2)",
+          "title": ".am-manga-hero__title",
+          "description": ".am-manga-summary__text",
+          "thumbnail": ".am-manga-hero__cover img",
+          "author": ".am-manga-meta tr:has(td:matchesOwn(Author\\\\(s\\\\))) td:nth-child(2) a",
+          "artist": ".am-manga-meta tr:has(td:matchesOwn(Artist\\\\(s\\\\))) td:nth-child(2) a",
+          "genre": ".am-genres-wrap a"
+        },
+        "dateFormat": "MM/dd/yyyy",
+        "dateLocale": "en"
+      },
+      "unportedOverrides": 4,
       "id": "1000000000000000172"
     },
     {
@@ -113,6 +157,9 @@
       "baseUrl": "https://apcomics.org",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax"
+      },
       "id": "1000000000000000015"
     },
     {
@@ -123,6 +170,12 @@
       "baseUrl": "https://01.apkomik.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "hasProjectPage": true,
+        "dateFormat": "MMMM dd, yyyy",
+        "minIntervalMs": 15000
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000238"
     },
     {
@@ -133,6 +186,10 @@
       "baseUrl": "https://apollcomics.es",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "es"
+      },
       "id": "1000000000000000187"
     },
     {
@@ -153,6 +210,13 @@
       "baseUrl": "https://arabtoons.net",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "selectors": {
+          "status": "div.summary_image span.status",
+          "description": "div.summary-text"
+        },
+        "dateFormat": "yyyy-MM-dd"
+      },
       "id": "1000000000000000174"
     },
     {
@@ -163,6 +227,12 @@
       "baseUrl": "https://arabmanhwa.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "variant": "noajax",
+        "dateFormat": "MMM d, yyyy"
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000173"
     },
     {
@@ -173,6 +243,9 @@
       "baseUrl": "https://arbxcomix.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax"
+      },
       "id": "1000000000000000175"
     },
     {
@@ -183,6 +256,11 @@
       "baseUrl": "https://arcurafansub.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "seri",
+        "dateFormat": "MMMM d, yyy",
+        "dateLocale": "tr"
+      },
       "id": "1000000000000000318"
     },
     {
@@ -193,6 +271,21 @@
       "baseUrl": "https://ar.kenmanga.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "selectors": {
+          "status": ".info-label:contains(الحالة) + span",
+          "title": ".manga-title-large",
+          "description": "div.story-text",
+          "thumbnail": ".manga-poster img",
+          "author": ".info-label:contains(المؤلف) + span",
+          "artist": ".info-label:contains(الرسام) + span",
+          "genre": "div.filter-tags a",
+          "details": "div.legendary-single-page"
+        },
+        "dateFormat": "yyyy/MM/dd",
+        "dateLocale": "ar"
+      },
+      "unportedOverrides": 5,
       "id": "1000000000000000176"
     },
     {
@@ -213,6 +306,14 @@
       "baseUrl": "https://www.silentquill.net",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "selectors": {
+          "title": "h1.kdt8-left-title",
+          "description": ".kdt8-synopsis",
+          "thumbnail": ".kdt8-cover img",
+          "genre": ".kdt8-genres a.kdt8-genre-tag"
+        }
+      },
       "id": "1000000000000000018"
     },
     {
@@ -223,6 +324,10 @@
       "baseUrl": "https://brainrotcomics.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax"
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000019"
     },
     {
@@ -233,6 +338,9 @@
       "baseUrl": "https://asialotuss.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "minIntervalMs": 20000
+      },
       "id": "1000000000000000188"
     },
     {
@@ -243,6 +351,10 @@
       "baseUrl": "https://astralscans.top",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "hasProjectPage": true
+      },
+      "unportedOverrides": 4,
       "id": "1000000000000000232"
     },
     {
@@ -253,6 +365,10 @@
       "baseUrl": "https://asurascans.com.tr",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "d MMMM yyyy",
+        "dateLocale": "tr"
+      },
       "id": "1000000000000000319"
     },
     {
@@ -263,6 +379,11 @@
       "baseUrl": "https://atemporal.cloud",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMM dd, yyyy",
+        "dateLocale": "pt",
+        "minIntervalMs": 30000
+      },
       "id": "1000000000000000271"
     },
     {
@@ -273,6 +394,10 @@
       "baseUrl": "https://athreascans.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "minIntervalMs": 30000
+      },
+      "unportedOverrides": 3,
       "id": "1000000000000000020"
     },
     {
@@ -283,6 +408,17 @@
       "baseUrl": "https://www.deatte5.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "selectors": {
+          "status": "h5:contains(Status) + h4",
+          "title": "h1",
+          "description": ".synopsis p",
+          "thumbnail": ".cover_managa img",
+          "author": "h5:contains(Author) + h4 a",
+          "artist": "h5:contains(Artist) + h4 a"
+        }
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000021"
     },
     {
@@ -293,6 +429,19 @@
       "baseUrl": "https://bloomscans.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "series",
+        "selectors": {
+          "status": ".lrs-infotable tr:contains(Status) td:last-child",
+          "title": ".lrs-title",
+          "description": ".lrs-syn-wrap",
+          "thumbnail": "img.lrs-cover",
+          "genre": ".lrs-genre"
+        },
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "es"
+      },
+      "unportedOverrides": 3,
       "id": "1000000000000000189"
     },
     {
@@ -303,6 +452,11 @@
       "baseUrl": "https://bokugents.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "dd MMMM, yyyy",
+        "dateLocale": "en",
+        "minIntervalMs": 333
+      },
       "id": "1000000000000000190"
     },
     {
@@ -313,6 +467,9 @@
       "baseUrl": "https://boratscans.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax"
+      },
       "id": "1000000000000000022"
     },
     {
@@ -323,6 +480,11 @@
       "baseUrl": "https://leitor.borutoexplorer.com.br",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "dd 'de' MMMM 'de' yyyy",
+        "minIntervalMs": 2000
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000272"
     },
     {
@@ -343,6 +505,12 @@
       "baseUrl": "https://bymichiby.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "hasProjectPage": true,
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "es",
+        "minIntervalMs": 333
+      },
       "id": "1000000000000000191"
     },
     {
@@ -353,6 +521,13 @@
       "baseUrl": "https://cafecomyaoi.com.br",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "pt",
+        "minIntervalMs": 2000
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000273"
     },
     {
@@ -363,6 +538,9 @@
       "baseUrl": "https://caprazmanga.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax"
+      },
       "id": "1000000000000000320"
     },
     {
@@ -383,6 +561,11 @@
       "baseUrl": "https://celestialmoonscan.es",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "es",
+        "minIntervalMs": 333
+      },
       "id": "1000000000000000192"
     },
     {
@@ -403,6 +586,11 @@
       "baseUrl": "https://cocomic.co",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "minIntervalMs": 2000
+      },
+      "unportedOverrides": 2,
       "id": "1000000000000000024"
     },
     {
@@ -423,6 +611,20 @@
       "baseUrl": "https://comicasura.net",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "pageSelector": "div > img.object-cover.mx-auto",
+        "selectors": {
+          "status": "div:contains(Status) + div",
+          "title": ".comic-title-content",
+          "description": ".comic-content.mobile",
+          "thumbnail": "img[alt=poster]",
+          "genre": "div.hidden div:contains(Genres) + div > a"
+        },
+        "dateFormat": "MMMM d yyyy",
+        "dateLocale": "en-US",
+        "minIntervalMs": 20000
+      },
+      "unportedOverrides": 8,
       "id": "1000000000000000026"
     },
     {
@@ -443,6 +645,12 @@
       "baseUrl": "https://comicsvalley.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "comics-new",
+        "chapterMode": "MangaAjax",
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "en"
+      },
       "id": "1000000000000000163"
     },
     {
@@ -453,6 +661,7 @@
       "baseUrl": "https://crowscans.xyz",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "unportedOverrides": 2,
       "id": "1000000000000000028"
     },
     {
@@ -463,6 +672,9 @@
       "baseUrl": "https://cucumbermanga.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax"
+      },
       "id": "1000000000000000029"
     },
     {
@@ -473,6 +685,15 @@
       "baseUrl": "https://culturedworks.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "selectors": {
+          "status": ".info-right .status, ${super.seriesStatusSelector}",
+          "genre": ".meta .genres .genre-item",
+          "details": ".main-info"
+        },
+        "minIntervalMs": 30000
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000030"
     },
     {
@@ -483,6 +704,9 @@
       "baseUrl": "https://dailysuka.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "komik"
+      },
       "id": "1000000000000000233"
     },
     {
@@ -493,6 +717,9 @@
       "baseUrl": "https://reader.decadencescans.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax"
+      },
       "id": "1000000000000000031"
     },
     {
@@ -503,6 +730,7 @@
       "baseUrl": "https://despair-manga.net",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "unportedOverrides": 1,
       "id": "1000000000000000177"
     },
     {
@@ -513,6 +741,11 @@
       "baseUrl": "https://manga.detectiveconanar.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "ar"
+      },
       "id": "1000000000000000178"
     },
     {
@@ -523,6 +756,16 @@
       "baseUrl": "https://diamondfansub.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "seri",
+        "chapterMode": "MangaAjax",
+        "selectors": {
+          "description": ".manga-info",
+          "author": ".manga-authors",
+          "chapterDate": ".chapter-release-date .timediff"
+        },
+        "dateFormat": "MMMM d, yyyy"
+      },
       "id": "1000000000000000321"
     },
     {
@@ -533,6 +776,10 @@
       "baseUrl": "https://dojing.net",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "hasProjectPage": true,
+        "minIntervalMs": 15000
+      },
       "id": "1000000000000000234"
     },
     {
@@ -543,6 +790,14 @@
       "baseUrl": "https://dom4lfansub.online",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "selectors": {
+          "status": "div.summary-heading:contains(Durum) + div.summary-content"
+        },
+        "dateFormat": "d MMMM yyyy"
+      },
+      "unportedOverrides": 3,
       "id": "1000000000000000322"
     },
     {
@@ -563,6 +818,15 @@
       "baseUrl": "https://doujin-lc.net",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "doujin",
+        "filterNonMangaItems": false,
+        "selectors": {
+          "pageList": ".reading-content img"
+        },
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "th"
+      },
       "id": "1000000000000000294"
     },
     {
@@ -573,6 +837,14 @@
       "baseUrl": "https://dragontea.ink",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "novel",
+        "chapterMode": "MangaAjax",
+        "dateFormat": "MM/dd/yyyy",
+        "dateLocale": "en-US",
+        "minIntervalMs": 60000
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000032"
     },
     {
@@ -583,6 +855,10 @@
       "baseUrl": "https://drakecomic.org",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "minIntervalMs": 333
+      },
+      "unportedOverrides": 3,
       "id": "1000000000000000033"
     },
     {
@@ -593,6 +869,11 @@
       "baseUrl": "https://ecchi-doujin.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "doujin",
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "th"
+      },
       "id": "1000000000000000296"
     },
     {
@@ -603,6 +884,7 @@
       "baseUrl": "https://elftoon.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "unportedOverrides": 1,
       "id": "1000000000000000034"
     },
     {
@@ -613,6 +895,10 @@
       "baseUrl": "https://ero18x.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "variant": "noajax"
+      },
       "id": "1000000000000000035"
     },
     {
@@ -623,6 +909,13 @@
       "baseUrl": "https://es.mi2manga.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "es",
+        "minIntervalMs": 500
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000194"
     },
     {
@@ -633,6 +926,14 @@
       "baseUrl": "https://euphoriascan.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "selectors": {
+          "status": "div.summary-heading:contains(Status) + div.summary-content"
+        },
+        "dateFormat": "dd 'de' MMMM 'de' yyyy",
+        "dateLocale": "pt"
+      },
       "id": "1000000000000000274"
     },
     {
@@ -643,6 +944,20 @@
       "baseUrl": "https://evascans.org",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "series",
+        "pageSelector": "div#readerArea img",
+        "selectors": {
+          "status": ".stat-v-box:has(.stat-v-label:containsOwn(Status)) .stat-v-value",
+          "title": ".series-title-main",
+          "thumbnail": ".series-poster-premium img, .poster-box img",
+          "genre": ".series-genres-wrap .gen-tag",
+          "details": ".series-premium-header"
+        },
+        "dateFormat": "yyyy/MM/dd",
+        "dateLocale": "en"
+      },
+      "unportedOverrides": 4,
       "id": "1000000000000000036"
     },
     {
@@ -693,6 +1008,15 @@
       "baseUrl": "https://fbsquadx.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "selectors": {
+          "status": "div.post-content_item:contains(Status) > div.summary-content"
+        },
+        "dateFormat": "dd/MM/yyyy",
+        "minIntervalMs": 2000
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000275"
     },
     {
@@ -703,6 +1027,16 @@
       "baseUrl": "https://flowermangas.net",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "selectors": {
+          "chapterDate": ".chapter-release-date .timediff"
+        },
+        "dateFormat": "dd.MM.yyyy",
+        "dateLocale": "en",
+        "minIntervalMs": 30000
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000276"
     },
     {
@@ -723,6 +1057,7 @@
       "baseUrl": "https://gafeland.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "unportedOverrides": 1,
       "id": "1000000000000000323"
     },
     {
@@ -733,6 +1068,10 @@
       "baseUrl": "https://gaiatoon.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM d, yyy",
+        "dateLocale": "tr"
+      },
       "id": "1000000000000000324"
     },
     {
@@ -743,6 +1082,10 @@
       "baseUrl": "https://gakamangas.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "filterNonMangaItems": false
+      },
       "id": "1000000000000000040"
     },
     {
@@ -763,6 +1106,9 @@
       "baseUrl": "https://gdscans.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax"
+      },
       "id": "1000000000000000042"
     },
     {
@@ -773,6 +1119,11 @@
       "baseUrl": "https://garciamanga.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "filterNonMangaItems": false,
+        "dateFormat": "MMMM d, yyyy"
+      },
       "id": "1000000000000000325"
     },
     {
@@ -783,6 +1134,14 @@
       "baseUrl": "https://gedecomix.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "porncomic",
+        "chapterMode": "MangaAjax",
+        "selectors": {
+          "thumbnail": "${super.mangaDetailsSelectorThumbnail}:not([data-eio])"
+        }
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000043"
     },
     {
@@ -793,6 +1152,13 @@
       "baseUrl": "https://ghostscan.xyz",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "dd 'de' MMMM 'de' yyyy",
+        "dateLocale": "pt",
+        "minIntervalMs": 2000
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000277"
     },
     {
@@ -803,6 +1169,14 @@
       "baseUrl": "https://ghostoon.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "variant": "noajax",
+        "selectors": {
+          "pageList": "div.page-break img.wp-manga-chapter-img"
+        }
+      },
+      "unportedOverrides": 3,
       "id": "1000000000000000326"
     },
     {
@@ -813,6 +1187,12 @@
       "baseUrl": "https://gingertoon.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "variant": "noajax",
+        "dateFormat": "MM.dd.uuuu",
+        "dateLocale": "en"
+      },
       "id": "1000000000000000044"
     },
     {
@@ -833,6 +1213,10 @@
       "baseUrl": "https://god-doujin.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "th"
+      },
       "id": "1000000000000000298"
     },
     {
@@ -843,6 +1227,9 @@
       "baseUrl": "https://goonscans.org",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "title"
+      },
       "id": "1000000000000000179"
     },
     {
@@ -863,6 +1250,12 @@
       "baseUrl": "https://grabber.zone",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "comics",
+        "dateFormat": "dd.MM.yyyy",
+        "dateLocale": "en"
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000164"
     },
     {
@@ -873,6 +1266,15 @@
       "baseUrl": "https://lectorhades.latamtoon.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "tmo",
+        "chapterMode": "MangaAjax",
+        "selectors": {
+          "status": "div.summary_content > div.post-content div.post-content_item:has(div.summary-heading:contains(Status)) div.summary-content"
+        },
+        "dateFormat": "MM/dd/yyyy",
+        "dateLocale": "es"
+      },
       "id": "1000000000000000195"
     },
     {
@@ -883,6 +1285,20 @@
       "baseUrl": "https://hadesscans.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "selectors": {
+          "status": ".meta-row span:has(.status-tag)",
+          "title": ".manga-title",
+          "description": ".entry-content",
+          "thumbnail": ".info-poster img",
+          "author": ".meta-row span:has(i.fa-user-edit)",
+          "genre": ".genre-list a"
+        },
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "en",
+        "minIntervalMs": 30000
+      },
+      "unportedOverrides": 4,
       "id": "1000000000000000046"
     },
     {
@@ -893,6 +1309,9 @@
       "baseUrl": "https://harmony-scan.fr",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax"
+      },
       "id": "1000000000000000216"
     },
     {
@@ -903,6 +1322,11 @@
       "baseUrl": "https://hayalistic.online",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "variant": "noajax",
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "en"
+      },
       "id": "1000000000000000327"
     },
     {
@@ -913,6 +1337,14 @@
       "baseUrl": "https://hentai.scantrad-vf.cc",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "selectors": {
+          "status": "div.summary-heading:contains(État) + .summary-content"
+        },
+        "dateFormat": "d MMMM, yyyy",
+        "dateLocale": "fr"
+      },
       "id": "1000000000000000217"
     },
     {
@@ -933,6 +1365,11 @@
       "baseUrl": "https://dexhentai.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "en-US"
+      },
+      "unportedOverrides": 4,
       "id": "1000000000000000048"
     },
     {
@@ -953,6 +1390,10 @@
       "baseUrl": "https://hentaisco.cc",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "hentai",
+        "variant": "noajax"
+      },
       "id": "1000000000000000050"
     },
     {
@@ -963,6 +1404,11 @@
       "baseUrl": "https://hentaixcomic.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "MMM d, uuuu",
+        "dateLocale": "en-US"
+      },
       "id": "1000000000000000051"
     },
     {
@@ -973,6 +1419,7 @@
       "baseUrl": "https://hentaixdickgirl.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "unportedOverrides": 1,
       "id": "1000000000000000052"
     },
     {
@@ -983,6 +1430,11 @@
       "baseUrl": "https://hentaixyuri.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "MMM d, uuuu",
+        "dateLocale": "en-US"
+      },
       "id": "1000000000000000053"
     },
     {
@@ -993,6 +1445,11 @@
       "baseUrl": "https://hentaizone.xyz",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "tous-les-mangas",
+        "dateFormat": "MMM d, yyyy",
+        "dateLocale": "fr"
+      },
       "id": "1000000000000000218"
     },
     {
@@ -1003,6 +1460,11 @@
       "baseUrl": "https://hijala.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "ar"
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000180"
     },
     {
@@ -1013,6 +1475,11 @@
       "baseUrl": "https://hhentai.fr",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "variant": "noajax",
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "fr"
+      },
       "id": "1000000000000000219"
     },
     {
@@ -1023,6 +1490,15 @@
       "baseUrl": "https://hizomanga.net",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "serie",
+        "selectors": {
+          "status": ".manga-status",
+          "description": ".manga-excerpt"
+        },
+        "dateFormat": "yyyy-MM-dd",
+        "dateLocale": "en-US"
+      },
       "id": "1000000000000000181"
     },
     {
@@ -1033,6 +1509,9 @@
       "baseUrl": "https://doujindistrict.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax"
+      },
       "id": "1000000000000000054"
     },
     {
@@ -1043,6 +1522,12 @@
       "baseUrl": "https://hotcabaretscan.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "pt",
+        "minIntervalMs": 2000
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000278"
     },
     {
@@ -1053,6 +1538,11 @@
       "baseUrl": "https://houseofotakusv2.xyz",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "es"
+      },
       "id": "1000000000000000196"
     },
     {
@@ -1063,6 +1553,11 @@
       "baseUrl": "https://inventariooculto.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "dd MMMM, yyyy",
+        "dateLocale": "es"
+      },
       "id": "1000000000000000197"
     },
     {
@@ -1073,6 +1568,10 @@
       "baseUrl": "https://ch1.isekaikomik.site",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "id"
+      },
       "id": "1000000000000000257"
     },
     {
@@ -1093,6 +1592,14 @@
       "baseUrl": "https://izanamiscans.my.id",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "selectors": {
+          "author": ".fmed b:contains(Penulis) + span"
+        },
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "id",
+        "minIntervalMs": 20000
+      },
       "id": "1000000000000000235"
     },
     {
@@ -1103,6 +1610,9 @@
       "baseUrl": "https://jinmangas.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax"
+      },
       "id": "1000000000000000056"
     },
     {
@@ -1113,6 +1623,12 @@
       "baseUrl": "https://leitor.kamisama.com.br",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "dd 'de' MMMM 'de' yyyy",
+        "minIntervalMs": 2000
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000279"
     },
     {
@@ -1123,6 +1639,10 @@
       "baseUrl": "https://kanzenin.info",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "id"
+      },
       "id": "1000000000000000236"
     },
     {
@@ -1133,6 +1653,10 @@
       "baseUrl": "https://www.kazokuden.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "variant": "noajax"
+      },
       "id": "1000000000000000198"
     },
     {
@@ -1153,6 +1677,11 @@
       "baseUrl": "https://kissmanga.in",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "kissmanga",
+        "chapterMode": "MangaAjax"
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000058"
     },
     {
@@ -1163,6 +1692,11 @@
       "baseUrl": "https://kiwiyascans.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "en"
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000220"
     },
     {
@@ -1173,6 +1707,11 @@
       "baseUrl": "https://klikmanga.org",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "daftar-komik",
+        "chapterMode": "MangaAjax",
+        "dateFormat": "MMMM dd, yyyy"
+      },
       "id": "1000000000000000237"
     },
     {
@@ -1183,6 +1722,10 @@
       "baseUrl": "https://kmansin09.top",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "variant": "noajax"
+      },
       "id": "1000000000000000269"
     },
     {
@@ -1193,6 +1736,10 @@
       "baseUrl": "https://kodokustudio.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "manhua",
+        "chapterMode": "MangaAjax"
+      },
       "id": "1000000000000000165"
     },
     {
@@ -1203,6 +1750,9 @@
       "baseUrl": "https://kokomangas.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax"
+      },
       "id": "1000000000000000059"
     },
     {
@@ -1213,6 +1763,12 @@
       "baseUrl": "https://komikdewasa.mom",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "komik",
+        "hasProjectPage": true,
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "id"
+      },
       "id": "1000000000000000239"
     },
     {
@@ -1223,6 +1779,11 @@
       "baseUrl": "https://komikdewasa.art",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "komik",
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "en"
+      },
       "id": "1000000000000000240"
     },
     {
@@ -1233,6 +1794,10 @@
       "baseUrl": "https://komikstation.org",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "hasProjectPage": true,
+        "minIntervalMs": 15000
+      },
       "id": "1000000000000000244"
     },
     {
@@ -1243,6 +1808,11 @@
       "baseUrl": "https://komikhwa.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "id"
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000241"
     },
     {
@@ -1253,6 +1823,11 @@
       "baseUrl": "https://komikindo.fit",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "hasProjectPage": true,
+        "minIntervalMs": 20000
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000242"
     },
     {
@@ -1263,6 +1838,15 @@
       "baseUrl": "https://komiksin.net",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "hasProjectPage": true,
+        "selectors": {
+          "details": ".seriestucon"
+        },
+        "dateFormat": "MMM dd, yyyy",
+        "dateLocale": "id",
+        "minIntervalMs": 15000
+      },
       "id": "1000000000000000243"
     },
     {
@@ -1283,6 +1867,10 @@
       "baseUrl": "https://www.nabicix.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "d MMMM yyyy",
+        "dateLocale": "tr"
+      },
       "id": "1000000000000000328"
     },
     {
@@ -1293,6 +1881,9 @@
       "baseUrl": "https://ksgroupscans.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax"
+      },
       "id": "1000000000000000060"
     },
     {
@@ -1303,6 +1894,10 @@
       "baseUrl": "https://kumapoi.info",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "hasProjectPage": true,
+        "minIntervalMs": 15000
+      },
       "id": "1000000000000000246"
     },
     {
@@ -1313,6 +1908,10 @@
       "baseUrl": "https://kumopoi.org",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "hasProjectPage": true,
+        "dateFormat": "MMMM dd, yyyy"
+      },
       "id": "1000000000000000247"
     },
     {
@@ -1333,6 +1932,11 @@
       "baseUrl": "https://kuromanga.id",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "id"
+      },
+      "unportedOverrides": 4,
       "id": "1000000000000000248"
     },
     {
@@ -1343,6 +1947,12 @@
       "baseUrl": "https://kuroimanga.site",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "variant": "noajax",
+        "dateFormat": "d MMMM yyyy"
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000329"
     },
     {
@@ -1363,6 +1973,10 @@
       "baseUrl": "https://mangalami.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "th"
+      },
       "id": "1000000000000000300"
     },
     {
@@ -1373,6 +1987,20 @@
       "baseUrl": "https://lavascans.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "variant": "alt",
+        "selectors": {
+          "status": ".status-badge-lux",
+          "title": ".lh-title",
+          "description": "#manga-story",
+          "thumbnail": ".lh-poster img",
+          "genre": ".lh-genres a",
+          "details": "div.lh-container"
+        },
+        "dateFormat": "yyyy/MM/dd",
+        "dateLocale": "ar"
+      },
+      "unportedOverrides": 5,
       "id": "1000000000000000182"
     },
     {
@@ -1383,6 +2011,12 @@
       "baseUrl": "https://laviniafansub.shop",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "en"
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000330"
     },
     {
@@ -1393,6 +2027,14 @@
       "baseUrl": "https://www.lelmanga.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "selectors": {
+          "author": ".imptdt:contains(Auteur) i",
+          "artist": ".imptdt:contains(Artiste) i"
+        },
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "en"
+      },
       "id": "1000000000000000221"
     },
     {
@@ -1403,6 +2045,9 @@
       "baseUrl": "https://lhtranslation.net",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax"
+      },
       "id": "1000000000000000063"
     },
     {
@@ -1413,6 +2058,10 @@
       "baseUrl": "https://www.lianscans.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "hasProjectPage": true,
+        "minIntervalMs": 15000
+      },
       "id": "1000000000000000249"
     },
     {
@@ -1443,6 +2092,11 @@
       "baseUrl": "https://lunapiecesfansub.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "doujinshi",
+        "dateFormat": "d MMMM, yyyy",
+        "dateLocale": "es"
+      },
       "id": "1000000000000000199"
     },
     {
@@ -1453,6 +2107,11 @@
       "baseUrl": "https://tuhafscans.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "ajax",
+        "dateFormat": "d MMMM yyyy"
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000331"
     },
     {
@@ -1463,6 +2122,11 @@
       "baseUrl": "https://v4.luvyaa.co",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "en-US"
+      },
+      "unportedOverrides": 2,
       "id": "1000000000000000250"
     },
     {
@@ -1473,6 +2137,21 @@
       "baseUrl": "https://madarascans.org",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "series",
+        "pageSelector": ".pagination, .legendary-pagination, .magma-pagination",
+        "selectors": {
+          "status": "span.status-badge-lux",
+          "title": "h1.lh-title",
+          "description": "div.lh-story > #manga-story",
+          "thumbnail": ".lh-poster > img",
+          "genre": ".lh-genres > .lh-genre-tag",
+          "details": "div.lh-container"
+        },
+        "dateFormat": "yyyy/MM/dd",
+        "dateLocale": "en-US"
+      },
+      "unportedOverrides": 6,
       "id": "1000000000000000066"
     },
     {
@@ -1493,6 +2172,9 @@
       "baseUrl": "https://mahouirexnohentaikarte.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjaxQuery"
+      },
       "id": "1000000000000000068"
     },
     {
@@ -1503,6 +2185,13 @@
       "baseUrl": "https://makimaaaaa.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "selectors": {
+          "status": ".tsinfo .imptdt:contains(สถานะ) i"
+        },
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "th"
+      },
       "id": "1000000000000000301"
     },
     {
@@ -1513,6 +2202,9 @@
       "baseUrl": "https://manga18x.net",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax"
+      },
       "id": "1000000000000000069"
     },
     {
@@ -1523,6 +2215,15 @@
       "baseUrl": "https://mangacanblog.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "",
+        "pageSelector": "div.images img",
+        "selectors": {
+          "genre": ".seriestugenre a[href*=genre]"
+        },
+        "minIntervalMs": 20000
+      },
+      "unportedOverrides": 5,
       "id": "1000000000000000251"
     },
     {
@@ -1573,6 +2274,11 @@
       "baseUrl": "https://mangakusu.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "tr",
+        "minIntervalMs": 20000
+      },
       "id": "1000000000000000332"
     },
     {
@@ -1583,6 +2289,15 @@
       "baseUrl": "https://mangalivre.to",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "selectors": {
+          "chapterDate": ".chapter-date"
+        },
+        "dateFormat": "dd 'de' MMMM 'de' yyyy",
+        "dateLocale": "pt",
+        "minIntervalMs": 30000
+      },
+      "unportedOverrides": 2,
       "id": "1000000000000000280"
     },
     {
@@ -1593,6 +2308,10 @@
       "baseUrl": "https://mangamukai.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "es"
+      },
       "id": "1000000000000000201"
     },
     {
@@ -1603,6 +2322,11 @@
       "baseUrl": "https://mangaromance19.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "dd MMMM, yyyy",
+        "dateLocale": "es"
+      },
       "id": "1000000000000000200"
     },
     {
@@ -1613,6 +2337,11 @@
       "baseUrl": "https://manga-sehri.net",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "d MMMM yyyy",
+        "dateLocale": "tr"
+      },
       "id": "1000000000000000333"
     },
     {
@@ -1623,6 +2352,9 @@
       "baseUrl": "https://starzmanga.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "d MMMM، yyyy"
+      },
       "id": "1000000000000000183"
     },
     {
@@ -1633,6 +2365,12 @@
       "baseUrl": "https://mangastop.net",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "pt",
+        "minIntervalMs": 30000
+      },
+      "unportedOverrides": 7,
       "id": "1000000000000000281"
     },
     {
@@ -1643,6 +2381,10 @@
       "baseUrl": "https://mangatrend.org",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "ar"
+      },
       "id": "1000000000000000074"
     },
     {
@@ -1653,6 +2395,15 @@
       "baseUrl": "https://mangatv.net",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "lista",
+        "selectors": {
+          "description": "b:contains(Sinopsis) + span"
+        },
+        "dateFormat": "yyyy-MM-dd",
+        "dateLocale": "en"
+      },
+      "unportedOverrides": 4,
       "id": "1000000000000000202"
     },
     {
@@ -1663,6 +2414,14 @@
       "baseUrl": "https://manga-lc.net",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "filterNonMangaItems": false,
+        "selectors": {
+          "pageList": ".reading-content img"
+        },
+        "dateFormat": "d MMMM yyyy",
+        "dateLocale": "th"
+      },
       "id": "1000000000000000304"
     },
     {
@@ -1673,6 +2432,11 @@
       "baseUrl": "https://manga-scantrad.io",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "d MMMM yyyy",
+        "dateLocale": "fr-FR"
+      },
       "id": "1000000000000000223"
     },
     {
@@ -1683,6 +2447,11 @@
       "baseUrl": "https://manga1688.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "th"
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000302"
     },
     {
@@ -1693,6 +2462,9 @@
       "baseUrl": "https://manga18free.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "ajax"
+      },
       "id": "1000000000000000075"
     },
     {
@@ -1723,6 +2495,11 @@
       "baseUrl": "https://mangacrazy.net",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "en"
+      },
       "id": "1000000000000000166"
     },
     {
@@ -1733,6 +2510,10 @@
       "baseUrl": "https://mangadia.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "d MMMM yyyy"
+      },
       "id": "1000000000000000078"
     },
     {
@@ -1753,6 +2534,11 @@
       "baseUrl": "https://mangaforfree.net",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "ajax",
+        "minIntervalMs": 1000
+      },
+      "unportedOverrides": 2,
       "id": "1000000000000000167"
     },
     {
@@ -1763,6 +2549,9 @@
       "baseUrl": "https://mangafree.info",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax"
+      },
       "id": "1000000000000000080"
     },
     {
@@ -1773,6 +2562,12 @@
       "baseUrl": "https://mangagg.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "MM/dd/yyyy",
+        "dateLocale": "en-US"
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000081"
     },
     {
@@ -1793,6 +2588,7 @@
       "baseUrl": "https://mangahe.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "unportedOverrides": 1,
       "id": "1000000000000000083"
     },
     {
@@ -1803,6 +2599,12 @@
       "baseUrl": "https://mangahub.fr",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "d MMMM yyyy",
+        "dateLocale": "fr"
+      },
+      "unportedOverrides": 2,
       "id": "1000000000000000222"
     },
     {
@@ -1813,6 +2615,9 @@
       "baseUrl": "https://mangaka.cc",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "ajax"
+      },
       "id": "1000000000000000084"
     },
     {
@@ -1823,6 +2628,12 @@
       "baseUrl": "https://www.mangakimi.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "pageSelector": "div#readerarea img, #readerarea div.displayImage + script:containsData(p,a,c,k,e,d)",
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "th"
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000303"
     },
     {
@@ -1843,6 +2654,10 @@
       "baseUrl": "https://mangaowl.io",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "read-1",
+        "chapterMode": "MangaAjax"
+      },
       "id": "1000000000000000086"
     },
     {
@@ -1853,6 +2668,10 @@
       "baseUrl": "https://www.mangaread.org",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "dd.MM.yyy",
+        "dateLocale": "en-US"
+      },
       "id": "1000000000000000087"
     },
     {
@@ -1863,6 +2682,10 @@
       "baseUrl": "https://mangas-scans.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "fr"
+      },
       "id": "1000000000000000224"
     },
     {
@@ -1873,6 +2696,10 @@
       "baseUrl": "https://mangastep.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "th"
+      },
       "id": "1000000000000000305"
     },
     {
@@ -1883,6 +2710,9 @@
       "baseUrl": "https://mangasushi.org",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax"
+      },
       "id": "1000000000000000088"
     },
     {
@@ -1893,6 +2723,10 @@
       "baseUrl": "https://mangasusuku.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "komik"
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000252"
     },
     {
@@ -1903,6 +2737,11 @@
       "baseUrl": "https://www.tilkiscans.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "dd/MM/yyyy"
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000334"
     },
     {
@@ -1913,6 +2752,15 @@
       "baseUrl": "https://mangatx.cc",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "manga-list",
+        "selectors": {
+          "author": ".imptdt:contains(Author) a"
+        },
+        "dateFormat": "dd-MM-yyyy",
+        "dateLocale": "en",
+        "minIntervalMs": 20000
+      },
       "id": "1000000000000000089"
     },
     {
@@ -1923,6 +2771,9 @@
       "baseUrl": "https://mangawow.org",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "dd MMMM yyyy"
+      },
       "id": "1000000000000000335"
     },
     {
@@ -1933,6 +2784,11 @@
       "baseUrl": "https://mangayy.org",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "dd MMMM, yyyy",
+        "dateLocale": "en-US"
+      },
       "id": "1000000000000000090"
     },
     {
@@ -1943,6 +2799,10 @@
       "baseUrl": "https://mangazure.net",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "dd MMMM yyyy",
+        "dateLocale": "tr"
+      },
       "id": "1000000000000000336"
     },
     {
@@ -1963,6 +2823,12 @@
       "baseUrl": "https://manhuaplus.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "filterNonMangaItems": false,
+        "selectors": {
+          "pageList": ".read-container img"
+        }
+      },
       "id": "1000000000000000091"
     },
     {
@@ -1973,6 +2839,10 @@
       "baseUrl": "https://www.manhuazonghe.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "manhua",
+        "filterNonMangaItems": false
+      },
       "id": "1000000000000000092"
     },
     {
@@ -2003,6 +2873,10 @@
       "baseUrl": "https://manhuanext.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax"
+      },
+      "unportedOverrides": 2,
       "id": "1000000000000000095"
     },
     {
@@ -2013,6 +2887,15 @@
       "baseUrl": "https://manhuascan.us",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "manga-list",
+        "selectors": {
+          "author": ".tsinfo .imptdt:contains(Author) a"
+        },
+        "dateFormat": "dd-MM-yyyy",
+        "dateLocale": "en"
+      },
+      "unportedOverrides": 2,
       "id": "1000000000000000096"
     },
     {
@@ -2023,6 +2906,13 @@
       "baseUrl": "https://manhuatop.org",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "manhua",
+        "chapterMode": "MangaAjax",
+        "filterNonMangaItems": false,
+        "dateFormat": "MM/dd/yyyy",
+        "dateLocale": "en"
+      },
       "id": "1000000000000000097"
     },
     {
@@ -2033,6 +2923,10 @@
       "baseUrl": "https://manhuaus.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "filterNonMangaItems": false
+      },
       "id": "1000000000000000098"
     },
     {
@@ -2043,6 +2937,12 @@
       "baseUrl": "https://manhwacomics.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "manhwa",
+        "chapterMode": "MangaAjax",
+        "dateFormat": "d MMM yyyy",
+        "dateLocale": "en-US"
+      },
       "id": "1000000000000000099"
     },
     {
@@ -2053,6 +2953,14 @@
       "baseUrl": "https://www.manhwaindo.my",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "series",
+        "hasProjectPage": true,
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "en-US",
+        "minIntervalMs": 15000
+      },
+      "unportedOverrides": 2,
       "id": "1000000000000000254"
     },
     {
@@ -2063,6 +2971,9 @@
       "baseUrl": "https://manhwalist02.asia",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "minIntervalMs": 20000
+      },
       "id": "1000000000000000256"
     },
     {
@@ -2073,6 +2984,9 @@
       "baseUrl": "https://manhwareads.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax"
+      },
       "id": "1000000000000000100"
     },
     {
@@ -2083,6 +2997,10 @@
       "baseUrl": "https://www.manhwatoon.me",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax"
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000101"
     },
     {
@@ -2093,6 +3011,16 @@
       "baseUrl": "https://manhwa-raw.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "variant": "noajax",
+        "selectors": {
+          "status": "div.post-content_item:contains(Status) > div.summary-content",
+          "description": "div.post-content_item:contains(Summary) div.summary-container",
+          "pageList": "div.page-break img.wp-manga-chapter-img"
+        },
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "en"
+      },
       "id": "1000000000000000169"
     },
     {
@@ -2113,6 +3041,12 @@
       "baseUrl": "https://manhwa68.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "filterNonMangaItems": false,
+        "dateFormat": "MMM d, yyyy",
+        "dateLocale": "en-US"
+      },
       "id": "1000000000000000103"
     },
     {
@@ -2123,6 +3057,10 @@
       "baseUrl": "https://manhwaclub.net",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "ajax"
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000168"
     },
     {
@@ -2133,6 +3071,11 @@
       "baseUrl": "https://www.manhwaden.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "variant": "noajax",
+        "filterNonMangaItems": false
+      },
       "id": "1000000000000000104"
     },
     {
@@ -2143,6 +3086,13 @@
       "baseUrl": "https://manhwadesu.store",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "komik",
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "id",
+        "minIntervalMs": 15000
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000253"
     },
     {
@@ -2153,6 +3103,9 @@
       "baseUrl": "https://manhwaget.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax"
+      },
       "id": "1000000000000000105"
     },
     {
@@ -2163,6 +3116,11 @@
       "baseUrl": "https://02.manhwaland.land",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "id",
+        "minIntervalMs": 15000
+      },
       "id": "1000000000000000255"
     },
     {
@@ -2183,6 +3141,10 @@
       "baseUrl": "https://manhwamanhua.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "filterNonMangaItems": false
+      },
       "id": "1000000000000000107"
     },
     {
@@ -2193,6 +3155,9 @@
       "baseUrl": "https://manhwanex.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax"
+      },
       "id": "1000000000000000108"
     },
     {
@@ -2203,6 +3168,11 @@
       "baseUrl": "https://manhwa-online.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "es"
+      },
       "id": "1000000000000000203"
     },
     {
@@ -2213,6 +3183,10 @@
       "baseUrl": "https://manhwatop.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "filterNonMangaItems": false
+      },
       "id": "1000000000000000109"
     },
     {
@@ -2233,6 +3207,11 @@
       "baseUrl": "https://marmota.me",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "d 'de' MMM 'de' yyyy",
+        "dateLocale": "es"
+      },
       "id": "1000000000000000204"
     },
     {
@@ -2243,6 +3222,17 @@
       "baseUrl": "https://leemiau.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "selectors": {
+          "status": ".lm4-poster-status",
+          "description": ".lm4-summary-full",
+          "thumbnail": "img.lm4-poster-image",
+          "genre": ".mgen a:not(:contains(Português))"
+        },
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "en"
+      },
+      "unportedOverrides": 7,
       "id": "1000000000000000170"
     },
     {
@@ -2253,6 +3243,7 @@
       "baseUrl": "https://mihentai.net",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "unportedOverrides": 1,
       "id": "1000000000000000258"
     },
     {
@@ -2263,6 +3254,10 @@
       "baseUrl": "https://milftoon.xxx",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "comics",
+        "variant": "noajax"
+      },
       "id": "1000000000000000111"
     },
     {
@@ -2273,6 +3268,13 @@
       "baseUrl": "https://minitwoscan.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "ajax",
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "pt",
+        "minIntervalMs": 2000
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000282"
     },
     {
@@ -2283,6 +3285,11 @@
       "baseUrl": "https://moon-toon.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "th"
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000306"
     },
     {
@@ -2293,6 +3300,11 @@
       "baseUrl": "https://moondaisyscans.pro",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "tr",
+        "minIntervalMs": 20000
+      },
       "id": "1000000000000000337"
     },
     {
@@ -2303,6 +3315,13 @@
       "baseUrl": "https://mrtenzus.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "MM/dd/yyyy",
+        "dateLocale": "en",
+        "minIntervalMs": 333
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000283"
     },
     {
@@ -2313,6 +3332,11 @@
       "baseUrl": "https://mundomanhwa.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "es"
+      },
       "id": "1000000000000000205"
     },
     {
@@ -2323,6 +3347,13 @@
       "baseUrl": "https://nebulosascan.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "MM/dd/yyyy",
+        "dateLocale": "en",
+        "minIntervalMs": 333
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000284"
     },
     {
@@ -2333,6 +3364,11 @@
       "baseUrl": "https://nekoproject.org",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "es",
+        "minIntervalMs": 30000
+      },
       "id": "1000000000000000206"
     },
     {
@@ -2353,6 +3389,7 @@
       "baseUrl": "https://nexcomic.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "unportedOverrides": 2,
       "id": "1000000000000000112"
     },
     {
@@ -2363,6 +3400,10 @@
       "baseUrl": "https://02.ngomik.cc",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "hasProjectPage": true
+      },
+      "unportedOverrides": 2,
       "id": "1000000000000000259"
     },
     {
@@ -2373,6 +3414,7 @@
       "baseUrl": "https://nikatoons.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "unportedOverrides": 1,
       "id": "1000000000000000113"
     },
     {
@@ -2383,6 +3425,13 @@
       "baseUrl": "https://ninjacomics.xyz",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "dd 'de' MMMM 'de' yyyy",
+        "dateLocale": "pt",
+        "minIntervalMs": 30000
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000285"
     },
     {
@@ -2393,6 +3442,10 @@
       "baseUrl": "https://nirvanamanga.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "tr"
+      },
       "id": "1000000000000000339"
     },
     {
@@ -2403,6 +3456,10 @@
       "baseUrl": "https://noromax02.my.id",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "hasProjectPage": true,
+        "pageSelector": "div#readerarea img:not(noscript img)"
+      },
       "id": "1000000000000000260"
     },
     {
@@ -2413,6 +3470,10 @@
       "baseUrl": "https://novamanhwa.cc",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "es"
+      },
       "id": "1000000000000000207"
     },
     {
@@ -2433,6 +3494,7 @@
       "baseUrl": "https://noxenscan.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "unportedOverrides": 1,
       "id": "1000000000000000115"
     },
     {
@@ -2443,6 +3505,10 @@
       "baseUrl": "https://www.ntr-manga.net",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "th"
+      },
       "id": "1000000000000000307"
     },
     {
@@ -2453,6 +3519,9 @@
       "baseUrl": "https://octopusmanga.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax"
+      },
       "id": "1000000000000000116"
     },
     {
@@ -2463,6 +3532,9 @@
       "baseUrl": "https://omicaso.org",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "comik"
+      },
       "id": "1000000000000000261"
     },
     {
@@ -2473,6 +3545,10 @@
       "baseUrl": "https://opiatoon.shop",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax"
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000340"
     },
     {
@@ -2483,6 +3559,9 @@
       "baseUrl": "https://www.orchisasia.org",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "comic"
+      },
       "id": "1000000000000000117"
     },
     {
@@ -2493,6 +3572,11 @@
       "baseUrl": "https://origami-orpheans.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMMM dd, yyyy",
+        "dateLocale": "pt",
+        "minIntervalMs": 2000
+      },
       "id": "1000000000000000286"
     },
     {
@@ -2503,6 +3587,17 @@
       "baseUrl": "https://yurilab.top",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "series",
+        "chapterMode": "MangaAjaxPaginated",
+        "selectors": {
+          "title": "h1.post-title"
+        },
+        "dateFormat": "d MMMM yyyy",
+        "dateLocale": "en",
+        "minIntervalMs": 30000
+      },
+      "unportedOverrides": 4,
       "id": "1000000000000000262"
     },
     {
@@ -2513,6 +3608,12 @@
       "baseUrl": "https://pantheon-scan.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "variant": "noajax",
+        "dateFormat": "d MMMM yyyy",
+        "dateLocale": "fr-FR"
+      },
       "id": "1000000000000000225"
     },
     {
@@ -2523,6 +3624,12 @@
       "baseUrl": "https://paradise-bl.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "selectors": {
+          "title": ".new-post-title h3 a"
+        }
+      },
       "id": "1000000000000000185"
     },
     {
@@ -2543,6 +3650,10 @@
       "baseUrl": "https://www.patimanga.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM d, yyy",
+        "dateLocale": "tr"
+      },
       "id": "1000000000000000341"
     },
     {
@@ -2563,6 +3674,9 @@
       "baseUrl": "https://www.petrotechsociety.org",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "dd/MM/yyyy"
+      },
       "id": "1000000000000000120"
     },
     {
@@ -2573,6 +3687,15 @@
       "baseUrl": "https://kitsuneyako.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "selectors": {
+          "thumbnail": ".tx-hero-cover > img.wp-post-image"
+        },
+        "dateFormat": "dd.MM.yyyy",
+        "dateLocale": "en",
+        "minIntervalMs": 20000
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000287"
     },
     {
@@ -2583,6 +3706,10 @@
       "baseUrl": "https://popsmanga.net",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "th"
+      },
       "id": "1000000000000000308"
     },
     {
@@ -2593,6 +3720,11 @@
       "baseUrl": "https://pornhwa.fr",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "catalogue",
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "fr"
+      },
       "id": "1000000000000000226"
     },
     {
@@ -2603,6 +3735,13 @@
       "baseUrl": "https://lerboyslove.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "variant": "noajax",
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "pt",
+        "minIntervalMs": 2000
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000288"
     },
     {
@@ -2623,6 +3762,7 @@
       "baseUrl": "https://ragescans.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "unportedOverrides": 2,
       "id": "1000000000000000122"
     },
     {
@@ -2633,6 +3773,11 @@
       "baseUrl": "https://www.raindropteamfan.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "tr"
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000342"
     },
     {
@@ -2643,6 +3788,9 @@
       "baseUrl": "https://ravenscans.net",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "series"
+      },
       "id": "1000000000000000123"
     },
     {
@@ -2653,6 +3801,10 @@
       "baseUrl": "https://rawbaka.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "filterNonMangaItems": false
+      },
       "id": "1000000000000000270"
     },
     {
@@ -2663,6 +3815,10 @@
       "baseUrl": "https://razure.org",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "series"
+      },
+      "unportedOverrides": 2,
       "id": "1000000000000000124"
     },
     {
@@ -2693,6 +3849,7 @@
       "baseUrl": "https://restscans.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "unportedOverrides": 1,
       "id": "1000000000000000126"
     },
     {
@@ -2703,6 +3860,12 @@
       "baseUrl": "https://r1.richtoon.top",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "en",
+        "minIntervalMs": 500
+      },
+      "unportedOverrides": 2,
       "id": "1000000000000000208"
     },
     {
@@ -2713,6 +3876,14 @@
       "baseUrl": "https://rizzfables.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "series",
+        "pageSelector": "div#readerarea > img",
+        "dateFormat": "dd MMM yyyy",
+        "dateLocale": "en",
+        "minIntervalMs": 3000
+      },
+      "unportedOverrides": 14,
       "id": "1000000000000000127"
     },
     {
@@ -2733,6 +3904,7 @@
       "baseUrl": "https://rokaricomics.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "unportedOverrides": 7,
       "id": "1000000000000000129"
     },
     {
@@ -2753,6 +3925,11 @@
       "baseUrl": "https://www.ruyamanga2.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "filterNonMangaItems": false,
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "en"
+      },
       "id": "1000000000000000343"
     },
     {
@@ -2763,6 +3940,11 @@
       "baseUrl": "https://s2read.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "selectors": {
+          "pageList": "div.page-break img[src*=\\"
+        }
+      },
       "id": "1000000000000000131"
     },
     {
@@ -2773,6 +3955,9 @@
       "baseUrl": "https://sasangeyou.net",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM dd, yyyy"
+      },
       "id": "1000000000000000263"
     },
     {
@@ -2783,6 +3968,10 @@
       "baseUrl": "https://scythescans.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "minIntervalMs": 20000
+      },
+      "unportedOverrides": 2,
       "id": "1000000000000000132"
     },
     {
@@ -2793,6 +3982,10 @@
       "baseUrl": "https://sektedoujin.cc",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM dd, yyyy",
+        "minIntervalMs": 15000
+      },
       "id": "1000000000000000264"
     },
     {
@@ -2803,6 +3996,13 @@
       "baseUrl": "https://seraphic-deviltry.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "MM/dd/yyyy",
+        "dateLocale": "en-US",
+        "minIntervalMs": 333
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000171"
     },
     {
@@ -2813,6 +4013,10 @@
       "baseUrl": "https://sereinscan.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMM d, yyy",
+        "dateLocale": "tr"
+      },
       "id": "1000000000000000344"
     },
     {
@@ -2843,6 +4047,11 @@
       "baseUrl": "https://shijiescans.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "seri",
+        "dateFormat": "MMM d, yyy",
+        "dateLocale": "tr"
+      },
       "id": "1000000000000000345"
     },
     {
@@ -2853,6 +4062,10 @@
       "baseUrl": "https://shirakami.xyz",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "id"
+      },
       "id": "1000000000000000265"
     },
     {
@@ -2863,6 +4076,11 @@
       "baseUrl": "https://siikomik.id",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "komik",
+        "chapterMode": "MangaAjax"
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000266"
     },
     {
@@ -2873,6 +4091,7 @@
       "baseUrl": "https://www.sing-manga.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "unportedOverrides": 1,
       "id": "1000000000000000310"
     },
     {
@@ -2883,6 +4102,12 @@
       "baseUrl": "https://skymanga.work",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "manga-list",
+        "dateFormat": "dd-MM-yyyy",
+        "dateLocale": "en-US",
+        "minIntervalMs": 20000
+      },
       "id": "1000000000000000135"
     },
     {
@@ -2893,6 +4118,11 @@
       "baseUrl": "https://skymangas.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "es"
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000209"
     },
     {
@@ -2903,6 +4133,9 @@
       "baseUrl": "https://sleepytranslations.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax"
+      },
       "id": "1000000000000000136"
     },
     {
@@ -2923,6 +4156,10 @@
       "baseUrl": "https://www.xn--l3c0azab5a2gta.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMMM dd, yyyy",
+        "dateLocale": "th"
+      },
       "id": "1000000000000000312"
     },
     {
@@ -2933,6 +4170,11 @@
       "baseUrl": "https://soulscans.my.id",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "hasProjectPage": true,
+        "pageSelector": "div#readerarea img:not([src*='.gif'])"
+      },
+      "unportedOverrides": 2,
       "id": "1000000000000000267"
     },
     {
@@ -2963,6 +4205,23 @@
       "baseUrl": "https://starligthscan.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "mangas",
+        "pageSelector": "div.scanImagesContainer img.scanImage",
+        "selectors": {
+          "status": "span.base__horizontalList[title^=Status]",
+          "title": "h1.mangaDetails__title",
+          "description": "span.mangaDetails__description",
+          "thumbnail": "img.mangaDetails__cover",
+          "author": "span.mangaDetails__author",
+          "genre": "li.mangaTags__item",
+          "details": "section.mangaDetails"
+        },
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "pt",
+        "minIntervalMs": 2000
+      },
+      "unportedOverrides": 11,
       "id": "1000000000000000289"
     },
     {
@@ -2973,6 +4232,10 @@
       "baseUrl": "https://sunsetmanga.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "dd.MM.yyyy",
+        "dateLocale": "en"
+      },
       "id": "1000000000000000346"
     },
     {
@@ -2983,6 +4246,17 @@
       "baseUrl": "https://sushiscan.net",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "catalogue",
+        "selectors": {
+          "status": ".infotable tr:contains(Statut) td:last-child",
+          "author": ".infotable tr:contains(Auteur) td:last-child"
+        },
+        "dateFormat": "dd MMMM yyyy",
+        "dateLocale": "fr",
+        "minIntervalMs": 500
+      },
+      "unportedOverrides": 9,
       "id": "1000000000000000228"
     },
     {
@@ -2993,6 +4267,16 @@
       "baseUrl": "https://sushiscan.fr",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "catalogue",
+        "selectors": {
+          "status": ".imptdt:contains(Statut) i",
+          "author": ".imptdt:contains(Auteur) i, .fmed b:contains(Auteur)+span"
+        },
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "fr"
+      },
+      "unportedOverrides": 2,
       "id": "1000000000000000229"
     },
     {
@@ -3003,6 +4287,13 @@
       "baseUrl": "https://tankouhentai.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "dd 'de' MMMM 'de' yyyy",
+        "dateLocale": "pt",
+        "minIntervalMs": 2000
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000290"
     },
     {
@@ -3013,6 +4304,10 @@
       "baseUrl": "https://www.tanuki-manga.net",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "th"
+      },
       "id": "1000000000000000314"
     },
     {
@@ -3023,6 +4318,10 @@
       "baseUrl": "https://www.tarotscans.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "tr"
+      },
       "id": "1000000000000000347"
     },
     {
@@ -3043,6 +4342,11 @@
       "baseUrl": "https://en-thunderscans.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "comics",
+        "variant": "alt"
+      },
+      "unportedOverrides": 4,
       "id": "1000000000000000138"
     },
     {
@@ -3053,6 +4357,17 @@
       "baseUrl": "https://tonizu.top",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "selectors": {
+          "status": ".summary-heading:contains(Durum) ~ .summary-content",
+          "title": "#manga-title",
+          "author": ".summary-heading:contains(Yazar) ~ .summary-content"
+        },
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "en"
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000349"
     },
     {
@@ -3063,6 +4378,14 @@
       "baseUrl": "https://toomtam-manga.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "selectors": {
+          "author": ".imptdt:contains(ผู้เขียน) i",
+          "artist": ".imptdt:contains(ศิลปิน) i"
+        },
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "th"
+      },
       "id": "1000000000000000315"
     },
     {
@@ -3073,6 +4396,16 @@
       "baseUrl": "https://toonfr.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "webtoon",
+        "chapterMode": "MangaAjax",
+        "selectors": {
+          "status": "div.summary-heading:contains(Statut) + div.summary-content",
+          "title": ".post-content h3"
+        },
+        "dateFormat": "MMM d",
+        "dateLocale": "fr"
+      },
       "id": "1000000000000000230"
     },
     {
@@ -3083,6 +4416,10 @@
       "baseUrl": "https://toon-es.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMM dd, yyyy",
+        "dateLocale": "es"
+      },
       "id": "1000000000000000210"
     },
     {
@@ -3103,6 +4440,12 @@
       "baseUrl": "https://www.toongod.org",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "webtoons",
+        "variant": "noajax",
+        "dateFormat": "d MMM yyyy",
+        "dateLocale": "en-US"
+      },
       "id": "1000000000000000140"
     },
     {
@@ -3133,6 +4476,15 @@
       "baseUrl": "https://mangatop.org",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "series",
+        "chapterMode": "MangaAjaxPaginated",
+        "filterNonMangaItems": false,
+        "dateFormat": "MM/dd/yy",
+        "dateLocale": "en-US",
+        "minIntervalMs": 30000
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000143"
     },
     {
@@ -3143,6 +4495,11 @@
       "baseUrl": "https://topcomicporno.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "MMM dd, yy",
+        "dateLocale": "es"
+      },
       "id": "1000000000000000211"
     },
     {
@@ -3153,6 +4510,11 @@
       "baseUrl": "https://topcomicporno.net",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "MMM dd, yy",
+        "dateLocale": "es"
+      },
       "id": "1000000000000000212"
     },
     {
@@ -3163,6 +4525,13 @@
       "baseUrl": "https://www.topmanhua.fan",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "manhua",
+        "variant": "noajax",
+        "dateFormat": "MM/dd/yyyy",
+        "dateLocale": "en"
+      },
+      "unportedOverrides": 2,
       "id": "1000000000000000144"
     },
     {
@@ -3173,6 +4542,9 @@
       "baseUrl": "https://topmanhua.net",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax"
+      },
       "id": "1000000000000000145"
     },
     {
@@ -3183,6 +4555,9 @@
       "baseUrl": "https://tortugaceviri.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMM d, yyy"
+      },
       "id": "1000000000000000350"
     },
     {
@@ -3193,6 +4568,9 @@
       "baseUrl": "https://tritinia.org",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax"
+      },
       "id": "1000000000000000146"
     },
     {
@@ -3203,6 +4581,10 @@
       "baseUrl": "https://truyentranhdammyy.site",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "ajax",
+        "dateFormat": "MMMM d, yyyy"
+      },
       "id": "1000000000000000356"
     },
     {
@@ -3213,6 +4595,12 @@
       "baseUrl": "https://tsundoku.com.br",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMMM d, yyyy",
+        "dateLocale": "pt",
+        "minIntervalMs": 2000
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000291"
     },
     {
@@ -3223,6 +4611,13 @@
       "baseUrl": "https://trmangaoku.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "selectors": {
+          "status": "div.summary-heading:contains(Durumu) + div.summary-content"
+        },
+        "dateFormat": "d MMMM yyyy"
+      },
       "id": "1000000000000000351"
     },
     {
@@ -3233,6 +4628,12 @@
       "baseUrl": "https://uchuujinmangas.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "hasProjectPage": true,
+        "dateFormat": "dd 'de' MMMM 'de' yyyy",
+        "dateLocale": "es",
+        "minIntervalMs": 333
+      },
       "id": "1000000000000000213"
     },
     {
@@ -3253,6 +4654,10 @@
       "baseUrl": "https://vermanhwa.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "MMMM d, yyyy"
+      },
       "id": "1000000000000000214"
     },
     {
@@ -3263,6 +4668,10 @@
       "baseUrl": "https://violetscans.org",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "comics"
+      },
+      "unportedOverrides": 2,
       "id": "1000000000000000148"
     },
     {
@@ -3283,6 +4692,10 @@
       "baseUrl": "https://www.walpurgiscan.it",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMM d, yyyy",
+        "dateLocale": "it"
+      },
       "id": "1000000000000000268"
     },
     {
@@ -3293,6 +4706,15 @@
       "baseUrl": "https://webtoonhatti.club",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "webtoon",
+        "variant": "noajax",
+        "selectors": {
+          "pageList": "div.page-break:not([style*=display:]):not([style*=visibility:])"
+        },
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "en"
+      },
       "id": "1000000000000000352"
     },
     {
@@ -3333,6 +4755,7 @@
       "baseUrl": "https://witchscans.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "unportedOverrides": 2,
       "id": "1000000000000000153"
     },
     {
@@ -3353,6 +4776,10 @@
       "baseUrl": "https://wuxiaworld.site",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "novel",
+        "chapterMode": "MangaAjax"
+      },
       "id": "1000000000000000155"
     },
     {
@@ -3363,6 +4790,14 @@
       "baseUrl": "https://x-manga.org",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "selectors": {
+          "pageList": "div.reading-content img"
+        },
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "fr"
+      },
       "id": "1000000000000000227"
     },
     {
@@ -3383,6 +4818,12 @@
       "baseUrl": "https://yaoiflix.fit",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "MMMM dd, yyyy",
+        "minIntervalMs": 20000
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000353"
     },
     {
@@ -3393,6 +4834,9 @@
       "baseUrl": "https://yaoimangaoku.net",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "d MMMM yyyy"
+      },
       "id": "1000000000000000354"
     },
     {
@@ -3403,6 +4847,11 @@
       "baseUrl": "https://yaoihub.org",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "minIntervalMs": 2000
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000157"
     },
     {
@@ -3423,6 +4872,14 @@
       "baseUrl": "https://yaoiscan.fr",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "catalogue",
+        "selectors": {
+          "status": ".status-value"
+        },
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "fr-FR"
+      },
       "id": "1000000000000000231"
     },
     {
@@ -3433,6 +4890,12 @@
       "baseUrl": "https://yurionair.top",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "dd/MM/yyyy",
+        "minIntervalMs": 2000
+      },
+      "unportedOverrides": 1,
       "id": "1000000000000000292"
     },
     {
@@ -3443,6 +4906,11 @@
       "baseUrl": "https://yuri-online.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjax",
+        "dateFormat": "MMM dd, yyyy",
+        "dateLocale": "es"
+      },
       "id": "1000000000000000215"
     },
     {
@@ -3453,6 +4921,10 @@
       "baseUrl": "https://www.zazamanga.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "variant": "noajax"
+      },
+      "unportedOverrides": 3,
       "id": "1000000000000000159"
     },
     {
@@ -3463,6 +4935,10 @@
       "baseUrl": "https://zenithscans.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMM d, yyy",
+        "dateLocale": "tr"
+      },
       "id": "1000000000000000355"
     },
     {
@@ -3473,6 +4949,9 @@
       "baseUrl": "https://mangazin.org",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "filterNonMangaItems": false
+      },
       "id": "1000000000000000160"
     },
     {

@@ -101,7 +101,13 @@ function extractTsReader(html: string): string[] {
 
 export function createMangaThemesiaSource(config: MangaThemesiaConfig, deps: SourceDeps): Source {
   const baseUrl = config.baseUrl.replace(/\/+$/, '');
-  const mangaPath = config.mangaPath ?? 'series';
+  // `manga`, not `series`. The theme's own default is `/manga` and 112 of the
+  // 142 installs upstream leave it alone; `series` is the most common *override*
+  // (7 sites), which is how it came to be mistaken for the default. Getting this
+  // wrong is not a degraded result but a 404 on every listing and every search —
+  // it was 86 of 141 sources. The real value now arrives per-site from the
+  // generator, so this is only the floor under a site that overrides nothing.
+  const mangaPath = config.mangaPath ?? 'manga';
   const listPath = config.listPath ?? mangaPath;
   const searchMode = config.searchMode ?? 'query';
   const http = deps.http;

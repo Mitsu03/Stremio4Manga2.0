@@ -36,6 +36,23 @@ interface ThemedEntry {
   id: string;
   contentWarning: 'SAFE' | 'MIXED' | 'NSFW';
   versionName: string;
+  /**
+   * How this site differs from its theme's defaults, read off the extension's
+   * own Kotlin by `tools/sync-keiyoushi.mjs`.
+   *
+   * Absent only for a site that overrides nothing — 30 of 315 upstream, which
+   * is why leaving this out was never the harmless simplification it looked
+   * like. The fields are a subset of each engine's own config type; a key the
+   * engine does not know is ignored rather than rejected, so the generator can
+   * carry a value across before the engine has a use for it.
+   */
+  config?: Record<string, unknown>;
+  /**
+   * How many *functions* the upstream extension overrode. Those are logic, not
+   * data, so none of them came across; the count is kept so a source that is
+   * only approximately right can say so instead of looking exact.
+   */
+  unportedOverrides?: number;
 }
 
 import { definition as mangadex } from './sites/mangadex.js';
@@ -66,6 +83,9 @@ const THEMED: SourceDefinition[] = (themed.extensions as ThemedEntry[]).flatMap(
     lang: entry.lang,
     baseUrl: entry.baseUrl,
     contentWarning: entry.contentWarning,
+    // Spread last so a site's own values win over the identity fields only if
+    // they collide, which they cannot: the generator never emits those keys.
+    ...entry.config,
   };
   const build =
     entry.theme === 'madara'
