@@ -268,7 +268,7 @@ export function createApiHandler(deps: { config: Config; db: Db; log: Logger }):
         notFound(res);
         return true;
       }
-      const icon = await sourceIcon(definition.pkgName, definition.name, dataPaths(config).cache);
+      const icon = sourceIcon(definition.pkgName, definition.name, dataPaths(config).cache);
       res.writeHead(200, {
         'Content-Type': icon.type,
         'Content-Length': String(icon.body.byteLength),

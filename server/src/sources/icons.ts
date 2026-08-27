@@ -23,7 +23,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import themed from '../../sources.themed.json' with { type: 'json' };
-import { sourceHttpFor } from './registry.js';
+import { USER_AGENT } from './http.js';
 
 /**
  * Where each source's icon is fetched from, keyed by pkgName.
@@ -51,12 +51,30 @@ const SITES: Record<string, string> = {
  * In the order worth trying. `apple-touch-icon.png` first because it is a real
  * PNG at a usable size; `/favicon.ico` is often 16 pixels and sometimes an ICO
  * that a browser renders in a tab and refuses inside an `<img>`.
+ *
+ * Two, not four. Every extra candidate is another timeout to sit through for
+ * every site that has none of them, and with hundreds of sources that arithmetic
+ * is the difference between a warm cache in a minute and one in an hour.
  */
-const CANDIDATES = ['/apple-touch-icon.png', '/favicon.svg', '/favicon.png', '/favicon.ico'];
+const CANDIDATES = ['/apple-touch-icon.png', '/favicon.ico'];
 
 const MAX_BYTES = 512 * 1024;
-/** A source site being slow must not hold the Sources page open. */
-const TIMEOUT_MS = 8_000;
+/** Short: nothing waits on this, and a site that is slow to serve a favicon is
+ * not going to become fast on the next try. */
+const TIMEOUT_MS = 6_000;
+
+/**
+ * How many icons are fetched at once, in the background.
+ *
+ * Deliberately not the shared source client. That client allows four requests
+ * in flight across the whole server, which is the right budget for reading
+ * manga and precisely the wrong place to put several hundred favicons: they
+ * would fill the queue for hours and every search would wait behind them. This
+ * is one request per site, once, cached forever after — low enough volume to
+ * run outside the limiter without being the kind of traffic it exists to
+ * prevent.
+ */
+const WARM_CONCURRENCY = 2;
 
 /** Cached in memory as well as on disk: this is hit once per row per page load. */
 const memory = new Map<string, { body: Buffer; type: string }>();
@@ -129,34 +147,22 @@ export function monogram(name: string): SourceIcon {
   return { body, type: 'image/svg+xml', real: false };
 }
 
-/**
- * The icon for a source: memory, then disk, then the site, then a monogram.
- *
- * Never throws and never returns nothing. The caller is an `<img>` tag, which
- * has no better idea than a broken-image mark.
- */
-export async function sourceIcon(
-  pkgName: string,
-  displayName: string,
-  cacheRoot: string,
-): Promise<SourceIcon> {
-  const held = memory.get(pkgName);
-  if (held) return { ...held, real: true };
+/** pkgNames queued or in flight, so a site is never fetched twice at once. */
+const warming = new Set<string>();
+let active = 0;
+const queue: (() => void)[] = [];
 
-  const dir = cacheDir(cacheRoot);
-  const stored = fromDisk(dir, pkgName);
-  if (stored) {
-    memory.set(pkgName, stored);
-    return { ...stored, real: true };
-  }
-
+async function fetchIcon(pkgName: string, dir: string): Promise<void> {
   const site = SITES[pkgName];
-  if (!site || missing.has(pkgName)) return monogram(displayName);
+  if (!site) return;
 
-  const http = sourceHttpFor({ sourceName: `${displayName} icon`, timeoutMs: TIMEOUT_MS });
   for (const path of CANDIDATES) {
     try {
-      const response = await http.raw(`${site}${path}`);
+      const response = await fetch(`${site}${path}`, {
+        headers: { 'User-Agent': USER_AGENT, Accept: 'image/*' },
+        signal: AbortSignal.timeout(TIMEOUT_MS),
+        redirect: 'follow',
+      });
       if (!response.ok) continue;
 
       const type = response.headers.get('content-type') ?? '';
@@ -167,20 +173,64 @@ export async function sourceIcon(
       const body = Buffer.from(await response.arrayBuffer());
       if (body.byteLength === 0 || body.byteLength > MAX_BYTES) continue;
 
-      const found = { body, type };
-      memory.set(pkgName, found);
+      memory.set(pkgName, { body, type });
       try {
         writeFileSync(join(dir, `${pkgName}.${extensionFor(type)}`), body);
       } catch {
         // A read-only or full data directory costs a re-fetch next boot, which
-        // is not a reason to fail the request in hand.
+        // is not a reason to lose the copy already in memory.
       }
-      return { ...found, real: true };
+      return;
     } catch {
       // Down, blocked, timed out: try the next path, then give up quietly.
     }
   }
 
   missing.add(pkgName);
+}
+
+/** Run `job` when a warming slot frees up. Fire-and-forget by design. */
+function schedule(job: () => Promise<void>): void {
+  const run = () => {
+    active++;
+    void job().finally(() => {
+      active--;
+      queue.shift()?.();
+    });
+  };
+  if (active < WARM_CONCURRENCY) run();
+  else queue.push(run);
+}
+
+/**
+ * The icon for a source: memory, then disk, then a monogram — and never the
+ * network.
+ *
+ * This used to fetch the favicon inline, which was fine for six sources and
+ * ruinous for several hundred: a cold icon cost up to 30 seconds, the Sources
+ * page asks for one per row, and they queued through the four in-flight slots
+ * the whole server shares with actual reading. The page took minutes and every
+ * search waited behind a pile of favicons.
+ *
+ * So the request is answered immediately, from cache or with a monogram, and a
+ * real icon is fetched in the background for the *next* load. The monogram
+ * carries a short cache lifetime for exactly that reason.
+ */
+export function sourceIcon(pkgName: string, displayName: string, cacheRoot: string): SourceIcon {
+  const held = memory.get(pkgName);
+  if (held) return { ...held, real: true };
+
+  const dir = cacheDir(cacheRoot);
+  const stored = fromDisk(dir, pkgName);
+  if (stored) {
+    memory.set(pkgName, stored);
+    return { ...stored, real: true };
+  }
+
+  if (SITES[pkgName] && !missing.has(pkgName) && !warming.has(pkgName)) {
+    warming.add(pkgName);
+    schedule(() => fetchIcon(pkgName, dir).finally(() => warming.delete(pkgName)));
+  }
+
   return monogram(displayName);
 }
