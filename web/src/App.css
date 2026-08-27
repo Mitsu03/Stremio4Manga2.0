@@ -416,6 +416,13 @@ button.result-row { width: 100%; text-align: left; cursor: pointer; font: inheri
 .search-all-sources { display: inline-flex; align-items: center; gap: 0.55rem; margin: 0.3rem 0 0.9rem; }
 .search-all-sources svg { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
 .search-all-sources small { color: var(--ink-soft); font-weight: 600; }
+
+/* The sweep button and the patience toggle sit together: one starts the wait, the other sets it. */
+.search-all-row { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+.search-all-row .search-all-sources { margin-bottom: 0; }
+.wait-longer { display: inline-flex; align-items: center; gap: 0.45rem; }
+.wait-longer svg { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.wait-longer.active { color: var(--accent); border-color: currentColor; }
 .result-row { display: grid; grid-template-columns: 82px minmax(0, 1fr) auto; gap: 1.2rem; align-items: center; padding: 1rem; background: var(--surface); border: 1px solid var(--line); border-radius: 6px 6px 18px 6px; }
 .result-row img { width: 82px; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 3px 3px 10px 3px; }
 .result-copy h2 { margin-bottom: 0.5rem; }

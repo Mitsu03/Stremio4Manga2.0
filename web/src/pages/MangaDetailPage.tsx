@@ -31,7 +31,7 @@ import {
   SOURCES_QUERY,
 } from '../utils/sources'
 import type { SourceNode } from '../utils/sources'
-import { readSourceSearchCache, useSourceSearch } from '../utils/sourceSearch'
+import { readSourceSearchCache, usePatience, useSourceSearch } from '../utils/sourceSearch'
 import type { SearchScope } from '../utils/sourceSearch'
 import {
   cleanupReassurance,
@@ -998,14 +998,15 @@ function FindOnSource({ mangaId, title, eyebrow, onPick, onCancel, onUseOwnSourc
   } = useSourceSearch(String(mangaId), title, searchSources, topSources)
 
   const [showLooseMatches, setShowLooseMatches] = useState(false)
+  const [waitLonger, toggleWaitLonger] = usePatience()
   const searched = useRef<string | null>(null)
 
   // Loose matches are asked for one search at a time, so a fresh sweep goes back to showing only
   // the titles that actually look like this one.
   const startSearch = useCallback((batch: SourceNode[], append: boolean, scope: SearchScope) => {
     if (batch.length > 0 && !append) setShowLooseMatches(false)
-    return runSearch(batch, append, scope)
-  }, [runSearch])
+    return runSearch(batch, append, scope, waitLonger)
+  }, [runSearch, waitLonger])
 
   useEffect(() => {
     if (searchSources.length === 0) return
@@ -1045,6 +1046,20 @@ function FindOnSource({ mangaId, title, eyebrow, onPick, onCancel, onUseOwnSourc
         <div><span className="eyebrow">{eyebrow}</span><h2>{t('Matches across your sources')}</h2></div>
         <div className="source-picker-controls">
           {onUseOwnSource && <button type="button" className="button quiet" onClick={onUseOwnSource.onUse}>{t('Use {source}', { source: onUseOwnSource.name })}</button>}
+          {/* Always here, not only when a tail is left to sweep: it governs every search this panel
+              runs, and the one that is always available is "Search again". */}
+          <button
+            type="button"
+            className={`button quiet wait-longer${waitLonger ? ' active' : ''}`}
+            onClick={toggleWaitLonger}
+            aria-pressed={waitLonger}
+            title={waitLonger
+              ? t('Slow sources are waited for. Searches take longer and find more.')
+              : t('Slow sources are skipped. Searches are quicker and may miss some.')}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10M7 21h10" /><path d="M8 3v4l4 5 4-5V3" /><path d="M8 21v-4l4-5 4 5v4" /></svg>
+            <span>{waitLonger ? t('Waiting for slow sources') : t('Skipping slow sources')}</span>
+          </button>
           {!finding && <button type="button" className="button quiet" onClick={() => startSearch(searchedAll ? searchSources : topSources, false, searchedAll ? 'all' : 'top')}>{t('Search again')}</button>}
           {onCancel && (
             <button type="button" className="button quiet source-picker-close" onClick={onCancel} aria-label={t('Keep the current source')} title={t('Keep the current source')}>
