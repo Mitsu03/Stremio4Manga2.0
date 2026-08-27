@@ -44,7 +44,13 @@ interface FetchSourceMangaArgs {
 }
 
 interface FetchSourceMangaBulkArgs {
-  input: { sources: string[]; type: BrowseType; page: number; query?: string | null };
+  input: {
+    sources: string[];
+    type: BrowseType;
+    page: number;
+    query?: string | null;
+    waitLonger?: boolean | null;
+  };
 }
 
 // ------------------------------------------------------------------ upsert --
@@ -202,12 +208,22 @@ async function inBatches<T, R>(items: T[], work: (item: T) => Promise<R>): Promi
  */
 const SOURCE_DEADLINE_MS = 12_000;
 
-function withDeadline<T>(work: Promise<T>, sourceName: string): Promise<T> {
+/**
+ * The same wait when the reader has asked for it.
+ *
+ * Not unlimited: a source that has said nothing in three quarters of a minute is
+ * not about to, and the per-request budget and the breaker still apply
+ * underneath. This is the reader choosing to wait, not the server agreeing to
+ * wait forever.
+ */
+const PATIENT_DEADLINE_MS = 45_000;
+
+function withDeadline<T>(work: Promise<T>, sourceName: string, limitMs: number): Promise<T> {
   let timer: NodeJS.Timeout;
   const deadline = new Promise<never>((_resolve, reject) => {
     timer = setTimeout(
-      () => reject(new Error(`${sourceName} took longer than ${SOURCE_DEADLINE_MS / 1000}s.`)),
-      SOURCE_DEADLINE_MS,
+      () => reject(new Error(`${sourceName} took longer than ${Math.round(limitMs / 1000)}s.`)),
+      limitMs,
     );
   });
   return Promise.race([work, deadline]).finally(() => clearTimeout(timer)) as Promise<T>;
@@ -266,6 +282,8 @@ export const group: ResolverGroup = {
       const ids = [...new Set(args.input.sources.map(String))];
       const page = pageNumber(args.input.page);
       const query = args.input.query ?? '';
+      // Opt-in, and off by default: the wait is the thing being chosen.
+      const limitMs = args.input.waitLonger ? PATIENT_DEADLINE_MS : SOURCE_DEADLINE_MS;
 
       const results = await inBatches(ids, async (sourceId) => {
         const source = getSource(sourceId);
@@ -280,6 +298,7 @@ export const group: ResolverGroup = {
           const answer = await withDeadline(
             browse(source, args.input.type, page, query, []),
             source.name,
+            limitMs,
           );
           return {
             source: sourceId,

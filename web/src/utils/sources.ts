@@ -20,8 +20,8 @@ export const SOURCES_QUERY = `
 // detail page's source picker and the library's mass migration ask sources the same question —
 // "what do you have under this title?" — and neither owns the answer.
 export const FETCH_SOURCE_MANGA_BULK_MUTATION = `
-  mutation FetchSourceMangaBulk($sources: [LongString!]!, $page: Int!, $query: String) {
-    fetchSourceMangaBulk(input: { sources: $sources, type: SEARCH, page: $page, query: $query }) {
+  mutation FetchSourceMangaBulk($sources: [LongString!]!, $page: Int!, $query: String, $waitLonger: Boolean) {
+    fetchSourceMangaBulk(input: { sources: $sources, type: SEARCH, page: $page, query: $query, waitLonger: $waitLonger }) {
       results {
         source
         error
