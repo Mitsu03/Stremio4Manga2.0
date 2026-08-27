@@ -99,9 +99,6 @@ export default function SourcesPage() {
   const [browsing, setBrowsing] = useState(false)
   const [catalogueQuery, setCatalogueQuery] = useState('')
   const [showAdult, setShowAdult] = useState(true)
-  // Installing drops a row out of the catalogue's own filter, which would make it vanish from under
-  // the cursor. These stay on screen — as a tick rather than a button — until the dialog is closed.
-  const [justInstalled, setJustInstalled] = useState<string[]>([])
   const [limit, setLimit] = useState(CATALOGUE_PAGE)
   const results = useRef<HTMLDivElement>(null)
   const [busyId, setBusyId] = useState<string | null>(null)
@@ -127,7 +124,10 @@ export default function SourcesPage() {
     const needle = catalogueQuery.trim().toLocaleLowerCase()
     return extensions
       .filter((extension) => !extension.isObsolete)
-      .filter((extension) => !extension.isInstalled || justInstalled.includes(extension.pkgName))
+      // Installed ones stay on the list, ticked. Hiding them was right when the
+      // catalogue was a remote index of thousands and the installed handful was
+      // noise; with a built-in catalogue that a new account installs whole, it
+      // meant "Add a source" opened on nothing at all.
       .filter((extension) => showAdult || extension.contentWarning === 'SAFE')
       // The language code is worth matching too: "pt" is how you find the Portuguese catalogues,
       // whose names rarely say which language they publish in.
@@ -135,7 +135,7 @@ export default function SourcesPage() {
         || extension.name.toLocaleLowerCase().includes(needle)
         || extension.lang.toLocaleLowerCase().includes(needle))
       .sort((a, b) => a.name.localeCompare(b.name))
-  }, [extensions, catalogueQuery, showAdult, justInstalled])
+  }, [extensions, catalogueQuery, showAdult])
 
   const outdated = useMemo(
     () => extensions.filter((extension) => extension.isInstalled && extension.hasUpdate && !extension.isObsolete),
@@ -158,7 +158,6 @@ export default function SourcesPage() {
   const closeCatalogue = () => {
     setBrowsing(false)
     setCatalogueQuery('')
-    setJustInstalled([])
   }
 
   useEffect(() => {
@@ -167,7 +166,6 @@ export default function SourcesPage() {
       if (event.key !== 'Escape') return
       setBrowsing(false)
       setCatalogueQuery('')
-      setJustInstalled([])
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
@@ -203,7 +201,6 @@ export default function SourcesPage() {
     const result = await updateExtension({ id: extension.pkgName, patch: { [action]: true } })
     setBusyId(null)
     if (result.error) { setActionError(friendlyError(result.error)); return }
-    if (action === 'install') setJustInstalled((pending) => [...pending, extension.pkgName])
     refetch({ requestPolicy: 'network-only' })
   }
 
@@ -224,7 +221,9 @@ export default function SourcesPage() {
   }
 
   const installedCount = extensions.filter((extension) => extension.isInstalled).length
-  const nothingToBrowse = extensions.every((extension) => extension.isInstalled)
+  // An empty catalogue now means the index itself is empty, not that everything
+  // in it is installed — installed rows are listed too, ticked.
+  const nothingToBrowse = extensions.length === 0
   const shown = catalogue.slice(0, limit)
 
   return (

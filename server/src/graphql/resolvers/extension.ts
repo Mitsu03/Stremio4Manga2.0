@@ -25,6 +25,7 @@ import type { GraphQLContext } from '../../types.js';
 import type { ResolverGroup } from './index.js';
 import catalog from '../../../catalog.json' with { type: 'json' };
 import { ANILIST_ICON } from '../../tracker/anilist.js';
+import { iconPath } from '../../sources/icons.js';
 import {
   allDefinitions,
   definitionById,
@@ -80,7 +81,7 @@ function toSource(definition: SourceDefinition) {
     id: definition.id,
     name: definition.name,
     lang: definition.lang,
-    iconUrl: null,
+    iconUrl: iconPath(definition.pkgName),
     // Every source here implements a latest listing; the field stays because
     // the client hides the "Latest" tab on the ones that do not.
     supportsLatest: true,
@@ -144,7 +145,8 @@ function toExtension(extension: CatalogExtension, installed: boolean) {
     name: extension.name,
     lang: extension.lang,
     versionName: extension.versionName,
-    iconUrl: null,
+    // Served by us, not linked at the site: see sources/icons.ts.
+    iconUrl: iconPath(extension.pkgName),
     contentWarning: extension.contentWarning,
     isNsfw: isNsfw(extension.contentWarning),
     isInstalled: installed,
@@ -157,7 +159,7 @@ function toExtension(extension: CatalogExtension, installed: boolean) {
         id: source.id,
         name: source.name,
         lang: source.lang,
-        iconUrl: null,
+        iconUrl: iconPath(extension.pkgName),
         supportsLatest: true,
         contentWarning: extension.contentWarning,
         isNsfw: isNsfw(extension.contentWarning),

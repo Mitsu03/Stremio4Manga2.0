@@ -23,6 +23,7 @@ import type { Db, Param } from '../../db/open.js';
 import type { GraphQLContext } from '../../types.js';
 import type { ResolverGroup } from './index.js';
 import { ANILIST_ICON, ANILIST_SOURCE_ID } from '../../tracker/anilist.js';
+import { iconPath } from '../../sources/icons.js';
 import { definitionById, getSource } from '../../sources/registry.js';
 import type { Source, SourceManga } from '../../sources/types.js';
 import { chaptersForManga, fetchChaptersFor, listChapters, type Chapter } from './chapter.js';
@@ -202,7 +203,7 @@ function sourceView(sourceId: string): Record<string, unknown> | null {
     id: definition.id,
     name: definition.name,
     lang,
-    iconUrl: null,
+    iconUrl: iconPath(definition.pkgName),
     supportsLatest: true,
     contentWarning: definition.contentWarning,
     isNsfw: definition.contentWarning === 'NSFW',

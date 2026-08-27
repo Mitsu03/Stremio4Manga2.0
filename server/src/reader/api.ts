@@ -21,6 +21,8 @@ import { dataPaths } from '../config.js';
 import type { Config } from '../config.js';
 import type { Db } from '../db/open.js';
 import type { ApiHandler, Logger, Req, Res, Session } from '../types.js';
+import { sourceIcon } from '../sources/icons.js';
+import { definitionByPkg } from '../sources/registry.js';
 import { readPage, readThumbnail, type ImageBytes, type ReaderDeps } from './pages.js';
 import { recordProgress } from './progress.js';
 
@@ -250,6 +252,31 @@ export function createApiHandler(deps: { config: Config; db: Db; log: Logger }):
         return true;
       }
       serveBackup(req, res, session, filename);
+      return true;
+    }
+
+    // /api/v1/extension/<pkgName>/icon — the Sources page draws one of these per
+    // row, so it answers from cache after the first and never fails: a miss is a
+    // generated monogram, not a 404 the browser would draw a broken mark for.
+    if (segments[2] === 'extension' && segments[4] === 'icon' && segments.length === 5) {
+      if (!isRead) {
+        methodNotAllowed(res);
+        return true;
+      }
+      const definition = definitionByPkg(segments[3]);
+      if (!definition) {
+        notFound(res);
+        return true;
+      }
+      const icon = await sourceIcon(definition.pkgName, definition.name, dataPaths(config).cache);
+      res.writeHead(200, {
+        'Content-Type': icon.type,
+        'Content-Length': String(icon.body.byteLength),
+        // A real icon is worth a day; a monogram is only worth holding until the
+        // site is reachable again, and an hour fixes itself unnoticed.
+        'Cache-Control': icon.real ? 'private, max-age=86400' : 'private, max-age=3600',
+      });
+      res.end(method === 'HEAD' ? undefined : icon.body);
       return true;
     }
 
