@@ -122,7 +122,8 @@ The volume is the deployment. The container is disposable — `podman rm` it,
 rebuild, recreate against the same volume, and the library is still there.
 `test/podman-validate.sh` (or `npm run test:podman`) proves exactly that, along
 with the sign-in, a GraphQL call and the non-root user, against a throwaway
-container on port 18080.
+container on port 18080. It runs rootless, and 18080 is deliberate: a real
+deployment on 8080 on the same machine is left alone.
 
 ## The config a public server needs
 
