@@ -18,6 +18,7 @@
  */
 import { load, type CheerioAPI, type Cheerio } from 'cheerio';
 import type { AnyNode } from 'domhandler';
+import { selector, widen, type ThemeSelectors } from './selectors.js';
 import type {
   FilterChange,
   FilterSpec,
@@ -56,17 +57,25 @@ export interface MadaraConfig {
   mangaPath?: string;
   /**
    * How the chapter list arrives.
-   *   `page`  — already in the series HTML (older installs, and any site whose
-   *             owner turned the AJAX loader off for SEO);
-   *   `ajax`  — POST admin-ajax.php with the numeric post id;
-   *   `auto`  — read the page, and only fall back to AJAX if it held nothing.
+   *   `page`        — already in the series HTML (older installs, and any site
+   *                   whose owner turned the AJAX loader off for SEO);
+   *   `ajax`        — POST admin-ajax.php with the numeric post id;
+   *   `manga-ajax`  — POST the series' own `/ajax/chapters/`, with neither a
+   *                   post id nor a body. This is what most current installs
+   *                   do — 107 of the 173 upstream extensions — and a site can
+   *                   be on it while still exposing a post id, so the `auto`
+   *                   probe below has to try it before giving up;
+   *   `auto`        — read the page, then fall back to whichever AJAX form the
+   *                   document gives us the means to call.
    */
-  chapterSource?: 'page' | 'ajax' | 'auto';
+  chapterSource?: 'page' | 'ajax' | 'manga-ajax' | 'auto';
   /** Genres offered as a filter. Empty means the source ships no genre filter. */
   genres?: MadaraGenre[];
   /** Extra headers, usually a Referer some installs demand on admin-ajax. */
   headers?: Record<string, string>;
   minIntervalMs?: number;
+  /** Per-site markup differences, read off the extension's own Kotlin. */
+  selectors?: ThemeSelectors;
 }
 
 /** The card grid, shared by the listing, the latest page and search results. */
@@ -98,6 +107,30 @@ export function createMadaraSource(config: MadaraConfig, deps: SourceDeps): Sour
   const chapterSource = config.chapterSource ?? 'auto';
   const genres = config.genres ?? [];
   const http = deps.http;
+
+  // A site that renames its markup usually *adds* to the theme's rather than
+  // replacing it, so listing and list-shaped selectors widen the default;
+  // matching either is what survives an install changing its skin back.
+  const sel = config.selectors ?? {};
+  const CARDS = widen(sel.searchItem, CARD);
+  const CHAPTER_ROW = widen(sel.chapterList, 'li.wp-manga-chapter');
+  const PAGE_IMG = widen(
+    sel.pageList,
+    'div.reading-content img.wp-manga-chapter-img, div.reading-content div.page-break img',
+  );
+  // Details come out of one document, so a wrong selector costs a field rather
+  // than the whole source; these replace, which is what an install that moved a
+  // summary row actually means.
+  const TITLE = selector(sel.title, 'div.post-title h1, div.post-title h3');
+  const THUMB = selector(sel.thumbnail, 'div.summary_image');
+  const DESC = selector(
+    sel.description,
+    'div.summary__content, div.description-summary div.summary__content',
+  );
+  const GENRE = selector(sel.genre, 'div.genres-content a');
+  const AUTHOR = selector(sel.author, 'div.author-content a');
+  const ARTIST = selector(sel.artist, 'div.artist-content a');
+  const CHAPTER_DATE = selector(sel.chapterDate, '.chapter-release-date');
 
   const filters: FilterSpec[] = [
     { kind: 'header', name: 'Filters do nothing when a text query is set' },
@@ -166,7 +199,7 @@ export function createMadaraSource(config: MadaraConfig, deps: SourceDeps): Sour
   function parseList(html: string): MangaPage<SourceManga> {
     const $ = load(html);
     const items: SourceManga[] = [];
-    $(CARD).each((_, element) => {
+    $(CARDS).each((_, element) => {
       const card = $(element);
       const link = card.find('h3 a, h4 a, .post-title a, a').first();
       const url = absoluteUrl(baseUrl, link.attr('href'));
@@ -195,6 +228,23 @@ export function createMadaraSource(config: MadaraConfig, deps: SourceDeps): Sour
     return parseList(await http.text(`${path}?m_orderby=${orderBy}`));
   }
 
+  /**
+   * The series' own chapter endpoint. Takes no post id and no body — the slug in
+   * the URL is the whole request — which is why it works on installs that have
+   * stopped exposing a numeric post id at all.
+   */
+  async function chaptersFromMangaAjax(mangaUrl: string): Promise<string> {
+    return http.text(`${mangaUrl.replace(/\/+$/, '')}/ajax/chapters/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'X-Requested-With': 'XMLHttpRequest',
+        Referer: mangaUrl,
+      },
+      body: '',
+    });
+  }
+
   async function chaptersFromAjax(postId: string): Promise<string> {
     return http.text(`${baseUrl}/wp-admin/admin-ajax.php`, {
       method: 'POST',
@@ -209,7 +259,7 @@ export function createMadaraSource(config: MadaraConfig, deps: SourceDeps): Sour
 
   function parseChapters($: CheerioAPI): SourceChapter[] {
     const chapters: SourceChapter[] = [];
-    $('li.wp-manga-chapter').each((_, element) => {
+    $(CHAPTER_ROW).each((_, element) => {
       const row = $(element);
       const link = row.find('a').first();
       const url = absoluteUrl(baseUrl, link.attr('href'));
@@ -217,7 +267,7 @@ export function createMadaraSource(config: MadaraConfig, deps: SourceDeps): Sour
       if (url === '' || name === '') return;
       // The release date is a `title` attribute on the "N days ago" tag when the
       // site renders a relative date, and plain text otherwise.
-      const dateCell = row.find('.chapter-release-date');
+      const dateCell = row.find(CHAPTER_DATE);
       const dateText = dateCell.find('a').attr('title') ?? dateCell.text();
       chapters.push({
         url,
@@ -250,20 +300,18 @@ export function createMadaraSource(config: MadaraConfig, deps: SourceDeps): Sour
     async getMangaDetails(manga) {
       const $ = load(await http.text(manga.url));
 
-      const description = clean(
-        $('div.summary__content, div.description-summary div.summary__content').first().text(),
-      );
-      const genre = $('div.genres-content a')
+      const description = clean($(DESC).first().text());
+      const genre = $(GENRE)
         .map((_, element) => clean($(element).text()))
         .get()
         .filter((value) => value !== '');
 
       return {
         url: manga.url,
-        title: clean($('div.post-title h1, div.post-title h3').first().text()),
-        thumbnailUrl: imageFrom($('div.summary_image').first(), baseUrl),
-        author: clean($('div.author-content a').first().text()) || null,
-        artist: clean($('div.artist-content a').first().text()) || null,
+        title: clean($(TITLE).first().text()),
+        thumbnailUrl: imageFrom($(THUMB).first(), baseUrl),
+        author: clean($(AUTHOR).first().text()) || null,
+        artist: clean($(ARTIST).first().text()) || null,
         description: description || null,
         genre,
         // The status row is identified by its heading, not by a class: Madara
@@ -285,12 +333,21 @@ export function createMadaraSource(config: MadaraConfig, deps: SourceDeps): Sour
       const html = await http.text(manga.url);
       const $ = load(html);
 
-      if (chapterSource !== 'ajax') {
+      if (chapterSource !== 'ajax' && chapterSource !== 'manga-ajax') {
         const inPage = parseChapters($);
         if (inPage.length > 0 || chapterSource === 'page') {
           if (inPage.length === 0) throw new NoResultsError();
           return inPage;
         }
+      }
+
+      // Asked for explicitly, this is the only thing to try; reached from
+      // `auto`, it is tried before admin-ajax because a site on this mode can
+      // still be advertising a post id that admin-ajax will refuse.
+      if (chapterSource === 'manga-ajax') {
+        const chapters = parseChapters(load(await chaptersFromMangaAjax(manga.url)));
+        if (chapters.length === 0) throw new NoResultsError();
+        return chapters;
       }
 
       // The numeric post id is what admin-ajax keys on. It is exposed either as
@@ -299,17 +356,31 @@ export function createMadaraSource(config: MadaraConfig, deps: SourceDeps): Sour
         $('div[id^=manga-chapters-holder]').attr('data-id') ??
         $('.wp-manga-action-button[data-post]').attr('data-post') ??
         /"?post_id"?\s*[:=]\s*"?(\d+)/.exec(html)?.[1];
-      if (!postId) throw new NoResultsError(`${config.name} did not expose a chapter list`);
+      // No post id and nothing in the page still leaves the slug endpoint, which
+      // is the shape most current installs use.
+      if (!postId) {
+        const chapters = parseChapters(load(await chaptersFromMangaAjax(manga.url)));
+        if (chapters.length === 0) {
+          throw new NoResultsError(`${config.name} did not expose a chapter list`);
+        }
+        return chapters;
+      }
 
       const chapters = parseChapters(load(await chaptersFromAjax(postId)));
-      if (chapters.length === 0) throw new NoResultsError();
-      return chapters;
+      if (chapters.length > 0) return chapters;
+
+      // admin-ajax answered, but with nothing. On an install that has moved to
+      // the slug endpoint that is what an obsolete post id looks like, so the
+      // other form is worth one request before calling the source empty.
+      const viaSlug = parseChapters(load(await chaptersFromMangaAjax(manga.url)));
+      if (viaSlug.length === 0) throw new NoResultsError();
+      return viaSlug;
     },
 
     async getPageList(chapter) {
       const $ = load(await http.text(chapter.url));
       const pages: SourcePage[] = [];
-      $('div.reading-content img.wp-manga-chapter-img, div.reading-content div.page-break img').each(
+      $(PAGE_IMG).each(
         (_, element) => {
           const img = $(element);
           for (const attr of IMAGE_ATTRS) {

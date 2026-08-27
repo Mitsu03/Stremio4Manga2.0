@@ -32,6 +32,7 @@ import {
   parseDate,
   parseStatus,
 } from '../util.js';
+import { selector, widen, type ThemeSelectors } from './selectors.js';
 
 export interface MangaThemesiaConfig {
   id: string;
@@ -53,6 +54,10 @@ export interface MangaThemesiaConfig {
   searchMode?: 'query' | 'client';
   usesCloudflare?: boolean;
   minIntervalMs?: number;
+  /** Per-site markup differences, read off the extension's own Kotlin. */
+  selectors?: ThemeSelectors;
+  /** The reader's images, when the install does not use `div#readerarea img`. */
+  pageSelector?: string;
 }
 
 interface TsReaderChapter {
@@ -132,16 +137,40 @@ export function createMangaThemesiaSource(config: MangaThemesiaConfig, deps: Sou
   const STATUS = ['', 'ongoing', 'completed', 'hiatus'];
   const TYPE = ['', 'manga', 'manhwa', 'manhua', 'comic'];
 
+  // A site that renames its card markup usually *adds* to the theme's, so the
+  // override widens the default rather than replacing it — matching either is
+  // what survives an install changing its skin back.
+  const sel = config.selectors ?? {};
+  const CARD = widen(sel.searchItem, 'div.bsx, div.utao div.uta');
+  const CARD_TITLE = widen(sel.searchTitle, 'div.tt, .luf h4');
+  const CHAPTER_ROW = widen(sel.chapterList, '#chapterlist li, div.eplister li');
+  const PAGE_IMG = widen(
+    config.pageSelector ?? sel.pageList,
+    'div#readerarea img, div.rdminimal img, div.chapterbody img',
+  );
+  // Details are read out of one document, so a wrong selector here costs a
+  // field rather than the whole source; these replace rather than widen, which
+  // is what an install that moved a row actually means.
+  const TITLE = selector(sel.title, 'h1.entry-title');
+  const THUMB = selector(sel.thumbnail, 'div.thumb img, div.thumbook img');
+  const DESC = selector(
+    sel.description,
+    'div.entry-content[itemprop=description], div.entry-content',
+  );
+  const GENRE = selector(sel.genre, 'span.mgen a, div.seriestugenre a');
+
   function parseList(html: string): MangaPage<SourceManga> {
     const $ = load(html);
     const items: SourceManga[] = [];
-    $('div.bsx, div.utao div.uta').each((_, element) => {
+    $(CARD).each((_, element) => {
       const card = $(element);
       const link = card.find('a').first();
       const url = absoluteUrl(baseUrl, link.attr('href'));
       // The card's own `title` attribute is the clean title; the visible text
       // carries the chapter badge ("Chapter 12") glued onto it.
-      const title = clean(link.attr('title') ?? card.find('div.tt, .luf h4').first().text());
+      const title = clean(
+        link.attr('title') ?? card.find(CARD_TITLE).first().text() ?? link.text(),
+      );
       if (url === '' || title === '') return;
       const img = card.find('img').first();
       const raw = img.attr('data-src') ?? img.attr('data-lazy-src') ?? img.attr('src');
@@ -221,7 +250,7 @@ export function createMangaThemesiaSource(config: MangaThemesiaConfig, deps: Sou
     async getMangaDetails(manga) {
       const html = await http.text(manga.url);
       const $ = load(html);
-      const cover = $('div.thumb img, div.thumbook img').first();
+      const cover = $(THUMB).first();
 
       // Some installs (RizzFables) moved the synopsis into a `var description`
       // string and render it client-side, leaving the container holding only
@@ -230,7 +259,7 @@ export function createMangaThemesiaSource(config: MangaThemesiaConfig, deps: Sou
       // Read the raw document, not the DOM: the fallback below removes the very
       // script the synopsis is hiding in.
       const inlineDescription = /var\s+description\s*=\s*"((?:[^"\\]|\\.)*)"/.exec(html)?.[1];
-      const container = $('div.entry-content[itemprop=description], div.entry-content').first();
+      const container = $(DESC).first();
       container.find('script, style').remove();
       let description = clean(container.text());
       if (description === '' && inlineDescription) {
@@ -243,12 +272,12 @@ export function createMangaThemesiaSource(config: MangaThemesiaConfig, deps: Sou
 
       return {
         url: manga.url,
-        title: clean($('h1.entry-title').first().text()),
+        title: clean($(TITLE).first().text()),
         thumbnailUrl: absoluteUrl(baseUrl, cover.attr('data-src') ?? cover.attr('src')) || null,
         author: infoRow($, /author|pengarang/i) || null,
         artist: infoRow($, /artist/i) || null,
         description: description || null,
-        genre: $('span.mgen a, div.seriestugenre a')
+        genre: $(GENRE)
           .map((_, element) => clean($(element).text()))
           .get()
           .filter((value) => value !== ''),
@@ -261,7 +290,7 @@ export function createMangaThemesiaSource(config: MangaThemesiaConfig, deps: Sou
     async getChapterList(manga) {
       const $ = load(await http.text(manga.url));
       const chapters: SourceChapter[] = [];
-      $('#chapterlist li, div.eplister li').each((_, element) => {
+      $(CHAPTER_ROW).each((_, element) => {
         const row = $(element);
         const link = row.find('a').first();
         const url = absoluteUrl(baseUrl, link.attr('href'));
@@ -292,7 +321,7 @@ export function createMangaThemesiaSource(config: MangaThemesiaConfig, deps: Sou
 
       const $ = load(html);
       const pages: SourcePage[] = [];
-      $('div#readerarea img, div.rdminimal img, div.chapterbody img').each((_, element) => {
+      $(PAGE_IMG).each((_, element) => {
         const img = $(element);
         const raw = img.attr('data-src') ?? img.attr('data-lazy-src') ?? img.attr('src');
         if (!raw || raw.startsWith('data:')) return;

@@ -178,8 +178,11 @@ function overrides(theme, dir) {
     // The chapter list arrives one of five ways upstream; this build knows two
     // of them, and `page` is what `MadaraNoAjax`-style installs need.
     const mode = text.match(/chapterMode\s*=\s*ChapterMode\.(\w+)/)?.[1];
-    if (mode === 'MangaPage') config.chapterSource = 'page';
-    else if (mode === 'AdminAjax') config.chapterSource = 'ajax';
+    const MODES = { MangaPage: 'page', AdminAjax: 'ajax', MangaAjax: 'manga-ajax' };
+    if (MODES[mode]) config.chapterSource = MODES[mode];
+    // `MangaAjaxPaginated` and `MangaAjaxQuery` have no engine yet. Carrying the
+    // raw name is what lets the engine gain one later without a re-scrape, and
+    // meanwhile the source falls back to probing, which is what it did before.
     else if (mode) config.chapterMode = mode;
     if (base === 'MadaraNoAjax') config.variant = 'noajax';
 
