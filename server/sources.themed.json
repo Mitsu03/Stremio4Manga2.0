@@ -627,7 +627,8 @@
         "minIntervalMs": 20000
       },
       "unportedOverrides": 8,
-      "id": "1000000000000000026"
+      "id": "1000000000000000026",
+      "retired": "rebuilt on a bespoke stack; no longer runs the declared theme"
     },
     {
       "pkgName": "en.comicsland",
@@ -2495,7 +2496,8 @@
       "baseUrl": "https://manga18fx.com",
       "id": "1000000000000000076",
       "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "versionName": "1.0.0",
+      "retired": "rebuilt on a bespoke theme; no longer runs the declared theme"
     },
     {
       "pkgName": "en.mangablaze",
@@ -3404,7 +3406,8 @@
       "baseUrl": "https://nemesisscans.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
-      "id": "1000000000000000338"
+      "id": "1000000000000000338",
+      "retired": "rebuilt on a bespoke stack; no longer runs the declared theme"
     },
     {
       "pkgName": "en.nexcomic",
@@ -3560,7 +3563,8 @@
       "config": {
         "mangaPath": "comik"
       },
-      "id": "1000000000000000261"
+      "id": "1000000000000000261",
+      "retired": "rebuilt on a bespoke stack; no longer runs the declared theme"
     },
     {
       "pkgName": "tr.opiatoon",
@@ -4788,14 +4792,12 @@
       "name": "WitchScans",
       "lang": "en",
       "theme": "mangathemesia",
-      "baseUrl": "https://witchtoons.net",
+      "baseUrl": "https://witchscans.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
       "unportedOverrides": 2,
       "id": "1000000000000000153",
-      "config": {
-        "mangaPath": "series"
-      }
+      "retired": "moved to witchtoons.net and was rebuilt; the new site runs no theme this build has"
     },
     {
       "pkgName": "en.woopread",
@@ -4805,7 +4807,8 @@
       "baseUrl": "https://woopread.com",
       "id": "1000000000000000154",
       "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "versionName": "1.0.0",
+      "retired": "rebuilt as a novel site; no longer runs the declared theme"
     },
     {
       "pkgName": "en.wuxiaworld",

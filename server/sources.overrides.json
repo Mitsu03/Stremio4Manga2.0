@@ -7,12 +7,6 @@
       "baseUrl": "https://mangaowl.io",
       "config": { "mangaPath": "manga-list" }
     },
-    "en.witchscans": {
-      "checked": "2026-08-28",
-      "note": "301 to witchtoons.net.",
-      "baseUrl": "https://witchtoons.net",
-      "config": { "mangaPath": "series" }
-    },
     "en.madaradex": {
       "checked": "2026-08-28",
       "note": "Archive moved to /title/.",
@@ -37,6 +31,31 @@
       "checked": "2026-08-28",
       "note": "The listing itself works; the ?m_orderby= parameter trips the site's WAF rule and turns a 200 into a challenge. Browsing unsorted is the whole difference between this source working without a solver and not working at all.",
       "config": { "omitSort": true }
+    },
+
+    "en.witchscans": {
+      "checked": "2026-08-28",
+      "retired": "moved to witchtoons.net and was rebuilt; the new site runs no theme this build has"
+    },
+    "en.comicasura": {
+      "checked": "2026-08-28",
+      "retired": "rebuilt on a bespoke stack; no longer runs the declared theme"
+    },
+    "tr.nemesisscans": {
+      "checked": "2026-08-28",
+      "retired": "rebuilt on a bespoke stack; no longer runs the declared theme"
+    },
+    "id.omicaso": {
+      "checked": "2026-08-28",
+      "retired": "rebuilt on a bespoke stack; no longer runs the declared theme"
+    },
+    "en.woopread": {
+      "checked": "2026-08-28",
+      "retired": "rebuilt as a novel site; no longer runs the declared theme"
+    },
+    "en.manga18fx": {
+      "checked": "2026-08-28",
+      "retired": "rebuilt on a bespoke theme; no longer runs the declared theme"
     },
 
     "id.dailysuka": { "checked": "2026-08-28", "retired": "domain no longer resolves" },
