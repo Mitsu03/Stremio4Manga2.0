@@ -1,3 +1,6 @@
+import type { Cheerio } from 'cheerio';
+import type { AnyNode } from 'domhandler';
+
 /**
  * Per-site selector overrides for the themed engines.
  *
@@ -18,6 +21,13 @@ export interface ThemeSelectors {
   searchItem?: string;
   /** The link carrying the title, inside a card. */
   searchTitle?: string;
+  /**
+   * Where the title *text* is, when it is not the text of the link.
+   *
+   * Several skins wrap the whole card in one anchor and put the title in a
+   * child, so the href and the words come from different elements.
+   */
+  searchTitleText?: string;
   /** The container the details fields are read from. */
   details?: string;
   title?: string;
@@ -58,4 +68,31 @@ export function selector(override: string | undefined, fallback: string): string
 export function widen(override: string | undefined, fallback: string): string {
   const trimmed = override?.trim();
   return trimmed === undefined || trimmed === '' ? fallback : `${trimmed}, ${fallback}`;
+}
+
+/**
+ * The first alternative of a comma-separated selector that matches — in the
+ * order written, not in document order.
+ *
+ * A selector list is a set, so `find('h3 a, .post-title a, a').first()` returns
+ * whichever match comes *first in the document*, and the bare `a` fallback
+ * therefore wins on every card whose thumbnail link precedes its title. Those
+ * cards yield an href with no title text and are dropped, so an install laid
+ * out that way returns an empty listing while looking perfectly well-formed —
+ * one site went from thirty cards to zero items this way.
+ *
+ * Written as a fallback chain, which is what the list was always meant to be:
+ * try the specific thing, and only then the general one.
+ */
+export function firstIn(
+  card: Cheerio<AnyNode>,
+  list: string,
+): ReturnType<Cheerio<AnyNode>['find']> | undefined {
+  for (const one of list.split(',')) {
+    const trimmed = one.trim();
+    if (trimmed === '') continue;
+    const found = card.find(trimmed).first();
+    if (found.length > 0) return found;
+  }
+  return undefined;
 }

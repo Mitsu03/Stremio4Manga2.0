@@ -18,7 +18,7 @@
  */
 import { load, type CheerioAPI, type Cheerio } from 'cheerio';
 import type { AnyNode } from 'domhandler';
-import { selector, widen, type ThemeSelectors } from './selectors.js';
+import { firstIn, selector, widen, type ThemeSelectors } from './selectors.js';
 import type {
   FilterChange,
   FilterSpec,
@@ -92,7 +92,11 @@ export interface MadaraConfig {
 }
 
 /** The card grid, shared by the listing, the latest page and search results. */
-const CARD = 'div.page-item-detail, div.c-tabs-item__content, div.manga__item';
+// Deliberately not tag-qualified. Madara child themes increasingly render the
+// card as <article> rather than <div>, and `div.page-item-detail` cannot match
+// those at all — the listing comes back empty on a site whose markup is
+// otherwise exactly the theme's.
+const CARD = '.page-item-detail, .c-tabs-item__content, .manga__item';
 
 /**
  * Madara lazy-loads covers through several plugins, each with its own
@@ -126,6 +130,9 @@ export function createMadaraSource(config: MadaraConfig, deps: SourceDeps): Sour
   // matching either is what survives an install changing its skin back.
   const sel = config.selectors ?? {};
   const CARDS = widen(sel.searchItem, CARD);
+  // Ordered as a fallback chain, most specific first — see `firstIn`.
+  const CARD_LINK = selector(sel.searchTitle, 'h3 a, h4 a, .post-title a, a');
+  const TITLE_TEXT = sel.searchTitleText;
   const CHAPTER_ROW = widen(sel.chapterList, 'li.wp-manga-chapter');
   const PAGE_IMG = widen(
     sel.pageList,
@@ -214,9 +221,15 @@ export function createMadaraSource(config: MadaraConfig, deps: SourceDeps): Sour
     const items: SourceManga[] = [];
     $(CARDS).each((_, element) => {
       const card = $(element);
-      const link = card.find('h3 a, h4 a, .post-title a, a').first();
+      const link = firstIn(card, CARD_LINK);
+      if (link === undefined) return;
       const url = absoluteUrl(baseUrl, link.attr('href'));
-      const title = clean(link.attr('title') ?? link.text());
+      // The title text can live in a child of the link rather than in the link,
+      // on skins that wrap the whole card in one anchor.
+      const text =
+        TITLE_TEXT === undefined ? undefined : clean(card.find(TITLE_TEXT).first().text());
+      const title =
+        text !== undefined && text !== '' ? text : clean(link.attr('title') ?? link.text());
       if (url === '' || title === '') return;
       items.push({ url, title, thumbnailUrl: imageFrom(card, baseUrl) });
     });

@@ -32,7 +32,7 @@ import {
   parseDateWith,
   parseStatus,
 } from '../util.js';
-import { selector, widen, type ThemeSelectors } from './selectors.js';
+import { firstIn, selector, widen, type ThemeSelectors } from './selectors.js';
 
 export interface MangaThemesiaConfig {
   id: string;
@@ -152,6 +152,8 @@ export function createMangaThemesiaSource(config: MangaThemesiaConfig, deps: Sou
   const sel = config.selectors ?? {};
   const CARD = widen(sel.searchItem, 'div.bsx, div.utao div.uta');
   const CARD_TITLE = widen(sel.searchTitle, 'div.tt, .luf h4');
+  const CARD_LINK = selector(sel.searchTitle, 'a');
+  const TITLE_TEXT = sel.searchTitleText;
   const CHAPTER_ROW = widen(sel.chapterList, '#chapterlist li, div.eplister li');
   const PAGE_IMG = widen(
     config.pageSelector ?? sel.pageList,
@@ -173,13 +175,18 @@ export function createMangaThemesiaSource(config: MangaThemesiaConfig, deps: Sou
     const items: SourceManga[] = [];
     $(CARD).each((_, element) => {
       const card = $(element);
-      const link = card.find('a').first();
+      const link = firstIn(card, CARD_LINK);
+      if (link === undefined) return;
       const url = absoluteUrl(baseUrl, link.attr('href'));
       // The card's own `title` attribute is the clean title; the visible text
       // carries the chapter badge ("Chapter 12") glued onto it.
-      const title = clean(
-        link.attr('title') ?? card.find(CARD_TITLE).first().text() ?? link.text(),
+      const text = clean(
+        card
+          .find(TITLE_TEXT ?? CARD_TITLE)
+          .first()
+          .text(),
       );
+      const title = clean(link.attr('title') ?? '') || text || clean(link.text());
       if (url === '' || title === '') return;
       const img = card.find('img').first();
       const raw = img.attr('data-src') ?? img.attr('data-lazy-src') ?? img.attr('src');

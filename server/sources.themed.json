@@ -231,7 +231,12 @@
       "config": {
         "chapterSource": "manga-ajax",
         "variant": "noajax",
-        "dateFormat": "MMM d, yyyy"
+        "dateFormat": "MMM d, yyyy",
+        "selectors": {
+          "searchItem": ".page-item-detail",
+          "searchTitle": ".post-title a",
+          "thumbnail": ".item-thumb img"
+        }
       },
       "unportedOverrides": 1,
       "id": "1000000000000000173"
@@ -287,7 +292,8 @@
         "dateLocale": "ar"
       },
       "unportedOverrides": 5,
-      "id": "1000000000000000176"
+      "id": "1000000000000000176",
+      "retired": "host times out on every request"
     },
     {
       "pkgName": "en.arenascans",
@@ -385,7 +391,8 @@
         "dateLocale": "pt",
         "minIntervalMs": 30000
       },
-      "id": "1000000000000000271"
+      "id": "1000000000000000271",
+      "retired": "domain parked for sale"
     },
     {
       "pkgName": "en.athreascans",
@@ -864,7 +871,8 @@
         "minIntervalMs": 333
       },
       "unportedOverrides": 3,
-      "id": "1000000000000000033"
+      "id": "1000000000000000033",
+      "retired": "moved and rebuilt; the new site runs no theme this build has"
     },
     {
       "pkgName": "th.ecchidoujin",
@@ -953,11 +961,9 @@
         "mangaPath": "series",
         "pageSelector": "div#readerArea img",
         "selectors": {
-          "status": ".stat-v-box:has(.stat-v-label:containsOwn(Status)) .stat-v-value",
-          "title": ".series-title-main",
-          "thumbnail": ".series-poster-premium img, .poster-box img",
-          "genre": ".series-genres-wrap .gen-tag",
-          "details": ".series-premium-header"
+          "searchItem": "div.manga-card-v",
+          "searchTitle": "h3.card-v-title a",
+          "thumbnail": ".card-v-cover img"
         },
         "dateFormat": "yyyy/MM/dd",
         "dateLocale": "en"
@@ -1200,7 +1206,8 @@
         "dateFormat": "MM.dd.uuuu",
         "dateLocale": "en"
       },
-      "id": "1000000000000000044"
+      "id": "1000000000000000044",
+      "retired": "catalogue unpublished; the archive renders \"there is no manga yet\" on every path"
     },
     {
       "pkgName": "th.gomanga",
@@ -1235,7 +1242,13 @@
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
       "config": {
-        "mangaPath": "title"
+        "mangaPath": "title",
+        "selectors": {
+          "searchItem": "div.webtoons-grid > div.webtoon-card",
+          "searchTitle": "h3.webtoon-title-card a",
+          "searchTitleText": ".title-text",
+          "thumbnail": "img.cover-image"
+        }
       },
       "id": "1000000000000000179"
     },
@@ -1297,12 +1310,10 @@
       "versionName": "1.0.0",
       "config": {
         "selectors": {
-          "status": ".meta-row span:has(.status-tag)",
-          "title": ".manga-title",
-          "description": ".entry-content",
-          "thumbnail": ".info-poster img",
-          "author": ".meta-row span:has(i.fa-user-edit)",
-          "genre": ".genre-list a"
+          "searchItem": "article.cx-poster-card",
+          "searchTitle": "a.cx-poster-card__body-link",
+          "searchTitleText": "h3.cx-poster-card__title",
+          "thumbnail": ".cx-poster-card__cover img"
         },
         "dateFormat": "MMMM d, yyyy",
         "dateLocale": "en",
@@ -1380,7 +1391,8 @@
         "dateLocale": "en-US"
       },
       "unportedOverrides": 4,
-      "id": "1000000000000000048"
+      "id": "1000000000000000048",
+      "retired": "parked, redirects to a lander"
     },
     {
       "pkgName": "en.hentairead",
@@ -1824,7 +1836,8 @@
         "dateLocale": "id"
       },
       "unportedOverrides": 1,
-      "id": "1000000000000000241"
+      "id": "1000000000000000241",
+      "retired": "site closed by its operator"
     },
     {
       "pkgName": "id.komikindo",
@@ -2002,12 +2015,9 @@
       "config": {
         "variant": "alt",
         "selectors": {
-          "status": ".status-badge-lux",
-          "title": ".lh-title",
-          "description": "#manga-story",
-          "thumbnail": ".lh-poster img",
-          "genre": ".lh-genres a",
-          "details": "div.lh-container"
+          "searchItem": "div.manga-card-v",
+          "searchTitle": "h3.card-v-title a",
+          "thumbnail": ".card-v-cover img"
         },
         "dateFormat": "yyyy/MM/dd",
         "dateLocale": "ar"
@@ -2159,12 +2169,9 @@
         "mangaPath": "series",
         "pageSelector": ".pagination, .legendary-pagination, .magma-pagination",
         "selectors": {
-          "status": "span.status-badge-lux",
-          "title": "h1.lh-title",
-          "description": "div.lh-story > #manga-story",
-          "thumbnail": ".lh-poster > img",
-          "genre": ".lh-genres > .lh-genre-tag",
-          "details": "div.lh-container"
+          "searchItem": "div.manga-card-v",
+          "searchTitle": "h3.card-v-title a",
+          "thumbnail": ".card-v-cover img"
         },
         "dateFormat": "yyyy/MM/dd",
         "dateLocale": "en-US"
@@ -2196,7 +2203,8 @@
       "config": {
         "chapterMode": "MangaAjaxQuery"
       },
-      "id": "1000000000000000068"
+      "id": "1000000000000000068",
+      "retired": "rebuilt; no longer runs the declared theme"
     },
     {
       "pkgName": "th.makimaaaaa",
@@ -2275,7 +2283,14 @@
       "baseUrl": "https://mangadrama.com",
       "id": "1000000000000000072",
       "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "versionName": "1.0.0",
+      "config": {
+        "selectors": {
+          "searchItem": "div.manga-item-grid",
+          "searchTitle": "h2 a.uk-link-heading",
+          "thumbnail": "img.image-3-4"
+        }
+      }
     },
     {
       "pkgName": "en.mangakiss",
@@ -2333,7 +2348,8 @@
         "dateFormat": "MMMM dd, yyyy",
         "dateLocale": "es"
       },
-      "id": "1000000000000000201"
+      "id": "1000000000000000201",
+      "retired": "rebuilt as a client-rendered app; nothing in the HTML to read"
     },
     {
       "pkgName": "es.mangaromance",
@@ -2764,7 +2780,12 @@
       "versionName": "1.0.0",
       "config": {
         "chapterSource": "manga-ajax",
-        "dateFormat": "dd/MM/yyyy"
+        "dateFormat": "dd/MM/yyyy",
+        "selectors": {
+          "searchItem": "article.mgcr-archive-card",
+          "searchTitle": ".mgcr-archive-card__body h3 a",
+          "thumbnail": "a.mgcr-archive-card__cover img"
+        }
       },
       "unportedOverrides": 1,
       "id": "1000000000000000334"
@@ -2838,7 +2859,8 @@
       "baseUrl": "https://manhatic.com",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
-      "id": "1000000000000000184"
+      "id": "1000000000000000184",
+      "retired": "moved and rebuilt; the new site runs no theme this build has"
     },
     {
       "pkgName": "en.manhuaplus",
@@ -3139,13 +3161,20 @@
       "name": "ManhwaLand.mom",
       "lang": "id",
       "theme": "mangathemesia",
-      "baseUrl": "https://02.manhwaland.land",
+      "baseUrl": "https://05c.manhwaland.land",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
       "config": {
         "dateFormat": "MMMM d, yyyy",
         "dateLocale": "id",
-        "minIntervalMs": 15000
+        "minIntervalMs": 15000,
+        "mangaPath": "popular",
+        "selectors": {
+          "searchItem": "a.manga-card",
+          "searchTitle": "a.manga-card",
+          "searchTitleText": ".manga-title",
+          "thumbnail": ".manga-cover img"
+        }
       },
       "id": "1000000000000000255"
     },
@@ -3171,7 +3200,8 @@
         "chapterSource": "manga-ajax",
         "filterNonMangaItems": false
       },
-      "id": "1000000000000000107"
+      "id": "1000000000000000107",
+      "retired": "parked, redirects to a lander"
     },
     {
       "pkgName": "en.manhwanex",
@@ -3523,7 +3553,8 @@
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
       "unportedOverrides": 1,
-      "id": "1000000000000000115"
+      "id": "1000000000000000115",
+      "retired": "parked, redirects to a lander"
     },
     {
       "pkgName": "th.ntrmanga",
@@ -3620,7 +3651,8 @@
         "mangaPath": "series",
         "chapterMode": "MangaAjaxPaginated",
         "selectors": {
-          "title": "h1.post-title"
+          "searchItem": "div.manga__item",
+          "searchTitle": ".post-title a"
         },
         "dateFormat": "d MMMM yyyy",
         "dateLocale": "en",
@@ -3693,7 +3725,8 @@
       "baseUrl": "https://pawmanga.com",
       "id": "1000000000000000119",
       "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "versionName": "1.0.0",
+      "retired": "host unreachable"
     },
     {
       "pkgName": "en.petrotechsociety",
@@ -3833,7 +3866,12 @@
       "versionName": "1.0.0",
       "config": {
         "chapterSource": "manga-ajax",
-        "filterNonMangaItems": false
+        "filterNonMangaItems": false,
+        "selectors": {
+          "searchItem": "article.manga-card",
+          "searchTitle": ".manga-card-body h3 a",
+          "thumbnail": "a.cover img"
+        }
       },
       "id": "1000000000000000270"
     },
@@ -3946,7 +3984,8 @@
       "baseUrl": "https://rosesquadscans.aishiteru.org",
       "id": "1000000000000000130",
       "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "versionName": "1.0.0",
+      "retired": "whole site redirects to a login; no longer public"
     },
     {
       "pkgName": "tr.ruyamanga",
@@ -4153,7 +4192,14 @@
       "versionName": "1.0.0",
       "config": {
         "dateFormat": "MMMM dd, yyyy",
-        "dateLocale": "es"
+        "dateLocale": "es",
+        "mangaPath": "explorar",
+        "selectors": {
+          "searchItem": "sky-manhua-card",
+          "searchTitle": "a.manhua-card",
+          "searchTitleText": ".manhua-card__title",
+          "thumbnail": "img.manhua-card__img"
+        }
       },
       "unportedOverrides": 1,
       "id": "1000000000000000209"
@@ -4209,7 +4255,8 @@
         "pageSelector": "div#readerarea img:not([src*='.gif'])"
       },
       "unportedOverrides": 2,
-      "id": "1000000000000000267"
+      "id": "1000000000000000267",
+      "retired": "replaced by a landing page; the site it points at has no archive"
     },
     {
       "pkgName": "th.speedmanga",
@@ -4229,7 +4276,8 @@
       "baseUrl": "https://spmanhwa.online",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
-      "id": "1000000000000000137"
+      "id": "1000000000000000137",
+      "retired": "domain parked for sale"
     },
     {
       "pkgName": "pt.starlightscan",
@@ -4243,13 +4291,9 @@
         "mangaPath": "mangas",
         "pageSelector": "div.scanImagesContainer img.scanImage",
         "selectors": {
-          "status": "span.base__horizontalList[title^=Status]",
-          "title": "h1.mangaDetails__title",
-          "description": "span.mangaDetails__description",
-          "thumbnail": "img.mangaDetails__cover",
-          "author": "span.mangaDetails__author",
-          "genre": "li.mangaTags__item",
-          "details": "section.mangaDetails"
+          "searchItem": "article.bulkMangaCard",
+          "searchTitle": "a.bulkMangaCard__title",
+          "thumbnail": "img.bulkMangaCard__cover"
         },
         "dateFormat": "dd/MM/yyyy",
         "dateLocale": "pt",
