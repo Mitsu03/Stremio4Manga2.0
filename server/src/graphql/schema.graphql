@@ -430,6 +430,14 @@ input FetchSourceMangaBulkInput {
   type: FetchSourceMangaType!
   page: Int!
   query: String
+  """
+  Give each source longer to answer before the batch moves on.
+
+  Off, a source has a few seconds: one slow site otherwise holds up every source
+  in its batch, and the tail of a sweep becomes the whole wait. On, the slow ones
+  are waited for — worth it when the answer matters more than the minute.
+  """
+  waitLonger: Boolean
 }
 
 type BulkSourceResult {

@@ -62,7 +62,7 @@ const IMPORT_ANILIST_LIBRARY_MUTATION = `
 `
 
 type BrowseType = 'POPULAR' | 'LATEST' | 'SEARCH'
-type IconName = 'search' | 'spark' | 'clock' | 'refresh' | 'layers' | 'arrowDown' | 'arrowUp' | 'close' | 'pin' | 'pinned' | 'filters' | 'globe'
+type IconName = 'search' | 'spark' | 'clock' | 'refresh' | 'layers' | 'arrowDown' | 'arrowUp' | 'close' | 'pin' | 'pinned' | 'filters' | 'globe' | 'hourglass'
 
 /** Where the answers to one all-sources search are kept, so coming back does not re-ask everybody. */
 const GLOBAL_SEARCH_SLOT = 'discover'
@@ -93,6 +93,7 @@ function Icon({ name }: { name: IconName }) {
     search: <><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4 4" /></>,
     spark: <><path d="M12 3 9.7 9.7 3 12l6.7 2.3L12 21l2.3-6.7L21 12l-6.7-2.3L12 3Z" /><path d="m5 4 .7 2.3L8 7l-2.3.7L5 10l-.7-2.3L2 7l2.3-.7L5 4Z" /></>,
     clock: <><circle cx="12" cy="12" r="8.5" /><path d="M12 7v5l3.5 2" /></>,
+    hourglass: <><path d="M7 3h10M7 21h10" /><path d="M8 3v4l4 5 4-5V3" /><path d="M8 21v-4l4-5 4 5v4" /></>,
     refresh: <><path d="M20 6v5h-5" /><path d="M4 18v-5h5" /><path d="M18.5 11A7 7 0 0 0 6.1 7.3L4 11M5.5 13A7 7 0 0 0 17.9 16.7L20 13" /></>,
     layers: <><path d="m12 3 8 4.5-8 4.5-8-4.5L12 3Z" /><path d="m4 12 8 4.5 8-4.5" /><path d="m4 16.5 8 4.5 8-4.5" /></>,
     arrowDown: <><path d="M12 4v15" /><path d="m6 13 6 6 6-6" /></>,
@@ -443,6 +444,19 @@ export default function SearchPage() {
   // same batch the detail page's bind flow sweeps, for the same reason: MangaDex answers the same
   // question once, not once per language it is installed in.
   const [allSources, setAllSources] = useState(false)
+  /* Whether slow catalogues are waited for. Off, a source has a few seconds and the batch moves on
+     without it, which is what keeps the tail of a sweep from being the whole sweep. It is a property
+     of the reader rather than of the query, so it is remembered. */
+  const [waitLonger, setWaitLonger] = useState(() => {
+    try { return localStorage.getItem('stremio4manga.wait-longer') === 'true' } catch { return false }
+  })
+  const toggleWaitLonger = useCallback(() => {
+    setWaitLonger((on) => {
+      const next = !on
+      try { localStorage.setItem('stremio4manga.wait-longer', String(next)) } catch { /* private window */ }
+      return next
+    })
+  }, [])
   const globalBatch = useMemo(() => prioritizedSources(sourceChoices), [sourceChoices])
   /* Recommended catalogues first, the long tail after — the same two-stage shape the detail page's
      bind flow uses. Asking every installed catalogue in one go was fine when that meant six; with
@@ -485,11 +499,11 @@ export default function SearchPage() {
     // Recommended first so there is something on screen in seconds, then the rest appended as they
     // answer. `append` is what makes the second stage add to the first rather than replace it, and
     // the scope only becomes 'all' once the tail has actually been asked.
-    void runGlobalSearch(globalTop, false, globalRest.length === 0 ? 'all' : 'top').then(() => {
+    void runGlobalSearch(globalTop, false, globalRest.length === 0 ? 'all' : 'top', waitLonger).then(() => {
       if (sweptFor.current !== key || globalRest.length === 0) return
-      return runGlobalSearch(globalRest, true, 'all')
+      return runGlobalSearch(globalRest, true, 'all', waitLonger)
     })
-  }, [applyGlobalCache, globalBatch, globalRest, globalTop, runGlobalSearch, showingAllSources, submittedQuery])
+  }, [applyGlobalCache, globalBatch, globalRest, globalTop, runGlobalSearch, showingAllSources, submittedQuery, waitLonger])
 
   const globalQuiet = useMemo(() => globalOutcomes.filter((outcome) => !outcome.error && outcome.mangas.length === 0), [globalOutcomes])
   const globalBroken = useMemo(() => globalOutcomes.filter((outcome) => outcome.error), [globalOutcomes])
@@ -691,6 +705,9 @@ export default function SearchPage() {
             {/* Not a third way of browsing but a wider way of searching: popular and latest still come
                 from the source in the pill, and only a typed search fans out. */}
             <button type="button" className={allSources ? 'active' : ''} onClick={() => setAllSources((on) => !on)} aria-label={allSources ? t('Search only the chosen source') : t('Search every installed source')} aria-pressed={allSources} title={t('Every source')}><Icon name="globe" /></button>
+            {allSources && (
+              <button type="button" className={waitLonger ? 'active' : ''} onClick={toggleWaitLonger} aria-label={waitLonger ? t('Stop waiting for slow sources') : t('Wait longer for slow sources')} aria-pressed={waitLonger} title={waitLonger ? t('Waiting for slow sources') : t('Skip slow sources')}><Icon name="hourglass" /></button>
+            )}
           </div>
 
           {pickerOpen && (

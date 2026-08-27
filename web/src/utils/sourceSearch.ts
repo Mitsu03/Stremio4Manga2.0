@@ -124,7 +124,7 @@ export interface SourceSearch {
    * Searches `batch` in server-side chunks. `append` keeps earlier results (the long-tail sweep);
    * `scope` records how much of the catalogue the accumulated results now cover, for the cache.
    */
-  runSearch: (batch: SourceNode[], append: boolean, scope: SearchScope) => Promise<void>
+  runSearch: (batch: SourceNode[], append: boolean, scope: SearchScope, waitLonger?: boolean) => Promise<void>
   /** Puts a saved answer back on screen without asking anybody anything. */
   applyCached: (cached: StoredSourceSearch) => void
 }
@@ -152,7 +152,7 @@ export function useSourceSearch(slot: string, title: string, searchSources: Sour
     setOutcomes(outcomesRef.current)
   }, [])
 
-  const runSearch = useCallback(async (batch: SourceNode[], append: boolean, scope: SearchScope) => {
+  const runSearch = useCallback(async (batch: SourceNode[], append: boolean, scope: SearchScope, waitLonger = false) => {
     if (batch.length === 0) return
     const runId = ++searchRun.current
     setFinding(true)
@@ -175,7 +175,7 @@ export function useSourceSearch(slot: string, title: string, searchSources: Sour
     let firstError: string | null = null
 
     await Promise.all(chunks.map(async (chunk) => {
-      const result = await fetchSourceMangaBulk({ sources: chunk.map((source) => source.id), page: 1, query: title })
+      const result = await fetchSourceMangaBulk({ sources: chunk.map((source) => source.id), page: 1, query: title, waitLonger })
       if (searchRun.current !== runId) return
 
       // A transport-level failure sinks the whole chunk; count every source in it as failed.
