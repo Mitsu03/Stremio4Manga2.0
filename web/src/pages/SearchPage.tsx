@@ -137,7 +137,7 @@ function SavedSearchShelf({ search, installed, onOpen, onRemove }: {
     if (!installed || feedCache.has(search.key)) return
     let live = true
     setLoading(true)
-    queueSourceRequest(() => fetchSourceManga({ source: search.sourceId, type: 'SEARCH', page: 1, query: search.query }))
+    queueSourceRequest(() => fetchSourceManga({ source: search.sourceId, type: 'SEARCH', page: 1, query: search.query }), search.sourceId)
       .then((result) => {
         if (!live) return
         setLoading(false)
@@ -157,7 +157,7 @@ function SavedSearchShelf({ search, installed, onOpen, onRemove }: {
         found
           .filter((item) => knownAvailability(item) === 'unknown')
           .forEach((item) => {
-            void verifyChapters(client, item.id, () => !live).then((has) => {
+            void verifyChapters(client, item.id, () => !live, search.sourceId).then((has) => {
               if (has !== false || !live) return
               setMangas((current) => {
                 const next = (current ?? []).filter((node) => node.id !== item.id)
@@ -491,7 +491,7 @@ export default function SearchPage() {
     if (unknown.length === 0) return
     setChecking((count) => count + unknown.length)
     unknown.forEach((node) => {
-      void verifyChapters(client, node.id, () => verifying.current !== token).then((has) => {
+      void verifyChapters(client, node.id, () => verifying.current !== token, sourceId ?? undefined).then((has) => {
         if (verifying.current !== token) return
         if (has === false) setHidden((current) => new Set([...current, node.id]))
         setChecking((count) => count - 1)
