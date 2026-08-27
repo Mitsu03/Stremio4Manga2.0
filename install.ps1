@@ -58,6 +58,12 @@ param(
     # Optional, external FlareSolverr, e.g. http://127.0.0.1:8191
     [string] $FlareSolverr = '',
 
+    # Where the database, downloads, backups, cache and log go. Left out of the
+    # config when not given, so the default in server\src\config.ts applies.
+    # Worth setting if version 1 is still installed - see the note where the
+    # config is written.
+    [string] $DataDir = '',
+
     # Create this account at the end. The password is typed at a hidden prompt
     # inside the CLI - there is deliberately no parameter that takes one.
     [string] $Admin = '',
@@ -287,8 +293,16 @@ if (Test-Path $ConfigFile) {
     # restated in a file is indistinguishable from a deliberate override - only
     # one of the two is still correct after the code changes. `secureCookies` in
     # particular is derived from the scheme of publicOrigin and must not be
-    # pinned. `dataDir` is left out too: the default,
-    # %LOCALAPPDATA%\Stremio4Manga, is already the right place on Windows.
+    # pinned.
+    #
+    # `dataDir` is left out unless -DataDir was given, and the default it falls
+    # back to is %LOCALAPPDATA%\Stremio4Manga. That is the right place on a
+    # clean machine and a shared one where version 1 is still installed: v1
+    # keeps `instances\` and `shared\` there, and 2.0 adds stremio4manga.db,
+    # downloads\, backups\, cache\ and thumbnails\ beside them. Nothing is
+    # overwritten - the names do not collide - but the two libraries then live
+    # in one folder, and "clear the Stremio4Manga data" stops having a single
+    # meaning. Pass -DataDir to keep them apart while both are installed.
     #
     # [ordered] so the file reads in the order a person would write it;
     # ConvertTo-Json on a plain hashtable shuffles the keys.
@@ -297,6 +311,7 @@ if (Test-Path $ConfigFile) {
         listen       = [ordered] @{ host = $ListenHost; port = $Port }
         trustProxy   = [bool] $trustProxy
     }
+    if ($DataDir) { $config.dataDir = [string] $DataDir }
     if ($FlareSolverr) {
         $config.flaresolverr = [ordered] @{ url = $FlareSolverr; timeoutMs = 60000 }
     }
@@ -315,6 +330,7 @@ if (Test-Path $ConfigFile) {
         $ConfigFile, $json, (New-Object System.Text.UTF8Encoding($false)))
 
     Write-Info "written - publicOrigin $Origin, listen ${ListenHost}:$Port"
+    if ($DataDir) { Write-Info "dataDir $DataDir" }
     if ($FlareSolverr) { Write-Info "flaresolverr $FlareSolverr" }
     if ($trustProxy) {
         Write-Info "trustProxy: true ($trustReason)"

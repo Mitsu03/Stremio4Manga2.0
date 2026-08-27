@@ -269,8 +269,17 @@ only complete record that crosses is a Suwayomi/Tachiyomi backup — a
 `.tachibk` (or `.proto.gz`), which is gzip around a protobuf message. Nothing
 else carries the reading progress.
 
-Export one from the old server, then, **signed in as the account it should land
-in**:
+**On Windows, both versions default to the same folder.** Version 1 keeps
+`instances\` and `shared\` in `%LOCALAPPDATA%\Stremio4Manga`; 2.0 puts
+`stremio4manga.db`, `downloads\`, `backups\`, `cache\` and `thumbnails\` beside
+them. Nothing is overwritten — no two names collide — but while both are
+installed, "delete the Stremio4Manga data folder" stops meaning one thing, and
+v1's library is usually the larger half. `install.ps1 -DataDir D:\S4M` keeps
+them apart; `--data-dir` is the same flag on Linux, where the installer's own
+`/var/lib/stremio4manga` never overlapped anything.
+
+Export a backup from the old server, then, **signed in as the account it should
+land in**:
 
 > **Settings → Backup & restore → Restore → Choose a backup file**
 
