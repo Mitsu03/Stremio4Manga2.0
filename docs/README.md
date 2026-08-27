@@ -128,8 +128,17 @@ AniList is per account, connected from **Settings** inside the app. Reading
 progress syncs both ways once it is linked.
 
 AniList OAuth applications are registered per *installation*, not per user: one
-client id covers everyone on the server. A default id is compiled in, so a fresh
-deployment works with no configuration at all. To use your own:
+client id covers everyone on the server, and each person still signs in with
+their own AniList account and gets their own token. The id identifies the
+application, never a person.
+
+A default id is compiled in — the one the Kotlin version used — so an upgrade of
+an existing deployment keeps working. It is **not** enough for a deployment at a
+new address. The redirect URL is registered on the AniList app rather than sent
+with the request, so the built-in id only ever returns to the origin that app
+was registered for; anywhere else AniList sends the browser somewhere that is
+not your server, and the connection never completes. If AniList returns you to a
+page that is not yours, or to nothing at all, that is this. Register your own:
 
 1. Register an app at <https://anilist.co/settings/developer>.
 2. Set its redirect URL to **`<publicOrigin>/handle/oauth/result`** — exactly

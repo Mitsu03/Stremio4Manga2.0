@@ -17,8 +17,15 @@
  *
  * `DEFAULT_CLIENT_ID` below is the id the Kotlin fork this replaces shipped
  * with, kept so an existing deployment keeps working without a new variable.
+ * It must match that fork exactly: the redirect URL is registered on the
+ * AniList app rather than sent with the request, so the wrong id is not a
+ * cosmetic difference — the browser comes back to somebody else's address, and
+ * the token is never delivered. Verify it against the fork before changing it.
+ *
  * Register your own at https://anilist.co/settings/developer with the redirect
- * URL set to `<publicOrigin>/handle/oauth/result`.
+ * URL set to `<publicOrigin>/handle/oauth/result`, and put it in
+ * `S4M_ANILIST_CLIENT_ID` — which is also the answer for any origin other than
+ * the one the shipped app is registered for.
  *
  * When neither is available `authUrl()` returns null rather than throwing: the
  * Settings page renders a tracker that simply cannot be connected yet, which is
@@ -42,8 +49,16 @@ export const ANILIST_ICON = 'https://anilist.co/img/icons/android-chrome-192x192
 const API_URL = 'https://graphql.anilist.co';
 const AUTHORIZE_URL = 'https://anilist.co/api/v2/oauth/authorize';
 
-/** See the module comment: overridden by S4M_ANILIST_CLIENT_ID. */
-const DEFAULT_CLIENT_ID = '17075';
+/**
+ * See the module comment: overridden by S4M_ANILIST_CLIENT_ID.
+ *
+ * This is the id the Kotlin fork registered, and it has to stay that id: the
+ * redirect URL lives on the AniList app, so a different app sends the browser
+ * somewhere that is not this server and the token never comes back. 2.0
+ * shipped `17075` here by mistake, which is why connecting AniList failed on a
+ * deployment where version 1 had worked.
+ */
+const DEFAULT_CLIENT_ID = '16186';
 
 /** AniList's implicit-grant tokens last a year; used when the URL omits it. */
 const DEFAULT_TOKEN_LIFETIME_MS = 365 * 24 * 60 * 60 * 1000;
