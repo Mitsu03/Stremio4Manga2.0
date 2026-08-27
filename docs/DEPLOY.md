@@ -93,6 +93,37 @@ anybody looks for a library. `install.ps1` prints the exact command at the end.
 If the machine is meant to be a server, Linux and systemd are the better answer
 to the same problem.
 
+### In a container
+
+The `Containerfile` is a two-stage build: Node and the built output, no JVM, no
+Chromium, no native module to compile. The runtime stage runs as an unprivileged
+`s4m` user and keeps everything under `/data`.
+
+```bash
+podman build -t stremio4manga .
+podman volume create s4m-data
+podman run -d --name stremio4manga -p 127.0.0.1:8080:8080 \
+  -v s4m-data:/data -v ./config.json:/app/server/config.json:ro stremio4manga
+podman exec -it stremio4manga node server/bin/s4m.js users add alice
+```
+
+Two keys differ from every other deployment, and both follow from the container
+being a network and filesystem namespace of its own:
+
+| | |
+|---|---|
+| `listen.host` | **`0.0.0.0`**, not `127.0.0.1`. Inside the container the loopback reaches only the container; a server bound to it publishes a port nothing answers on. What keeps this off the LAN is the `127.0.0.1:` in `-p 127.0.0.1:8080:8080` — the host is where that decision now lives. |
+| `dataDir` | `/data`, matching the volume. The image sets `XDG_DATA_HOME=/data`, so leaving it out lands in `/data/stremio4manga` — on the volume either way, but a container's data path is worth writing down rather than deriving. |
+
+Set `uiDist` to `/app/web/dist` as well: it defaults to a path relative to the
+config file, which is only right in a source checkout.
+
+The volume is the deployment. The container is disposable — `podman rm` it,
+rebuild, recreate against the same volume, and the library is still there.
+`test/podman-validate.sh` (or `npm run test:podman`) proves exactly that, along
+with the sign-in, a GraphQL call and the non-root user, against a throwaway
+container on port 18080.
+
 ## The config a public server needs
 
 Start from `server/config.example.json`. **Do not copy a working local config** —
@@ -104,7 +135,7 @@ Three keys have to be right:
 |---|---|
 | `publicOrigin` | The URL people actually type, e.g. `https://manga.example.com`. Every CSRF check compares against it, and its scheme is what makes the session cookie `Secure`. **Required** — the server refuses to start without it. |
 | `listen.port` | What the reverse proxy forwards to. Default 8080. |
-| `listen.host` | Leave it on `127.0.0.1`. Binding to `0.0.0.0` puts a plain-HTTP sign-in form on the LAN. |
+| `listen.host` | Leave it on `127.0.0.1`. Binding to `0.0.0.0` puts a plain-HTTP sign-in form on the LAN. A container is the one exception — see [In a container](#in-a-container). |
 
 And two that are best left out entirely:
 

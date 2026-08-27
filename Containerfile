@@ -7,12 +7,20 @@
 # was not.
 #
 # Build:  podman build -t stremio4manga .
-# Run:    podman run --rm -p 8080:8080 \
+# Run:    podman run --rm -p 127.0.0.1:8080:8080 \
 #           -v ./server/config.json:/app/server/config.json:ro \
 #           -v s4m-data:/data stremio4manga
 #
-# Set dataDir to /data in the mounted config; the volume is what survives a
-# rebuild.
+# The mounted config needs three values a host deployment does not:
+#
+#   listen.host  0.0.0.0 — the container's loopback reaches only the container,
+#                so 127.0.0.1 here publishes a port nothing answers on. The
+#                127.0.0.1: in -p is what keeps it off the LAN instead.
+#   dataDir      /data — the volume is what survives a rebuild.
+#   uiDist       /app/web/dist — the default is relative to the config file,
+#                which is only right in a source checkout.
+#
+# test/podman-validate.sh runs all of that end to end.
 
 FROM docker.io/library/node:24-bookworm-slim AS build
 
