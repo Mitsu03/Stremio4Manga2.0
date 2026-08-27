@@ -63,11 +63,24 @@ const MAX_ATTEMPTS = 3;
 /** First backoff; doubles per attempt, jittered, capped. */
 const BACKOFF_BASE_MS = 2_000;
 const BACKOFF_MAX_MS = 30_000;
-/** Consecutive hard failures before a host is left alone entirely. */
+/**
+ * Consecutive *soft* failures before a host is left alone entirely — a 503, a
+ * reset mid-response, the kinds of thing that do come back.
+ *
+ * A host that cannot be reached at all does not get five chances: see
+ * `unreachable` below.
+ */
 const BREAKER_FAILURES = 5;
 const BREAKER_COOLDOWN_MS = 5 * 60_000;
-/** Per-request budget. Long enough for a slow WordPress, short enough to fail. */
-const DEFAULT_TIMEOUT_MS = 30_000;
+/**
+ * Per-request budget. Long enough for a slow WordPress, short enough to fail.
+ *
+ * Was 30s, which is not a budget so much as a promise to wait. A scanlation site
+ * that has sent nothing in fifteen seconds is not about to; meanwhile every
+ * sweep paid that in full for each host that had quietly disappeared, three
+ * times over.
+ */
+const DEFAULT_TIMEOUT_MS = 15_000;
 
 /**
  * A current desktop Chrome string. Several of the sites here 403 anything that
@@ -255,6 +268,46 @@ class Breaker {
       this.failures.delete(host);
     }
   }
+
+  /**
+   * A host that could not be reached at all, closed on the first failure.
+   *
+   * Five chances made sense when the failure might be transient. This one is
+   * not: every sweep that follows would spend the whole timeout rediscovering
+   * the same absence, for every source on that host, for as long as it is gone.
+   */
+  unreachable(host: string): void {
+    this.openUntil.set(host, Date.now() + BREAKER_COOLDOWN_MS);
+    this.failures.delete(host);
+  }
+}
+
+/**
+ * Whether a failure means "this host is not there", as opposed to "this went
+ * wrong once".
+ *
+ * The distinction is worth its own function because retrying the two costs
+ * opposite things. A 503 or a reset mid-response is worth another go. A name
+ * that does not resolve, a refused connection, or a socket that never answered
+ * cannot succeed on the second attempt for the same reason it failed on the
+ * first — and with a 15s timeout, three attempts and backoff, insisting costs
+ * the best part of a minute per dead host. One measured sweep of 24 sources took
+ * 97s, of which 97s was a single host that no longer exists.
+ */
+function unreachable(error: unknown): boolean {
+  const name = (error as Error)?.name;
+  // AbortSignal.timeout rejects with TimeoutError; older shapes use AbortError.
+  if (name === 'TimeoutError' || name === 'AbortError') return true;
+  const code = (error as NodeJS.ErrnoException)?.code
+    ?? ((error as { cause?: NodeJS.ErrnoException })?.cause?.code);
+  return (
+    code === 'ENOTFOUND' ||
+    code === 'EAI_AGAIN' ||
+    code === 'ECONNREFUSED' ||
+    code === 'EHOSTUNREACH' ||
+    code === 'ENETUNREACH' ||
+    code === 'UND_ERR_CONNECT_TIMEOUT'
+  );
 }
 
 // --------------------------------------------------------------- retrying --
@@ -392,8 +445,14 @@ export function createHttpClient(config: Pick<Config, 'flaresolverr'>): HttpClie
         try {
           result = await once(url, init, options, wantBody);
         } catch (error) {
-          // DNS, TLS, reset, timeout. Worth one more go, and worth counting.
           lastError = error;
+          // Not there at all: further attempts cannot succeed, and the next
+          // sweep should not rediscover this the slow way either.
+          if (unreachable(error)) {
+            breaker.unreachable(host);
+            break;
+          }
+          // TLS, a reset mid-response: worth one more go, and worth counting.
           breaker.failed(host);
           if (attempt === attempts) break;
           await sleep(backoffMs(attempt));
