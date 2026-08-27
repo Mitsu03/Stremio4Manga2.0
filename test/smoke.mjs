@@ -242,6 +242,7 @@ function checkCatalogueData() {
     'dateLocale',
     'minIntervalMs',
     'omitSort',
+    'listingMode',
     'genres',
     'headers',
     'usesCloudflare',

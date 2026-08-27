@@ -361,6 +361,34 @@
     "en.mahouirexnohentaikarte": {
       "checked": "2026-08-28",
       "retired": "rebuilt; no longer runs the declared theme"
+    },
+    "tr.tarotscans": {
+      "checked": "2026-08-28",
+      "note": "Migrated MangaThemesia -> Madara; upstream still declares the old theme, so the whole engine was wrong, not a selector.",
+      "theme": "madara"
+    },
+    "en.frierenonline": {
+      "checked": "2026-08-28",
+      "note": "Archive path redirects to the home page; only the theme's load-more action answers. Upstream marks it LoadMoreStrategy.Always.",
+      "baseUrl": "https://ww5.frieren.online",
+      "config": {
+        "listingMode": "load-more"
+      }
+    },
+    "en.battleinfivesecondsaftermeeting": {
+      "checked": "2026-08-28",
+      "note": "Single-title site; the archive is empty and only the load-more action returns the entry.",
+      "config": {
+        "listingMode": "load-more"
+      }
+    },
+    "pt.mangastop": {
+      "checked": "2026-08-28",
+      "retired": "Cloudflare managed challenge on every path; needs a solver, not a config"
+    },
+    "tr.raindropfansub": {
+      "checked": "2026-08-28",
+      "retired": "reCAPTCHA bot wall on every path; needs a solver, not a config"
     }
   }
 }

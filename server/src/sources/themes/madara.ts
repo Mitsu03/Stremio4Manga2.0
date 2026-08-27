@@ -89,6 +89,16 @@ export interface MadaraConfig {
    * and not working at all.
    */
   omitSort?: boolean;
+  /**
+   * How the listing is fetched.
+   *   `archive`   — GET `/{mangaPath}/page/N/`, which is what most installs
+   *                 serve and remains the default;
+   *   `load-more` — POST the theme's own `madara_load_more` action. Some
+   *                 installs redirect the archive path to the home page and
+   *                 answer only this; upstream marks them
+   *                 `LoadMoreStrategy.Always`.
+   */
+  listingMode?: 'archive' | 'load-more';
 }
 
 /** The card grid, shared by the listing, the latest page and search results. */
@@ -247,9 +257,46 @@ export function createMadaraSource(config: MadaraConfig, deps: SourceDeps): Sour
     return { items, hasNextPage };
   }
 
+  /**
+   * The theme's own archive endpoint. It returns the same card markup the
+   * archive page does, so the ordinary parse handles the response unchanged,
+   * and — contrary to the note that used to sit below — it needs no nonce.
+   * `page` is zero-based here, unlike everywhere else in this theme.
+   */
+  async function listingViaLoadMore(page: number, metaKey: string): Promise<string> {
+    return http.text(`${baseUrl}/wp-admin/admin-ajax.php`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'X-Requested-With': 'XMLHttpRequest',
+        Referer: `${baseUrl}/`,
+      },
+      body: form({
+        action: 'madara_load_more',
+        page: page - 1,
+        template: 'madara-core/content/content-archive',
+        'vars[paged]': 1,
+        'vars[template]': 'archive',
+        'vars[posts_per_page]': 20,
+        'vars[post_type]': 'wp-manga',
+        'vars[post_status]': 'publish',
+        'vars[manga_archives_item_layout]': 'big_thumbnail',
+        'vars[orderby]': 'meta_value_num',
+        'vars[meta_key]': metaKey,
+        'vars[order]': 'desc',
+      }),
+    });
+  }
+
   async function listing(page: number, orderBy: string): Promise<MangaPage<SourceManga>> {
-    // The `/page/N/` form of the archive is the one every install keeps working;
-    // the AJAX loader the theme uses in the browser needs a nonce we do not have.
+    // The `/page/N/` form of the archive is the one most installs keep working.
+    // A few redirect it to the home page and answer only the AJAX loader, which
+    // is what `load-more` is for.
+    if (config.listingMode === 'load-more') {
+      return parseList(
+        await listingViaLoadMore(page, orderBy === 'latest' ? '_latest_update' : '_wp_manga_views'),
+      );
+    }
     const path = page > 1 ? `${baseUrl}/${mangaPath}/page/${page}/` : `${baseUrl}/${mangaPath}/`;
     return parseList(
       await http.text(config.omitSort === true ? path : `${path}?m_orderby=${orderBy}`),

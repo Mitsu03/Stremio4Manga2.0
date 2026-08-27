@@ -424,7 +424,8 @@
           "thumbnail": ".cover_managa img",
           "author": "h5:contains(Author) + h4 a",
           "artist": "h5:contains(Artist) + h4 a"
-        }
+        },
+        "listingMode": "load-more"
       },
       "unportedOverrides": 1,
       "id": "1000000000000000021"
@@ -1057,10 +1058,13 @@
       "name": "Frieren Online",
       "lang": "en",
       "theme": "madara",
-      "baseUrl": "https://www.frieren.online",
+      "baseUrl": "https://ww5.frieren.online",
       "id": "1000000000000000039",
       "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "versionName": "1.0.0",
+      "config": {
+        "listingMode": "load-more"
+      }
     },
     {
       "pkgName": "tr.gafeland",
@@ -2408,7 +2412,8 @@
         "minIntervalMs": 30000
       },
       "unportedOverrides": 7,
-      "id": "1000000000000000281"
+      "id": "1000000000000000281",
+      "retired": "Cloudflare managed challenge on every path; needs a solver, not a config"
     },
     {
       "pkgName": "en.mangatrend",
@@ -3841,7 +3846,8 @@
         "dateLocale": "tr"
       },
       "unportedOverrides": 1,
-      "id": "1000000000000000342"
+      "id": "1000000000000000342",
+      "retired": "reCAPTCHA bot wall on every path; needs a solver, not a config"
     },
     {
       "pkgName": "en.ravenscans",
@@ -4392,7 +4398,7 @@
       "pkgName": "tr.tarotscans",
       "name": "Tarot Scans",
       "lang": "tr",
-      "theme": "mangathemesia",
+      "theme": "madara",
       "baseUrl": "https://www.tarotscans.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",

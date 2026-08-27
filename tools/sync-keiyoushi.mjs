@@ -327,6 +327,9 @@ function main() {
     const fix = corrections[entry.pkgName];
     if (!fix) continue;
     if (fix.baseUrl) entry.baseUrl = fix.baseUrl.replace(/\/+$/, '');
+    // A site can migrate between themes without its extension being updated,
+    // and then it is not a selector that is wrong but the whole engine.
+    if (fix.theme) entry.theme = fix.theme;
     if (fix.config) entry.config = { ...entry.config, ...fix.config };
     if (fix.retired) entry.retired = fix.retired;
     if (fix.retired) retired += 1;
