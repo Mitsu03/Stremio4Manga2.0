@@ -80,6 +80,15 @@ export interface MadaraConfig {
   dateLocale?: string;
   /** Per-site markup differences, read off the extension's own Kotlin. */
   selectors?: ThemeSelectors;
+  /**
+   * Browse the archive unsorted.
+   *
+   * A couple of installs have a firewall rule on the sort parameter itself:
+   * `/manga/` answers, `/manga/?m_orderby=views` is challenged. Losing the sort
+   * order is the whole difference between the source working without a solver
+   * and not working at all.
+   */
+  omitSort?: boolean;
 }
 
 /** The card grid, shared by the listing, the latest page and search results. */
@@ -229,7 +238,9 @@ export function createMadaraSource(config: MadaraConfig, deps: SourceDeps): Sour
     // The `/page/N/` form of the archive is the one every install keeps working;
     // the AJAX loader the theme uses in the browser needs a nonce we do not have.
     const path = page > 1 ? `${baseUrl}/${mangaPath}/page/${page}/` : `${baseUrl}/${mangaPath}/`;
-    return parseList(await http.text(`${path}?m_orderby=${orderBy}`));
+    return parseList(
+      await http.text(config.omitSort === true ? path : `${path}?m_orderby=${orderBy}`),
+    );
   }
 
   /**

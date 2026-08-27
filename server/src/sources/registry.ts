@@ -53,6 +53,14 @@ interface ThemedEntry {
    * only approximately right can say so instead of looking exact.
    */
   unportedOverrides?: number;
+  /**
+   * Why this site is gone, when it has been checked and found gone.
+   *
+   * The row stays — its id is on somebody's manga rows and must never be handed
+   * to a second site — but the source is not built, so a dead host stops costing
+   * a slot and a timeout in every sweep.
+   */
+  retired?: string;
 }
 
 import { definition as mangadex } from './sites/mangadex.js';
@@ -77,6 +85,10 @@ import { definition as rizzfables } from './sites/rizzfables.js';
  * source that installs and then fails on every search.
  */
 const THEMED: SourceDefinition[] = (themed.extensions as ThemedEntry[]).flatMap((entry) => {
+  // Checked and found gone. Keeping the row keeps the id reserved; building the
+  // source would only spend a request per sweep to rediscover that.
+  if (entry.retired !== undefined) return [];
+
   const shared = {
     id: entry.id,
     name: entry.name,
@@ -278,7 +290,11 @@ export function install(db: Db, userId: string, pkgName: string): void {
  * person knows about this source" once they turn it back on.
  */
 export function uninstall(db: Db, userId: string, pkgName: string): void {
-  db.run('UPDATE source_state SET installed = 0 WHERE user_id = ? AND pkg_name = ?', userId, pkgName);
+  db.run(
+    'UPDATE source_state SET installed = 0 WHERE user_id = ? AND pkg_name = ?',
+    userId,
+    pkgName,
+  );
 }
 
 // -------------------------------------------------------- filter transport --
@@ -381,10 +397,7 @@ export function sanitizeFilterChanges(
 }
 
 /** Both halves in one call, for the resolvers that only ever need this. */
-export function prepareFilters(
-  id: SourceId,
-  changes: FilterChange[] | undefined,
-): FilterChange[] {
+export function prepareFilters(id: SourceId, changes: FilterChange[] | undefined): FilterChange[] {
   const source = getSource(id);
   return source ? sanitizeFilterChanges(source.getFilters(), changes) : [];
 }

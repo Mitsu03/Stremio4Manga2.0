@@ -347,7 +347,12 @@ function isChallenge(status: number, headers: Headers, body: string | undefined)
     body.includes('__cf_chl') ||
     body.includes('/cdn-cgi/challenge-platform') ||
     body.includes('cf-browser-verification') ||
-    body.includes('<title>Just a moment...</title>')
+    // Matched on the phrase rather than the whole tag: zones localise this title
+    // and prepend to it ("Checking your browser before accessing. Just a
+    // moment..."), and an exact match on the English form reports those as a
+    // plain 403 — which reads as the site refusing us, rather than as a
+    // challenge nobody tried to solve.
+    /<title>[^<]*just a moment/i.test(body)
   );
 }
 

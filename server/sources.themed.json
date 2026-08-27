@@ -13,7 +13,8 @@
       "baseUrl": "https://24hnovel.com",
       "id": "1000000000000000009",
       "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "versionName": "1.0.0",
+      "retired": "invalid certificate, no content behind it"
     },
     {
       "pkgName": "ar.manga3asq",
@@ -601,7 +602,8 @@
       "baseUrl": "https://coffeemanga.ink",
       "id": "1000000000000000025",
       "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "versionName": "1.0.0",
+      "retired": "nothing served at the root"
     },
     {
       "pkgName": "en.comicasura",
@@ -635,7 +637,8 @@
       "baseUrl": "https://comicsland.org",
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
-      "id": "1000000000000000027"
+      "id": "1000000000000000027",
+      "retired": "nothing served at the root"
     },
     {
       "pkgName": "all.comicsvalley",
@@ -707,7 +710,8 @@
       "config": {
         "mangaPath": "komik"
       },
-      "id": "1000000000000000233"
+      "id": "1000000000000000233",
+      "retired": "domain no longer resolves"
     },
     {
       "pkgName": "en.decadencescans",
@@ -988,7 +992,8 @@
       "baseUrl": "https://firescans.xyz",
       "id": "1000000000000000037",
       "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "versionName": "1.0.0",
+      "retired": "domain no longer resolves"
     },
     {
       "pkgName": "en.plutoscans",
@@ -998,7 +1003,8 @@
       "baseUrl": "https://flamescans.lol",
       "id": "1000000000000000038",
       "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "versionName": "1.0.0",
+      "retired": "parked, nothing behind it"
     },
     {
       "pkgName": "pt.fleurblanche",
@@ -1240,7 +1246,10 @@
       "baseUrl": "https://gourmetsupremacy.com",
       "id": "1000000000000000045",
       "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "project"
+      }
     },
     {
       "pkgName": "all.grabberzone",
@@ -1582,7 +1591,8 @@
       "baseUrl": "https://isekaiscan.top",
       "id": "1000000000000000055",
       "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "versionName": "1.0.0",
+      "retired": "stopped by its operator"
     },
     {
       "pkgName": "id.izanamiscans",
@@ -1937,7 +1947,8 @@
         "dateLocale": "id"
       },
       "unportedOverrides": 4,
-      "id": "1000000000000000248"
+      "id": "1000000000000000248",
+      "retired": "domain no longer resolves"
     },
     {
       "pkgName": "tr.kuroimanga",
@@ -2072,7 +2083,10 @@
       "baseUrl": "https://lilymanga.net",
       "id": "1000000000000000064",
       "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "gl"
+      }
     },
     {
       "pkgName": "en.linkmanga",
@@ -2082,7 +2096,10 @@
       "baseUrl": "https://linkmanga.com",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
-      "id": "1000000000000000065"
+      "id": "1000000000000000065",
+      "config": {
+        "omitSort": true
+      }
     },
     {
       "pkgName": "es.lunapieces",
@@ -2162,7 +2179,10 @@
       "baseUrl": "https://madaradex.org",
       "id": "1000000000000000067",
       "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "title"
+      }
     },
     {
       "pkgName": "en.mahouirexnohentaikarte",
@@ -2485,7 +2505,8 @@
       "baseUrl": "https://mangablaze.com",
       "id": "1000000000000000077",
       "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "versionName": "1.0.0",
+      "retired": "domain no longer resolves"
     },
     {
       "pkgName": "all.mangacrazy",
@@ -2578,7 +2599,8 @@
       "baseUrl": "https://www.mangago.fun",
       "id": "1000000000000000082",
       "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "versionName": "1.0.0",
+      "retired": "domain no longer resolves"
     },
     {
       "pkgName": "en.mangahe",
@@ -2618,7 +2640,8 @@
       "config": {
         "chapterSource": "ajax"
       },
-      "id": "1000000000000000084"
+      "id": "1000000000000000084",
+      "retired": "domain no longer resolves"
     },
     {
       "pkgName": "th.mangakimi",
@@ -2896,7 +2919,8 @@
         "dateLocale": "en"
       },
       "unportedOverrides": 2,
-      "id": "1000000000000000096"
+      "id": "1000000000000000096",
+      "retired": "domain no longer resolves"
     },
     {
       "pkgName": "en.manhuatop",
@@ -3290,7 +3314,8 @@
         "dateLocale": "th"
       },
       "unportedOverrides": 1,
-      "id": "1000000000000000306"
+      "id": "1000000000000000306",
+      "retired": "hosting placeholder page"
     },
     {
       "pkgName": "tr.moondaisyscans",
@@ -3710,7 +3735,8 @@
         "dateFormat": "MMMM d, yyyy",
         "dateLocale": "th"
       },
-      "id": "1000000000000000308"
+      "id": "1000000000000000308",
+      "retired": "no content at any path"
     },
     {
       "pkgName": "fr.pornhwafr",
@@ -3829,7 +3855,8 @@
       "baseUrl": "https://rdscans.com",
       "id": "1000000000000000125",
       "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "versionName": "1.0.0",
+      "retired": "origin rejects the TLS handshake"
     },
     {
       "pkgName": "th.reapertrans",
@@ -4037,7 +4064,8 @@
       "baseUrl": "https://shibamanga.com",
       "id": "1000000000000000134",
       "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "versionName": "1.0.0",
+      "retired": "hosting account suspended"
     },
     {
       "pkgName": "tr.shijiescans",
@@ -4108,7 +4136,8 @@
         "dateLocale": "en-US",
         "minIntervalMs": 20000
       },
-      "id": "1000000000000000135"
+      "id": "1000000000000000135",
+      "retired": "domain no longer resolves"
     },
     {
       "pkgName": "es.skymangas",
@@ -4134,7 +4163,8 @@
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
       "config": {
-        "chapterSource": "manga-ajax"
+        "chapterSource": "manga-ajax",
+        "mangaPath": "series"
       },
       "id": "1000000000000000136"
     },
@@ -4430,7 +4460,8 @@
       "baseUrl": "https://toon18.to",
       "id": "1000000000000000139",
       "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "versionName": "1.0.0",
+      "retired": "domain no longer resolves"
     },
     {
       "pkgName": "en.toongod",
@@ -4644,7 +4675,8 @@
       "baseUrl": "https://utoon.net",
       "id": "1000000000000000147",
       "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "versionName": "1.0.0",
+      "retired": "site pulled, replaced by a billing notice"
     },
     {
       "pkgName": "es.vermanhwas",
@@ -4679,10 +4711,13 @@
       "name": "VyvyManga.org",
       "lang": "en",
       "theme": "madara",
-      "baseUrl": "https://vyvymanga.org",
+      "baseUrl": "https://mangaowl.io",
       "id": "1000000000000000149",
       "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "manga-list"
+      }
     },
     {
       "pkgName": "it.walpurgisscan",
@@ -4745,18 +4780,22 @@
       "baseUrl": "https://whalemanga.com",
       "id": "1000000000000000152",
       "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "versionName": "1.0.0",
+      "retired": "hosting account suspended"
     },
     {
       "pkgName": "en.witchscans",
       "name": "WitchScans",
       "lang": "en",
       "theme": "mangathemesia",
-      "baseUrl": "https://witchscans.com",
+      "baseUrl": "https://witchtoons.net",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
       "unportedOverrides": 2,
-      "id": "1000000000000000153"
+      "id": "1000000000000000153",
+      "config": {
+        "mangaPath": "series"
+      }
     },
     {
       "pkgName": "en.woopread",

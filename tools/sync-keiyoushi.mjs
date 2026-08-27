@@ -46,6 +46,7 @@ import { fileURLToPath } from 'node:url';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = join(root, 'server', 'sources.themed.json');
 const CATALOG = join(root, 'server', 'catalog.json');
+const OVERRIDES = join(root, 'server', 'sources.overrides.json');
 
 /**
  * The themes `src/sources/themes/` implements. Anything else is skipped: a
@@ -312,11 +313,37 @@ function main() {
   // Whatever upstream no longer has keeps its row and its id.
   const dropped = [...byPkg.values()];
   out.push(...dropped);
+
+  // Corrections we have checked against the live site. Upstream is not always
+  // current — a site moves its archive and the extension is not updated for
+  // months — and a source that 404s on every request is worse than one nobody
+  // offered. Applied last so re-running the script never loses them.
+  const corrections = existsSync(OVERRIDES)
+    ? (JSON.parse(readFileSync(OVERRIDES, 'utf8')).sources ?? {})
+    : {};
+  let corrected = 0;
+  let retired = 0;
+  for (const entry of out) {
+    const fix = corrections[entry.pkgName];
+    if (!fix) continue;
+    if (fix.baseUrl) entry.baseUrl = fix.baseUrl.replace(/\/+$/, '');
+    if (fix.config) entry.config = { ...entry.config, ...fix.config };
+    if (fix.retired) entry.retired = fix.retired;
+    if (fix.retired) retired += 1;
+    else corrected += 1;
+  }
+  const unknown = Object.keys(corrections).filter(
+    (pkg) => !out.some((entry) => entry.pkgName === pkg),
+  );
+
   out.sort((a, b) => a.name.localeCompare(b.name));
 
   say(`added ${added}, base URL changed ${moved}, kept ${dropped.length} no longer upstream`);
   for (const entry of dropped) say(`  kept (gone upstream): ${entry.pkgName}`);
-  say(`total ${out.length}`);
+  say(`corrected ${corrected}, retired ${retired} from sources.overrides.json`);
+  // A correction whose source is gone is dead weight that reads as coverage.
+  for (const pkg of unknown) say(`  override matches no source: ${pkg}`);
+  say(`total ${out.length}, of which ${out.filter((e) => e.retired).length} retired`);
 
   if (dryRun) {
     say('--dry-run: nothing written');

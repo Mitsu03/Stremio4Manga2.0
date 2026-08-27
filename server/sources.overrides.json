@@ -1,0 +1,63 @@
+{
+  "$comment": "Hand-maintained corrections applied on top of what tools/sync-keiyoushi.mjs reads from keiyoushi. Two things live here that the generator cannot know. First, sites that moved or renamed their archive after upstream stopped updating the extension: upstream is not always current, and a source that 404s on every request is worse than one nobody offered. Second, sites verified to be gone: those keep their row and their id forever, because ids are stored on every manga row and must never be reused, but they are marked retired so they stop costing a slot in every sweep. Every entry was checked against the live site on the date it carries; re-check before trusting an old one. The generator merges this file, so these survive a re-run.",
+  "sources": {
+    "en.vyvymangaorg": {
+      "checked": "2026-08-28",
+      "note": "301 to mangaowl.io, where the old /manga/ path answers 410 Gone.",
+      "baseUrl": "https://mangaowl.io",
+      "config": { "mangaPath": "manga-list" }
+    },
+    "en.witchscans": {
+      "checked": "2026-08-28",
+      "note": "301 to witchtoons.net.",
+      "baseUrl": "https://witchtoons.net",
+      "config": { "mangaPath": "series" }
+    },
+    "en.madaradex": {
+      "checked": "2026-08-28",
+      "note": "Archive moved to /title/.",
+      "config": { "mangaPath": "title" }
+    },
+    "en.sleepytranslations": {
+      "checked": "2026-08-28",
+      "note": "Archive moved to /series/.",
+      "config": { "mangaPath": "series" }
+    },
+    "en.gourmetscans": {
+      "checked": "2026-08-28",
+      "note": "Archive moved to /project/.",
+      "config": { "mangaPath": "project" }
+    },
+    "en.lilymanga": {
+      "checked": "2026-08-28",
+      "note": "Upstream still declares mangaSubString = \"ys\", which is now a yuri-only sub-archive of two titles; the real catalogue is /gl/ with 125. Upstream being stale is exactly why this file exists rather than a generator fix.",
+      "config": { "mangaPath": "gl" }
+    },
+    "en.linkmanga": {
+      "checked": "2026-08-28",
+      "note": "The listing itself works; the ?m_orderby= parameter trips the site's WAF rule and turns a 200 into a challenge. Browsing unsorted is the whole difference between this source working without a solver and not working at all.",
+      "config": { "omitSort": true }
+    },
+
+    "id.dailysuka": { "checked": "2026-08-28", "retired": "domain no longer resolves" },
+    "en.firescans": { "checked": "2026-08-28", "retired": "domain no longer resolves" },
+    "id.kuromanga": { "checked": "2026-08-28", "retired": "domain no longer resolves" },
+    "en.mangablaze": { "checked": "2026-08-28", "retired": "domain no longer resolves" },
+    "en.mangagofun": { "checked": "2026-08-28", "retired": "domain no longer resolves" },
+    "en.mangaka": { "checked": "2026-08-28", "retired": "domain no longer resolves" },
+    "en.manhuascanus": { "checked": "2026-08-28", "retired": "domain no longer resolves" },
+    "en.skymanga": { "checked": "2026-08-28", "retired": "domain no longer resolves" },
+    "en.toon18": { "checked": "2026-08-28", "retired": "domain no longer resolves" },
+    "en.plutoscans": { "checked": "2026-08-28", "retired": "parked, nothing behind it" },
+    "en.isekaiscantop": { "checked": "2026-08-28", "retired": "stopped by its operator" },
+    "en.utoon": { "checked": "2026-08-28", "retired": "site pulled, replaced by a billing notice" },
+    "en.shibamanga": { "checked": "2026-08-28", "retired": "hosting account suspended" },
+    "en.whalemanga": { "checked": "2026-08-28", "retired": "hosting account suspended" },
+    "en.coffeemanga": { "checked": "2026-08-28", "retired": "nothing served at the root" },
+    "en.comicsland": { "checked": "2026-08-28", "retired": "nothing served at the root" },
+    "th.moodtoon": { "checked": "2026-08-28", "retired": "hosting placeholder page" },
+    "th.popsmanga": { "checked": "2026-08-28", "retired": "no content at any path" },
+    "en.rdscans": { "checked": "2026-08-28", "retired": "origin rejects the TLS handshake" },
+    "en.novel24h": { "checked": "2026-08-28", "retired": "invalid certificate, no content behind it" }
+  }
+}
