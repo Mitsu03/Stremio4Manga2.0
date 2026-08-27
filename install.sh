@@ -287,8 +287,12 @@ export npm_config_audit=false
 
 "$NPM_BIN" ci --no-audit --no-fund \
   || die "\`npm ci\` failed in $PREFIX." \
-         "There are no native modules here, so this is almost always the network" \
-         "or a package-lock.json that does not match package.json." \
+         "There are no native modules here, so it is the network, a lockfile that" \
+         "does not match package.json, or — if the error says EBADPLATFORM for a" \
+         "package belonging to some other OS — a lockfile carrying stale" \
+         "\"extraneous\" entries, which npm installs for real instead of skipping." \
+         "That last one is fixed at the source: delete node_modules, run" \
+         "\`npm install\`, and commit the smaller package-lock.json." \
          "Re-run it by hand to see the full output:  cd $PREFIX && npm ci"
 
 "$NPM_BIN" run build \
