@@ -1,0 +1,116 @@
+{
+ "method": "GET",
+ "url": "https://api.mangadex.org/manga/9906dfa8-52c9-40ac-8eef-1099a85c8611/feed?limit=500&offset=0&translatedLanguage%5B%5D=en&includes%5B%5D=scanlation_group&contentRating%5B%5D=safe&contentRating%5B%5D=suggestive&contentRating%5B%5D=erotica&contentRating%5B%5D=pornographic&order%5Bvolume%5D=desc&order%5Bchapter%5D=desc",
+ "status": 200,
+ "statusText": "OK",
+ "headers": [
+  [
+   "accept-ranges",
+   "bytes"
+  ],
+  [
+   "access-control-allow-credentials",
+   "true"
+  ],
+  [
+   "access-control-expose-headers",
+   "*"
+  ],
+  [
+   "alt-svc",
+   "h3=\":443\"; ma=86400"
+  ],
+  [
+   "cache-control",
+   "max-age=15, public, s-maxage=60, stale-while-revalidate=15"
+  ],
+  [
+   "content-encoding",
+   "gzip"
+  ],
+  [
+   "content-length",
+   "92"
+  ],
+  [
+   "content-type",
+   "application/json"
+  ],
+  [
+   "cross-origin-embedder-policy",
+   "unsafe-none"
+  ],
+  [
+   "cross-origin-opener-policy",
+   "same-origin-allow-popups"
+  ],
+  [
+   "cross-origin-resource-policy",
+   "cross-origin"
+  ],
+  [
+   "date",
+   "Fri, 28 Aug 2026 23:42:54 GMT"
+  ],
+  [
+   "md-edge-crs",
+   "Tk9ORQ"
+  ],
+  [
+   "md-progressive-rollout-bucket",
+   "311998222"
+  ],
+  [
+   "permissions-policy",
+   "fullscreen=(self)"
+  ],
+  [
+   "referrer-policy",
+   "strict-origin"
+  ],
+  [
+   "server",
+   "MangaDex"
+  ],
+  [
+   "strict-transport-security",
+   "max-age=63072000; includeSubDomains; preload"
+  ],
+  [
+   "vary",
+   "Origin"
+  ],
+  [
+   "via",
+   "HTTP/1.1 EU-CENTRAL-D2x1"
+  ],
+  [
+   "x-cache",
+   "MISS"
+  ],
+  [
+   "x-content-type-options",
+   "nosniff"
+  ],
+  [
+   "x-frame-options",
+   "DENY"
+  ],
+  [
+   "x-request-id",
+   "01a04ac1-4116-7f9f-b36a-46ef9af1df59"
+  ],
+  [
+   "x-xss-protection",
+   "1; mode=block"
+  ]
+ ],
+ "json": {
+  "result": "ok",
+  "response": "collection",
+  "data": [],
+  "limit": 500,
+  "offset": 0,
+  "total": 0
+ }
+}

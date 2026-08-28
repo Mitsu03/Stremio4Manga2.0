@@ -1,0 +1,2059 @@
+{
+ "method": "GET",
+ "url": "https://api.mangadex.org/manga?limit=20&offset=0&includes%5B%5D=cover_art&includes%5B%5D=author&includes%5B%5D=artist&availableTranslatedLanguage%5B%5D=en&title=Frieren&contentRating%5B%5D=safe&contentRating%5B%5D=suggestive&order%5Brelevance%5D=desc",
+ "status": 200,
+ "statusText": "OK",
+ "headers": [
+  [
+   "accept-ranges",
+   "bytes"
+  ],
+  [
+   "access-control-allow-credentials",
+   "true"
+  ],
+  [
+   "access-control-expose-headers",
+   "*"
+  ],
+  [
+   "alt-svc",
+   "h3=\":443\"; ma=86400"
+  ],
+  [
+   "cache-control",
+   "max-age=15, public, s-maxage=2592000, stale-while-revalidate=15"
+  ],
+  [
+   "content-encoding",
+   "gzip"
+  ],
+  [
+   "content-length",
+   "11903"
+  ],
+  [
+   "content-type",
+   "application/json"
+  ],
+  [
+   "cross-origin-embedder-policy",
+   "unsafe-none"
+  ],
+  [
+   "cross-origin-opener-policy",
+   "same-origin-allow-popups"
+  ],
+  [
+   "cross-origin-resource-policy",
+   "cross-origin"
+  ],
+  [
+   "date",
+   "Fri, 28 Aug 2026 23:32:32 GMT"
+  ],
+  [
+   "md-edge-crs",
+   "Tk9ORQ"
+  ],
+  [
+   "md-progressive-rollout-bucket",
+   "311998222"
+  ],
+  [
+   "permissions-policy",
+   "fullscreen=(self)"
+  ],
+  [
+   "referrer-policy",
+   "strict-origin"
+  ],
+  [
+   "server",
+   "MangaDex"
+  ],
+  [
+   "strict-transport-security",
+   "max-age=63072000; includeSubDomains; preload"
+  ],
+  [
+   "vary",
+   "Origin"
+  ],
+  [
+   "via",
+   "HTTP/1.1 EU-CENTRAL-D2x1"
+  ],
+  [
+   "x-cache",
+   "HIT (fresh)"
+  ],
+  [
+   "x-cache-age",
+   "621.119"
+  ],
+  [
+   "x-cache-hits",
+   "5"
+  ],
+  [
+   "x-cache-rid",
+   "01a04ab7-c2d3-7532-9cde-743a3f6b4a31"
+  ],
+  [
+   "x-content-type-options",
+   "nosniff"
+  ],
+  [
+   "x-frame-options",
+   "DENY"
+  ],
+  [
+   "x-request-id",
+   "01a04ac1-3e53-7440-9c20-a259372ccfc1"
+  ],
+  [
+   "x-xss-protection",
+   "1; mode=block"
+  ]
+ ],
+ "json": {
+  "result": "ok",
+  "response": "collection",
+  "data": [
+   {
+    "id": "9906dfa8-52c9-40ac-8eef-1099a85c8611",
+    "type": "manga",
+    "attributes": {
+     "title": {
+      "ja-ro": "Sousou no Frieren Anthology: Kotonaru Tabi o Tanoshimu Mahou"
+     },
+     "altTitles": [
+      {
+       "ja": "葬送のフリーレン　アンソロジー～異なる旅を楽しむ魔法～"
+      },
+      {
+       "en": "Funeral Frieren Anthology: The Magic of Enjoying a Divergent Journey"
+      }
+     ],
+     "description": {
+      "en": "Sousou no Frieren Anthology Spin-off Festival!\n\n1. Frieren wants to know about Humans by [Jona](https://mangadex.org/author/152b4216-ce74-4fa7-b408-8af9d332db55)\n2. Himmel's Adventure Diary by [Yamaguchi Kazumi](https://mangadex.org/author/52333290-d0b6-4c83-8848-1c23c998dc8b)\n3. The Adventures of the Hero Himmel by [Miura Ren](https://mangadex.org/author/b7685513-57b4-43c0-ad90-6da4418209cb)\n4. Frieren at the Kitchen by [Kassan](https://mangadex.org/author/c0ba420c-674f-4eb5-bfae-593a137c9ca5)\n5. Frieren's Stopover by [Igarashi Souichi](https://mangadex.org/author/8057f2f9-ddb8-4e25-8337-0a4519aaf108)"
+     },
+     "isLocked": false,
+     "links": {
+      "al": "173310",
+      "bw": "series/449050/list",
+      "mu": "mlfc52k",
+      "amz": "https://www.amazon.co.jp/dp/4098530996",
+      "ebj": "https://ebookjapan.yahoo.co.jp/books/803754",
+      "mal": "164432",
+      "raw": "https://blog.www.sunday-webry.com/entry/20230522"
+     },
+     "officialLinks": null,
+     "originalLanguage": "ja",
+     "lastVolume": "1",
+     "lastChapter": "5",
+     "publicationDemographic": "shounen",
+     "status": "completed",
+     "year": 2023,
+     "contentRating": "safe",
+     "tags": [
+      {
+       "id": "36fd93ea-e8b8-445e-b836-358f02b3d33d",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Monsters"
+        },
+        "description": {},
+        "group": "theme",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "39730448-9a5f-48a2-85b0-a70db87b1233",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Demons"
+        },
+        "description": {},
+        "group": "theme",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "51d83883-4103-437c-b4b1-731cb73d786c",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Anthology"
+        },
+        "description": {},
+        "group": "format",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "87cc87cd-a395-47af-b27a-93258283bbc6",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Adventure"
+        },
+        "description": {},
+        "group": "genre",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "a1f53773-c69a-4ce5-8cab-fffcd90b1565",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Magic"
+        },
+        "description": {},
+        "group": "theme",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "b9af3a63-f058-46de-a9a0-e0c13906197a",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Drama"
+        },
+        "description": {},
+        "group": "genre",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "cdc58593-87dd-415e-bbc0-2ec27bf404cc",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Fantasy"
+        },
+        "description": {},
+        "group": "genre",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "e5301a23-ebd9-49dd-a0cb-2add944c7fe9",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Slice of Life"
+        },
+        "description": {},
+        "group": "genre",
+        "version": 1
+       },
+       "relationships": []
+      }
+     ],
+     "state": "published",
+     "chapterNumbersResetOnNewVolume": false,
+     "createdAt": "2023-05-25T08:24:45+00:00",
+     "updatedAt": "2026-07-29T18:01:56+00:00",
+     "version": 21,
+     "availableTranslatedLanguages": [
+      "pt-br",
+      "en",
+      "es-la",
+      "fr"
+     ],
+     "latestUploadedChapter": "727e703b-1ab9-44c5-a6c1-5192adc380fb"
+    },
+    "relationships": [
+     {
+      "id": "152b4216-ce74-4fa7-b408-8af9d332db55",
+      "type": "author",
+      "attributes": {
+       "name": "Jona (城奈)",
+       "imageUrl": null,
+       "biography": {
+        "en": "**Name In Native Language:** 城奈 (Jouna)"
+       },
+       "twitter": "https://twitter.com/0827jona",
+       "pixiv": "https://www.pixiv.net/users/79724101",
+       "melonBook": null,
+       "fanBox": null,
+       "booth": null,
+       "namicomi": null,
+       "nicoVideo": null,
+       "skeb": null,
+       "fantia": null,
+       "tumblr": null,
+       "youtube": null,
+       "weibo": null,
+       "naver": null,
+       "website": null,
+       "createdAt": "2022-10-15T13:30:53+00:00",
+       "updatedAt": "2024-10-19T17:48:50+00:00",
+       "version": 5
+      }
+     },
+     {
+      "id": "52333290-d0b6-4c83-8848-1c23c998dc8b",
+      "type": "author",
+      "attributes": {
+       "name": "Yamaguchi Kazumi",
+       "imageUrl": null,
+       "biography": {
+        "en": "**Alt names**:\n山口和海"
+       },
+       "twitter": null,
+       "pixiv": null,
+       "melonBook": null,
+       "fanBox": null,
+       "booth": null,
+       "namicomi": null,
+       "nicoVideo": null,
+       "skeb": null,
+       "fantia": null,
+       "tumblr": null,
+       "youtube": null,
+       "weibo": null,
+       "naver": null,
+       "website": null,
+       "createdAt": "2023-05-25T08:28:43+00:00",
+       "updatedAt": "2023-06-06T05:17:29+00:00",
+       "version": 2
+      }
+     },
+     {
+      "id": "8057f2f9-ddb8-4e25-8337-0a4519aaf108",
+      "type": "author",
+      "attributes": {
+       "name": "Igarashi Souichi",
+       "imageUrl": null,
+       "biography": {
+        "en": "**Alt names**:\n五十嵐惣一"
+       },
+       "twitter": null,
+       "pixiv": null,
+       "melonBook": null,
+       "fanBox": null,
+       "booth": null,
+       "namicomi": null,
+       "nicoVideo": null,
+       "skeb": null,
+       "fantia": null,
+       "tumblr": null,
+       "youtube": null,
+       "weibo": null,
+       "naver": null,
+       "website": null,
+       "createdAt": "2023-05-25T08:29:05+00:00",
+       "updatedAt": "2023-06-06T05:22:33+00:00",
+       "version": 2
+      }
+     },
+     {
+      "id": "b7685513-57b4-43c0-ad90-6da4418209cb",
+      "type": "author",
+      "attributes": {
+       "name": "Miura Ren",
+       "imageUrl": null,
+       "biography": {
+        "en": "**Name In Native Language:** 三浦蓮"
+       },
+       "twitter": "https://twitter.com/D19980912",
+       "pixiv": null,
+       "melonBook": null,
+       "fanBox": null,
+       "booth": null,
+       "namicomi": null,
+       "nicoVideo": null,
+       "skeb": null,
+       "fantia": null,
+       "tumblr": null,
+       "youtube": null,
+       "weibo": null,
+       "naver": null,
+       "website": "https://rookie.shonenjump.com/users/11844546810161244765",
+       "createdAt": "2023-05-25T08:27:48+00:00",
+       "updatedAt": "2026-08-11T10:54:56+00:00",
+       "version": 3
+      }
+     },
+     {
+      "id": "c0ba420c-674f-4eb5-bfae-593a137c9ca5",
+      "type": "author",
+      "attributes": {
+       "name": "Kassan",
+       "imageUrl": null,
+       "biography": {
+        "en": "**Alt names**:\n蚊っさん"
+       },
+       "twitter": "https://twitter.com/inkdaisuki",
+       "pixiv": "https://pixiv.net/users/22592663",
+       "melonBook": null,
+       "fanBox": null,
+       "booth": null,
+       "namicomi": null,
+       "nicoVideo": null,
+       "skeb": null,
+       "fantia": null,
+       "tumblr": null,
+       "youtube": null,
+       "weibo": null,
+       "naver": null,
+       "website": null,
+       "createdAt": "2023-05-25T08:23:06+00:00",
+       "updatedAt": "2024-05-07T20:19:15+00:00",
+       "version": 3
+      }
+     },
+     {
+      "id": "152b4216-ce74-4fa7-b408-8af9d332db55",
+      "type": "artist",
+      "attributes": {
+       "name": "Jona (城奈)",
+       "imageUrl": null,
+       "biography": {
+        "en": "**Name In Native Language:** 城奈 (Jouna)"
+       },
+       "twitter": "https://twitter.com/0827jona",
+       "pixiv": "https://www.pixiv.net/users/79724101",
+       "melonBook": null,
+       "fanBox": null,
+       "booth": null,
+       "namicomi": null,
+       "nicoVideo": null,
+       "skeb": null,
+       "fantia": null,
+       "tumblr": null,
+       "youtube": null,
+       "weibo": null,
+       "naver": null,
+       "website": null,
+       "createdAt": "2022-10-15T13:30:53+00:00",
+       "updatedAt": "2024-10-19T17:48:50+00:00",
+       "version": 5
+      }
+     },
+     {
+      "id": "52333290-d0b6-4c83-8848-1c23c998dc8b",
+      "type": "artist",
+      "attributes": {
+       "name": "Yamaguchi Kazumi",
+       "imageUrl": null,
+       "biography": {
+        "en": "**Alt names**:\n山口和海"
+       },
+       "twitter": null,
+       "pixiv": null,
+       "melonBook": null,
+       "fanBox": null,
+       "booth": null,
+       "namicomi": null,
+       "nicoVideo": null,
+       "skeb": null,
+       "fantia": null,
+       "tumblr": null,
+       "youtube": null,
+       "weibo": null,
+       "naver": null,
+       "website": null,
+       "createdAt": "2023-05-25T08:28:43+00:00",
+       "updatedAt": "2023-06-06T05:17:29+00:00",
+       "version": 2
+      }
+     },
+     {
+      "id": "8057f2f9-ddb8-4e25-8337-0a4519aaf108",
+      "type": "artist",
+      "attributes": {
+       "name": "Igarashi Souichi",
+       "imageUrl": null,
+       "biography": {
+        "en": "**Alt names**:\n五十嵐惣一"
+       },
+       "twitter": null,
+       "pixiv": null,
+       "melonBook": null,
+       "fanBox": null,
+       "booth": null,
+       "namicomi": null,
+       "nicoVideo": null,
+       "skeb": null,
+       "fantia": null,
+       "tumblr": null,
+       "youtube": null,
+       "weibo": null,
+       "naver": null,
+       "website": null,
+       "createdAt": "2023-05-25T08:29:05+00:00",
+       "updatedAt": "2023-06-06T05:22:33+00:00",
+       "version": 2
+      }
+     },
+     {
+      "id": "b7685513-57b4-43c0-ad90-6da4418209cb",
+      "type": "artist",
+      "attributes": {
+       "name": "Miura Ren",
+       "imageUrl": null,
+       "biography": {
+        "en": "**Name In Native Language:** 三浦蓮"
+       },
+       "twitter": "https://twitter.com/D19980912",
+       "pixiv": null,
+       "melonBook": null,
+       "fanBox": null,
+       "booth": null,
+       "namicomi": null,
+       "nicoVideo": null,
+       "skeb": null,
+       "fantia": null,
+       "tumblr": null,
+       "youtube": null,
+       "weibo": null,
+       "naver": null,
+       "website": "https://rookie.shonenjump.com/users/11844546810161244765",
+       "createdAt": "2023-05-25T08:27:48+00:00",
+       "updatedAt": "2026-08-11T10:54:56+00:00",
+       "version": 3
+      }
+     },
+     {
+      "id": "c0ba420c-674f-4eb5-bfae-593a137c9ca5",
+      "type": "artist",
+      "attributes": {
+       "name": "Kassan",
+       "imageUrl": null,
+       "biography": {
+        "en": "**Alt names**:\n蚊っさん"
+       },
+       "twitter": "https://twitter.com/inkdaisuki",
+       "pixiv": "https://pixiv.net/users/22592663",
+       "melonBook": null,
+       "fanBox": null,
+       "booth": null,
+       "namicomi": null,
+       "nicoVideo": null,
+       "skeb": null,
+       "fantia": null,
+       "tumblr": null,
+       "youtube": null,
+       "weibo": null,
+       "naver": null,
+       "website": null,
+       "createdAt": "2023-05-25T08:23:06+00:00",
+       "updatedAt": "2024-05-07T20:19:15+00:00",
+       "version": 3
+      }
+     },
+     {
+      "id": "5adbebfd-0888-41cc-8d0b-bd66d427a361",
+      "type": "cover_art",
+      "attributes": {
+       "description": "",
+       "volume": "1",
+       "fileName": "0f874820-f723-4e37-846c-ddef0781c47a.jpg",
+       "locale": "ja",
+       "createdAt": "2024-10-19T17:55:36+00:00",
+       "updatedAt": "2024-10-19T17:55:36+00:00",
+       "version": 1
+      }
+     },
+     {
+      "id": "b0b721ff-c388-4486-aa0f-c2b0bb321512",
+      "type": "manga",
+      "related": "adapted_from"
+     },
+     {
+      "id": "95462a18-aa8f-40a9-b766-885f6bb0d018",
+      "type": "creator"
+     }
+    ]
+   },
+   {
+    "id": "1d55e985-8379-41bc-aeca-acd069bcadd0",
+    "type": "manga",
+    "attributes": {
+     "title": {
+      "en": "Sousou no Frieren -  Fern ga Ookiku Naru Ohanashi (Doujinshi)"
+     },
+     "altTitles": [
+      {
+       "ja": "葬送のフリーレン - フェルンが大きくなるお話"
+      },
+      {
+       "en": "Frieren at the Funeral -  Dreams About Fern"
+      },
+      {
+       "en": "Frieren: Beyond Journey’s End - Dreams About Fern"
+      }
+     ],
+     "description": {
+      "en": "**Links:**\n- Alternative Official Raw - [Twitter](https://twitter.com/armies_soul/status/1755887073775825049)"
+     },
+     "isLocked": false,
+     "links": {
+      "raw": "https://www.pixiv.net/artworks/115896589"
+     },
+     "officialLinks": null,
+     "originalLanguage": "ja",
+     "lastVolume": "",
+     "lastChapter": "",
+     "publicationDemographic": null,
+     "status": "completed",
+     "year": 2024,
+     "contentRating": "suggestive",
+     "tags": [
+      {
+       "id": "0234a31e-a729-4e28-9d6a-3f87c4966b9e",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Oneshot"
+        },
+        "description": {},
+        "group": "format",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "423e2eae-a7a2-4a8b-ac03-a8351462d71d",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Romance"
+        },
+        "description": {},
+        "group": "genre",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "4d32cc48-9f00-4cca-9b5a-a839f0764984",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Comedy"
+        },
+        "description": {},
+        "group": "genre",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "b13b2a48-c720-44a9-9c77-39c9979373fb",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Doujinshi"
+        },
+        "description": {},
+        "group": "format",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "cdc58593-87dd-415e-bbc0-2ec27bf404cc",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Fantasy"
+        },
+        "description": {},
+        "group": "genre",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "e197df38-d0e7-43b5-9b09-2842d0c326dd",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Web Comic"
+        },
+        "description": {},
+        "group": "format",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "e5301a23-ebd9-49dd-a0cb-2add944c7fe9",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Slice of Life"
+        },
+        "description": {},
+        "group": "genre",
+        "version": 1
+       },
+       "relationships": []
+      }
+     ],
+     "state": "published",
+     "chapterNumbersResetOnNewVolume": false,
+     "createdAt": "2024-03-06T14:34:27+00:00",
+     "updatedAt": "2024-04-07T14:11:53+00:00",
+     "version": 8,
+     "availableTranslatedLanguages": [
+      "en",
+      "vi"
+     ],
+     "latestUploadedChapter": "cb05c792-699c-4b07-bcf0-a0caac859a92"
+    },
+    "relationships": [
+     {
+      "id": "2d7512ee-19c6-4ecd-9d19-bba0413c612b",
+      "type": "author",
+      "attributes": {
+       "name": "Shiro Ami",
+       "imageUrl": null,
+       "biography": {
+        "en": "**Alternative Names:**\n- 白あみ\n- armies_soul"
+       },
+       "twitter": "https://twitter.com/armies_soul",
+       "pixiv": "https://www.pixiv.net/users/15652078",
+       "melonBook": null,
+       "fanBox": "https://armies.fanbox.cc/",
+       "booth": null,
+       "namicomi": null,
+       "nicoVideo": null,
+       "skeb": "https://skeb.jp/@armies_soul",
+       "fantia": null,
+       "tumblr": null,
+       "youtube": null,
+       "weibo": null,
+       "naver": null,
+       "website": null,
+       "createdAt": "2024-03-06T14:32:17+00:00",
+       "updatedAt": "2024-03-06T14:36:02+00:00",
+       "version": 2
+      }
+     },
+     {
+      "id": "2d7512ee-19c6-4ecd-9d19-bba0413c612b",
+      "type": "artist",
+      "attributes": {
+       "name": "Shiro Ami",
+       "imageUrl": null,
+       "biography": {
+        "en": "**Alternative Names:**\n- 白あみ\n- armies_soul"
+       },
+       "twitter": "https://twitter.com/armies_soul",
+       "pixiv": "https://www.pixiv.net/users/15652078",
+       "melonBook": null,
+       "fanBox": "https://armies.fanbox.cc/",
+       "booth": null,
+       "namicomi": null,
+       "nicoVideo": null,
+       "skeb": "https://skeb.jp/@armies_soul",
+       "fantia": null,
+       "tumblr": null,
+       "youtube": null,
+       "weibo": null,
+       "naver": null,
+       "website": null,
+       "createdAt": "2024-03-06T14:32:17+00:00",
+       "updatedAt": "2024-03-06T14:36:02+00:00",
+       "version": 2
+      }
+     },
+     {
+      "id": "f11597f5-e406-49da-becc-fd57fa5cc237",
+      "type": "cover_art",
+      "attributes": {
+       "description": "",
+       "volume": null,
+       "fileName": "aa7a0864-1295-490c-805d-b7461b01a733.jpg",
+       "locale": "ja",
+       "createdAt": "2024-03-06T14:34:31+00:00",
+       "updatedAt": "2024-03-06T14:34:31+00:00",
+       "version": 1
+      }
+     },
+     {
+      "id": "b0b721ff-c388-4486-aa0f-c2b0bb321512",
+      "type": "manga",
+      "related": "based_on"
+     },
+     {
+      "id": "f97a9a67-01cc-48d0-a542-59ea341174c0",
+      "type": "creator"
+     }
+    ]
+   },
+   {
+    "id": "8edc81f2-bb70-4100-9df7-2552a14e5d75",
+    "type": "manga",
+    "attributes": {
+     "title": {
+      "en": "Sousou no Frieren - kmtakpk's Frieren Koma (Doujinshi)"
+     },
+     "altTitles": [
+      {
+       "ja": "葬送のフリーレン - P助のフリーレンコマ"
+      },
+      {
+       "en": "Frieren at the Funeral - kmtakpk's Frieren Koma"
+      },
+      {
+       "en": "Frieren: Beyond Journey’s End - kmtakpk's Frieren Koma"
+      }
+     ],
+     "description": {
+      "en": "A collection of 1-5 koma manga shorts about *Frieren: Beyond Journey's End*."
+     },
+     "isLocked": false,
+     "links": {
+      "raw": "https://twitter.com/kmtakpk/status/1749967693829271613"
+     },
+     "officialLinks": null,
+     "originalLanguage": "ja",
+     "lastVolume": "",
+     "lastChapter": "",
+     "publicationDemographic": null,
+     "status": "ongoing",
+     "year": 2023,
+     "contentRating": "safe",
+     "tags": [
+      {
+       "id": "423e2eae-a7a2-4a8b-ac03-a8351462d71d",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Romance"
+        },
+        "description": {},
+        "group": "genre",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "4d32cc48-9f00-4cca-9b5a-a839f0764984",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Comedy"
+        },
+        "description": {},
+        "group": "genre",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "a1f53773-c69a-4ce5-8cab-fffcd90b1565",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Magic"
+        },
+        "description": {},
+        "group": "theme",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "b11fda93-8f1d-4bef-b2ed-8803d3733170",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "4-Koma"
+        },
+        "description": {},
+        "group": "format",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "b13b2a48-c720-44a9-9c77-39c9979373fb",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Doujinshi"
+        },
+        "description": {},
+        "group": "format",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "e197df38-d0e7-43b5-9b09-2842d0c326dd",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Web Comic"
+        },
+        "description": {},
+        "group": "format",
+        "version": 1
+       },
+       "relationships": []
+      }
+     ],
+     "state": "published",
+     "chapterNumbersResetOnNewVolume": false,
+     "createdAt": "2024-02-10T15:52:41+00:00",
+     "updatedAt": "2024-03-15T05:51:38+00:00",
+     "version": 22,
+     "availableTranslatedLanguages": [
+      "en",
+      "ja"
+     ],
+     "latestUploadedChapter": "f8d71c69-6499-4e99-9ea2-17f8db17a63d"
+    },
+    "relationships": [
+     {
+      "id": "260e2f10-4cbd-4d77-a5ca-d9ae22fedf89",
+      "type": "author",
+      "attributes": {
+       "name": "kmtakpk (P助)",
+       "imageUrl": null,
+       "biography": {
+        "en": "**Alternative Names:**\n- やまだ屋\n\n**Links:**\n- [Instagram](https://www.instagram.com/kmtakpk)\n- [Poipiku](https://poipiku.com/1188632/)\n- [Wavebox](https://wavebox.me/wave/7fdhk9h8bmhoygtz/)"
+       },
+       "twitter": "https://twitter.com/kmtakpk",
+       "pixiv": "https://www.pixiv.net/users/11416383",
+       "melonBook": null,
+       "fanBox": null,
+       "booth": "https://ympk.booth.pm/",
+       "namicomi": null,
+       "nicoVideo": null,
+       "skeb": null,
+       "fantia": null,
+       "tumblr": null,
+       "youtube": null,
+       "weibo": null,
+       "naver": null,
+       "website": "https://potofu.me/kmtakpk",
+       "createdAt": "2024-02-10T15:57:46+00:00",
+       "updatedAt": "2024-02-19T15:16:58+00:00",
+       "version": 7
+      }
+     },
+     {
+      "id": "260e2f10-4cbd-4d77-a5ca-d9ae22fedf89",
+      "type": "artist",
+      "attributes": {
+       "name": "kmtakpk (P助)",
+       "imageUrl": null,
+       "biography": {
+        "en": "**Alternative Names:**\n- やまだ屋\n\n**Links:**\n- [Instagram](https://www.instagram.com/kmtakpk)\n- [Poipiku](https://poipiku.com/1188632/)\n- [Wavebox](https://wavebox.me/wave/7fdhk9h8bmhoygtz/)"
+       },
+       "twitter": "https://twitter.com/kmtakpk",
+       "pixiv": "https://www.pixiv.net/users/11416383",
+       "melonBook": null,
+       "fanBox": null,
+       "booth": "https://ympk.booth.pm/",
+       "namicomi": null,
+       "nicoVideo": null,
+       "skeb": null,
+       "fantia": null,
+       "tumblr": null,
+       "youtube": null,
+       "weibo": null,
+       "naver": null,
+       "website": "https://potofu.me/kmtakpk",
+       "createdAt": "2024-02-10T15:57:46+00:00",
+       "updatedAt": "2024-02-19T15:16:58+00:00",
+       "version": 7
+      }
+     },
+     {
+      "id": "41dab1b4-459d-44ce-b51a-744f7bfbe1dd",
+      "type": "cover_art",
+      "attributes": {
+       "description": "",
+       "volume": null,
+       "fileName": "a796decd-4c85-45db-a95b-9f7ca32e1d8b.jpg",
+       "locale": "ja",
+       "createdAt": "2024-02-10T16:37:09+00:00",
+       "updatedAt": "2024-02-10T16:37:09+00:00",
+       "version": 1
+      }
+     },
+     {
+      "id": "b0b721ff-c388-4486-aa0f-c2b0bb321512",
+      "type": "manga",
+      "related": "based_on"
+     },
+     {
+      "id": "2a830aff-5a0d-47fa-a19a-84636d25510f",
+      "type": "creator"
+     }
+    ]
+   },
+   {
+    "id": "d1e038c4-d931-4525-9b1b-b943e2a7d7e1",
+    "type": "manga",
+    "attributes": {
+     "title": {
+      "ja-ro": "Frieren Cinnamoroll Kamigata"
+     },
+     "altTitles": [
+      {
+       "pt-br": "Fern Amarra o Cabelo de Frieren."
+      },
+      {
+       "en": "Fern ties Frieren’s hair"
+      },
+      {
+       "ja": "フリーレンシナモロール髪型"
+      }
+     ],
+     "description": {},
+     "isLocked": false,
+     "links": {
+      "raw": "https://twitter.com/i/status/2021936596204056645"
+     },
+     "officialLinks": null,
+     "originalLanguage": "ko",
+     "lastVolume": "",
+     "lastChapter": "",
+     "publicationDemographic": null,
+     "status": "completed",
+     "year": 2026,
+     "contentRating": "safe",
+     "tags": [
+      {
+       "id": "0234a31e-a729-4e28-9d6a-3f87c4966b9e",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Oneshot"
+        },
+        "description": {},
+        "group": "format",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "4d32cc48-9f00-4cca-9b5a-a839f0764984",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Comedy"
+        },
+        "description": {},
+        "group": "genre",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "e197df38-d0e7-43b5-9b09-2842d0c326dd",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Web Comic"
+        },
+        "description": {},
+        "group": "format",
+        "version": 1
+       },
+       "relationships": []
+      }
+     ],
+     "state": "published",
+     "chapterNumbersResetOnNewVolume": false,
+     "createdAt": "2026-02-17T05:49:24+00:00",
+     "updatedAt": "2026-02-20T12:33:03+00:00",
+     "version": 4,
+     "availableTranslatedLanguages": [
+      "en",
+      "zh-hk",
+      "pt-br",
+      "zh",
+      "ru",
+      "fr"
+     ],
+     "latestUploadedChapter": "f14361ec-e4d9-4804-a2ba-e24c6d5c837f"
+    },
+    "relationships": [
+     {
+      "id": "6ad516a3-be52-47e2-994b-7d191625be49",
+      "type": "author",
+      "attributes": {
+       "name": "FriFri1213",
+       "imageUrl": null,
+       "biography": {},
+       "twitter": "https://twitter.com/FriFri1213",
+       "pixiv": null,
+       "melonBook": null,
+       "fanBox": null,
+       "booth": null,
+       "namicomi": null,
+       "nicoVideo": null,
+       "skeb": null,
+       "fantia": null,
+       "tumblr": null,
+       "youtube": null,
+       "weibo": null,
+       "naver": null,
+       "website": null,
+       "createdAt": "2026-02-16T07:42:32+00:00",
+       "updatedAt": "2026-03-24T10:02:25+00:00",
+       "version": 2
+      }
+     },
+     {
+      "id": "6ad516a3-be52-47e2-994b-7d191625be49",
+      "type": "artist",
+      "attributes": {
+       "name": "FriFri1213",
+       "imageUrl": null,
+       "biography": {},
+       "twitter": "https://twitter.com/FriFri1213",
+       "pixiv": null,
+       "melonBook": null,
+       "fanBox": null,
+       "booth": null,
+       "namicomi": null,
+       "nicoVideo": null,
+       "skeb": null,
+       "fantia": null,
+       "tumblr": null,
+       "youtube": null,
+       "weibo": null,
+       "naver": null,
+       "website": null,
+       "createdAt": "2026-02-16T07:42:32+00:00",
+       "updatedAt": "2026-03-24T10:02:25+00:00",
+       "version": 2
+      }
+     },
+     {
+      "id": "6cf446fb-4295-4289-8182-7821d6bbab5b",
+      "type": "cover_art",
+      "attributes": {
+       "description": "",
+       "volume": "1",
+       "fileName": "6a264b94-e30e-4d1d-8f75-817aa7e478b9.jpg",
+       "locale": "ko",
+       "createdAt": "2026-02-17T05:49:26+00:00",
+       "updatedAt": "2026-02-17T05:49:26+00:00",
+       "version": 1
+      }
+     },
+     {
+      "id": "b0b721ff-c388-4486-aa0f-c2b0bb321512",
+      "type": "manga",
+      "related": "based_on"
+     },
+     {
+      "id": "6f6a4d7c-3344-47a5-af94-181ee786faaf",
+      "type": "creator"
+     }
+    ]
+   },
+   {
+    "id": "b0b721ff-c388-4486-aa0f-c2b0bb321512",
+    "type": "manga",
+    "attributes": {
+     "title": {
+      "ja-ro": "Sousou no Frieren"
+     },
+     "altTitles": [
+      {
+       "en": "Frieren: Beyond Journey's End"
+      },
+      {
+       "en": "Frieren at the Funeral"
+      },
+      {
+       "ru": "Фрирен, провожающая в последний путь"
+      },
+      {
+       "ja": "葬送のフリーレン"
+      },
+      {
+       "zh-hk": "葬送的芙莉蓮"
+      },
+      {
+       "ko": "장송의 프리렌"
+      },
+      {
+       "th": "คำอธิษฐานในวันที่จากลา Frieren"
+      },
+      {
+       "el": "Φρίρεν: Πέρα από το Τέλος του Ταξιδιού"
+      },
+      {
+       "de": "Frieren: Nach dem Ende der Reise"
+      },
+      {
+       "en": "Frieren: Remnants Of The Departed"
+      },
+      {
+       "es-la": "Frieren: Más allá del final"
+      },
+      {
+       "es-la": "Frieren: Más allá del fin del viaje"
+      },
+      {
+       "vi": "Pháp Sư Tiễn Táng Frieren"
+      }
+     ],
+     "description": {
+      "el": "Έχοντας νικήσει τον βασιλιά των δαιμόνων, το ταξίδι μιας δεκαετίας φτάνει στο τέλος του και μια νέα εποχή ειρήνης ξεκινά. Η ζωή όμως συνεχίζεται, ειδικά για την Φρίρεν, πως ως ξωτικό έχει ακόμα αιώνες ζωής μπροστά της. Με τις δεκαετίες να περνάνε, η Φρίρεν έρχεται αντιμέτωπη με την μεταβλητότητα του κόσμου και την παροδικότητα των ανθρώπων. Μετά από μια τελευταία συνάντηση με όλη την παλιά της ομάδα, συνειδητοποιεί ότι ο χρόνος που πέρασε με τους φίλους της ήταν υπερβολικά σύντομος και ότι δεν θα έχει ποτέ την ευκαιρία να τους μάθει καλύτερα. Έρχοντας αντιμέτωπη με την αλήθεια αυτή, η Φρίρεν αποφασίζει να ξεκινήσει ένα ακόμα ταξίδι αλλά αυτή τη φορά έχοντας σκοπό να μάθει το τι σημαίνει να είσαι άνθρωπος.",
+      "en": "The adventure is over but life goes on for an elf mage just beginning to learn what living is all about. Elf mage Frieren and her courageous fellow adventurers have defeated the Demon King and brought peace to the land. With the great struggle over, they all go their separate ways to live a quiet life. But as an elf, Frieren, nearly immortal, will long outlive the rest of her former party. How will she come to terms with the mortality of her friends? How can she find fulfillment in her own life, and can she learn to understand what life means to the humans around her? Frieren begins a new journey to find the answer.",
+      "es": "Frieren es una elfa, y como para todos los de su raza, los años pasan en un suspiro… pero no es así para sus antiguos compañeros de batalla, a los que Frieren verá morir y envejecer. De repente Frieren se da cuenta de que pese a que la vida avanza a un ritmo más lento para ella, las experiencias con sus seres queridos se le escapan de las manos. Un aire nostálgico envuelve a este manga fantástico tan entrañable que ha vendido ya más de 2,5 millones de copias en Japón.",
+      "fr": "Que deviennent les héros une fois le mal vaincu ?\nDans ce coffret collector : un jeu de 54 cartes entièrement personnalisé aux couleurs de la série et le manga avec une jaquette alternative réversible !\n\nAlors que Frieren et ses compagnons font halte dans la citadelle de Heiß, Stark propose à Fern d'aller en rendez-vous, sur le ton de la plaisanterie... et contre toute attente, la jeune fille accepte ! Sur les conseils de l'elfe, qui n'y connaît pas grand-chose, le guerrier emmène donc son amie faire le tour de la ville, ce qui leur permet de se rapprocher un peu.\n\nAprès cette pause bienvenue, les trois aventuriers repartent sur les routes et arrivent au haut-plateau du Nord, une zone extrêmement dangereuse où pullulent aussi bien des monstres coriaces que des démons retors... Parviendront-ils à survivre dans cette région hostile ?",
+      "vi": "Tổ đội anh hùng đã đánh bại được quỷ vương và kết thúc cuộc hành trình của họ. Nhưng thế chưa phải là hết, cuộc đời của cô nàng pháp sư Elf này sẽ còn rất dài, hơn cả những người đồng đội cũ của cô, một cuộc phiêu lưu mới để cô trải qua nhiều cung bậc cảm xúc, cũng như là học hỏi thêm về con người.",
+      "es-la": "Tras cumplir su misión de derrotar al Rey Demonio, la maga elfo Frieren, el héroe Himmel, el sacerdote Heiter y el guerrero Eisen regresan a casa después de un viaje de una década donde disolverán su grupo y tomarán sus propios caminos. Pero el tiempo pasa de forma distinta para los elfos, Frieren comienza a ser testigo de como sus excompañeros sufren sus estragos y comienzan a morir lentamente y uno a uno. Antes de fallecer, Heiter el sacerdote, le impone a Frieren un aprendiz humana llamada Fern. Llevados por la afición que tiene la alfa por recolectar hechizos mágicos, ambos emprenderán una aventura, llena de magia e introspección, que los llevará a revisitar lugares que había conocido en su anterior travesía, mientras enfrenta el pesar que le causa descubrir todas las posibilidades que ha desperdiciado en su viaje que le hubiesen posibilitado entablar una relación más cercana con sus compañeros ahora fallecidos.",
+      "zh-hk": "在打倒了魔王的勇者一行人当中，魔法使芙莉莲是精灵，她和其他三人有不一样的地方。 生活在“之后”的世界里，她感受到了什么—— 留下来的人们所编织的葬送与祈祷又意味着什么—— 故事从“冒险的结束”开始。 这是讲述英雄们的活法的，后日谈奇幻作品！"
+     },
+     "isLocked": true,
+     "links": {
+      "al": "118586",
+      "ap": "frieren-beyond-journeys-end",
+      "bl": "832389",
+      "bw": "series/260459/list",
+      "kt": "56355",
+      "mu": "ugf5dzu",
+      "amz": "https://www.amazon.co.jp/dp/B08KNX1RSQ",
+      "ebj": "https://ebookjapan.yahoo.co.jp/books/601441",
+      "mal": "126287",
+      "raw": "https://www.sunday-webry.com/detail.php?title_id=1093",
+      "engtl": "https://www.viz.com/vizmanga/chapters/frieren-the-journeys-end"
+     },
+     "officialLinks": null,
+     "originalLanguage": "ja",
+     "lastVolume": "",
+     "lastChapter": "",
+     "publicationDemographic": "shounen",
+     "status": "hiatus",
+     "year": 2020,
+     "contentRating": "safe",
+     "tags": [
+      {
+       "id": "0a39b5a1-b235-4886-a747-1d05d216532d",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Award Winning"
+        },
+        "description": {},
+        "group": "format",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "36fd93ea-e8b8-445e-b836-358f02b3d33d",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Monsters"
+        },
+        "description": {},
+        "group": "theme",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "39730448-9a5f-48a2-85b0-a70db87b1233",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Demons"
+        },
+        "description": {},
+        "group": "theme",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "87cc87cd-a395-47af-b27a-93258283bbc6",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Adventure"
+        },
+        "description": {},
+        "group": "genre",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "a1f53773-c69a-4ce5-8cab-fffcd90b1565",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Magic"
+        },
+        "description": {},
+        "group": "theme",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "b9af3a63-f058-46de-a9a0-e0c13906197a",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Drama"
+        },
+        "description": {},
+        "group": "genre",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "cdc58593-87dd-415e-bbc0-2ec27bf404cc",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Fantasy"
+        },
+        "description": {},
+        "group": "genre",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "e5301a23-ebd9-49dd-a0cb-2add944c7fe9",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Slice of Life"
+        },
+        "description": {},
+        "group": "genre",
+        "version": 1
+       },
+       "relationships": []
+      }
+     ],
+     "state": "published",
+     "chapterNumbersResetOnNewVolume": false,
+     "createdAt": "2020-06-30T04:20:01+00:00",
+     "updatedAt": "2026-08-22T02:07:29+00:00",
+     "version": 75,
+     "availableTranslatedLanguages": [
+      "pt-br",
+      "es-la",
+      "tr",
+      "ar",
+      "vi",
+      "id",
+      "ru",
+      "en",
+      "it",
+      "cs",
+      "th",
+      "el",
+      "fr",
+      "uk"
+     ],
+     "latestUploadedChapter": "ae58cfae-d520-4813-b05b-decd65a85a12"
+    },
+    "relationships": [
+     {
+      "id": "b3136811-9761-4606-93cf-583a00dde5e9",
+      "type": "author",
+      "attributes": {
+       "name": "Yamada Kanehito",
+       "imageUrl": null,
+       "biography": {
+        "en": "**Alternate names**: 山田鐘人,야마다 카네히토"
+       },
+       "twitter": null,
+       "pixiv": null,
+       "melonBook": null,
+       "fanBox": null,
+       "booth": null,
+       "namicomi": null,
+       "nicoVideo": null,
+       "skeb": null,
+       "fantia": null,
+       "tumblr": null,
+       "youtube": null,
+       "weibo": null,
+       "naver": null,
+       "website": null,
+       "createdAt": "2021-04-19T21:59:45+00:00",
+       "updatedAt": "2024-02-09T20:33:26+00:00",
+       "version": 4
+      }
+     },
+     {
+      "id": "ff98c5c0-daca-4c97-8c3d-1e2b98d04d9b",
+      "type": "artist",
+      "attributes": {
+       "name": "Abe Tsukasa",
+       "imageUrl": null,
+       "biography": {
+        "en": "**Alt names**:\nアベツカサ\n아베 츠카사\n\n---\nDraws fully in digital.\n\nIn 2018, “Meet Up” won the honorable mention in the shonen category at the 82nd Shogakukan Newcomer Manga Awards.\n\nSousou no Frieren ranked at number 1 in Manga Taisho 2021."
+       },
+       "twitter": "https://twitter.com/abetsukasa",
+       "pixiv": null,
+       "melonBook": null,
+       "fanBox": null,
+       "booth": null,
+       "namicomi": null,
+       "nicoVideo": null,
+       "skeb": null,
+       "fantia": null,
+       "tumblr": null,
+       "youtube": null,
+       "weibo": null,
+       "naver": null,
+       "website": null,
+       "createdAt": "2021-04-19T21:59:45+00:00",
+       "updatedAt": "2023-12-11T18:54:02+00:00",
+       "version": 4
+      }
+     },
+     {
+      "id": "baf9cd12-10cb-4596-a17a-1f9b9bace8ca",
+      "type": "cover_art",
+      "attributes": {
+       "description": "",
+       "volume": "15",
+       "fileName": "b9a049b0-186b-4714-a83e-bb965458914a.jpg",
+       "locale": "ja",
+       "createdAt": "2026-02-07T17:47:41+00:00",
+       "updatedAt": "2026-02-07T17:47:41+00:00",
+       "version": 1
+      }
+     },
+     {
+      "id": "03f3f742-e2da-4f3c-b057-0bb9da6757ee",
+      "type": "manga",
+      "related": "doujinshi"
+     },
+     {
+      "id": "11180e45-12ba-47e4-a985-cb88c217195b",
+      "type": "manga",
+      "related": "doujinshi"
+     },
+     {
+      "id": "140458f7-be02-424b-98ac-1aa0cd9f45f9",
+      "type": "manga",
+      "related": "doujinshi"
+     },
+     {
+      "id": "1d55e985-8379-41bc-aeca-acd069bcadd0",
+      "type": "manga",
+      "related": "doujinshi"
+     },
+     {
+      "id": "1e46de27-70a0-4aca-8192-b5a3c589ddfd",
+      "type": "manga",
+      "related": "doujinshi"
+     },
+     {
+      "id": "2062949e-2ff0-402b-9919-e35084208be6",
+      "type": "manga",
+      "related": "doujinshi"
+     },
+     {
+      "id": "48e38031-2e40-43ad-9766-09fe9864e388",
+      "type": "manga",
+      "related": "doujinshi"
+     },
+     {
+      "id": "5d938a16-b45b-4922-b77e-7ccf8dbf38b4",
+      "type": "manga",
+      "related": "doujinshi"
+     },
+     {
+      "id": "72819479-d7c8-4e92-b62b-e58e9c8b4421",
+      "type": "manga",
+      "related": "doujinshi"
+     },
+     {
+      "id": "81335419-9d87-4a01-a1ea-de6348f19b38",
+      "type": "manga",
+      "related": "doujinshi"
+     },
+     {
+      "id": "829d5943-a4eb-47e3-9dce-ef2d6c519e12",
+      "type": "manga",
+      "related": "doujinshi"
+     },
+     {
+      "id": "8af7e88b-2586-4a89-a6ab-16028c821b1a",
+      "type": "manga",
+      "related": "doujinshi"
+     },
+     {
+      "id": "8edc81f2-bb70-4100-9df7-2552a14e5d75",
+      "type": "manga",
+      "related": "doujinshi"
+     },
+     {
+      "id": "9906dfa8-52c9-40ac-8eef-1099a85c8611",
+      "type": "manga",
+      "related": "spin_off"
+     },
+     {
+      "id": "a3f81ae7-31b1-4319-9d4c-47d387c8b23e",
+      "type": "manga",
+      "related": "doujinshi"
+     },
+     {
+      "id": "b256dd98-1e69-4348-af24-8df8ddad6db2",
+      "type": "manga",
+      "related": "doujinshi"
+     },
+     {
+      "id": "b5097dd6-a42f-4dba-b281-0609378e939f",
+      "type": "manga",
+      "related": "doujinshi"
+     },
+     {
+      "id": "d1e038c4-d931-4525-9b1b-b943e2a7d7e1",
+      "type": "manga",
+      "related": "doujinshi"
+     },
+     {
+      "id": "e5afc3bc-c054-4b71-a182-a7e5ae9a4417",
+      "type": "manga",
+      "related": "doujinshi"
+     },
+     {
+      "id": "ee794d7d-322e-450f-bff3-1f52ded9a039",
+      "type": "manga",
+      "related": "doujinshi"
+     },
+     {
+      "id": "f90624a8-7964-44da-bd33-78a4c748ef6e",
+      "type": "manga",
+      "related": "doujinshi"
+     }
+    ]
+   },
+   {
+    "id": "e5afc3bc-c054-4b71-a182-a7e5ae9a4417",
+    "type": "manga",
+    "attributes": {
+     "title": {
+      "en": "Hokuto no Ken & Sousou no Frieren - Gouken no Frieren (Doujinshi)"
+     },
+     "altTitles": [
+      {
+       "ja": "剛拳のフリーレン"
+      },
+      {
+       "en": "Frieren of the Strong Fist"
+      }
+     ],
+     "description": {},
+     "isLocked": false,
+     "links": {
+      "raw": "https://www.dlsite.com/maniax/work/=/product_id/RJ01142446.html"
+     },
+     "officialLinks": null,
+     "originalLanguage": "ja",
+     "lastVolume": "",
+     "lastChapter": "",
+     "publicationDemographic": null,
+     "status": "completed",
+     "year": 2024,
+     "contentRating": "safe",
+     "tags": [
+      {
+       "id": "0234a31e-a729-4e28-9d6a-3f87c4966b9e",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Oneshot"
+        },
+        "description": {},
+        "group": "format",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "4d32cc48-9f00-4cca-9b5a-a839f0764984",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Comedy"
+        },
+        "description": {},
+        "group": "genre",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "799c202e-7daa-44eb-9cf7-8a3c0441531e",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Martial Arts"
+        },
+        "description": {},
+        "group": "theme",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "b13b2a48-c720-44a9-9c77-39c9979373fb",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Doujinshi"
+        },
+        "description": {},
+        "group": "format",
+        "version": 1
+       },
+       "relationships": []
+      }
+     ],
+     "state": "published",
+     "chapterNumbersResetOnNewVolume": false,
+     "createdAt": "2024-03-14T04:14:40+00:00",
+     "updatedAt": "2024-03-14T04:17:57+00:00",
+     "version": 3,
+     "availableTranslatedLanguages": [
+      "en"
+     ],
+     "latestUploadedChapter": "c0917484-51bd-4982-a436-46ffd5db6a9f"
+    },
+    "relationships": [
+     {
+      "id": "0b1871dc-093c-4df1-bbbe-10716cddb566",
+      "type": "author",
+      "attributes": {
+       "name": "Ojou no Yokushitsu (Circle)",
+       "imageUrl": null,
+       "biography": {
+        "en": "**Alt names**:\nお嬢の浴室\n\n**Members**:\n[Tetsujin](https://mangadex.org/author/3cbdab14-b784-4198-9f59-376eb4bd1cf9) (鉄人)\n[Hiyo-san](https://mangadex.org/author/c9f63fa2-4ac7-4bfa-9122-ee3269a29d82) (ひよさん)\n\n**Former members**:\n[AYA](https://mangadex.org/author/1a852980-b68a-4eb4-bb56-fd2c1549369c)"
+       },
+       "twitter": null,
+       "pixiv": null,
+       "melonBook": "https://www.melonbooks.co.jp/circle/index.php?circle_id=11000",
+       "fanBox": null,
+       "booth": null,
+       "namicomi": null,
+       "nicoVideo": null,
+       "skeb": null,
+       "fantia": null,
+       "tumblr": null,
+       "youtube": null,
+       "weibo": null,
+       "naver": null,
+       "website": "https://www.dlsite.com/maniax/circle/profile/=/maker_id/RG05959.html",
+       "createdAt": "2021-04-19T21:59:45+00:00",
+       "updatedAt": "2023-06-05T20:13:15+00:00",
+       "version": 2
+      }
+     },
+     {
+      "id": "3cbdab14-b784-4198-9f59-376eb4bd1cf9",
+      "type": "author",
+      "attributes": {
+       "name": "Tetsujin",
+       "imageUrl": null,
+       "biography": {
+        "en": "**Alt names**:\n鉄人\n\n**Circle**: [Ojou no Yokushitsu](https://mangadex.org/author/0b1871dc-093c-4df1-bbbe-10716cddb566) (お嬢の浴室)"
+       },
+       "twitter": "https://twitter.com/tetsujinybc",
+       "pixiv": "https://www.pixiv.net/users/19383935",
+       "melonBook": null,
+       "fanBox": null,
+       "booth": null,
+       "namicomi": null,
+       "nicoVideo": null,
+       "skeb": null,
+       "fantia": null,
+       "tumblr": "https://ojounoyokushitsu.tumblr.com/",
+       "youtube": null,
+       "weibo": null,
+       "naver": null,
+       "website": null,
+       "createdAt": "2021-04-19T21:59:45+00:00",
+       "updatedAt": "2023-06-05T20:15:35+00:00",
+       "version": 2
+      }
+     },
+     {
+      "id": "c9f63fa2-4ac7-4bfa-9122-ee3269a29d82",
+      "type": "author",
+      "attributes": {
+       "name": "Hiyo-san",
+       "imageUrl": null,
+       "biography": {
+        "en": "**Alt names**:\nHiyosan\nひよさん\n\n**Circle**: [Ojou no Yokushitsu](https://mangadex.org/author/0b1871dc-093c-4df1-bbbe-10716cddb566) (お嬢の浴室)"
+       },
+       "twitter": "https://twitter.com/hiyogeki",
+       "pixiv": "https://www.pixiv.net/users/463143",
+       "melonBook": null,
+       "fanBox": null,
+       "booth": null,
+       "namicomi": null,
+       "nicoVideo": null,
+       "skeb": null,
+       "fantia": null,
+       "tumblr": "https://hiyogeki.tumblr.com/",
+       "youtube": null,
+       "weibo": null,
+       "naver": null,
+       "website": null,
+       "createdAt": "2021-04-19T21:59:45+00:00",
+       "updatedAt": "2023-06-05T20:16:27+00:00",
+       "version": 2
+      }
+     },
+     {
+      "id": "0b1871dc-093c-4df1-bbbe-10716cddb566",
+      "type": "artist",
+      "attributes": {
+       "name": "Ojou no Yokushitsu (Circle)",
+       "imageUrl": null,
+       "biography": {
+        "en": "**Alt names**:\nお嬢の浴室\n\n**Members**:\n[Tetsujin](https://mangadex.org/author/3cbdab14-b784-4198-9f59-376eb4bd1cf9) (鉄人)\n[Hiyo-san](https://mangadex.org/author/c9f63fa2-4ac7-4bfa-9122-ee3269a29d82) (ひよさん)\n\n**Former members**:\n[AYA](https://mangadex.org/author/1a852980-b68a-4eb4-bb56-fd2c1549369c)"
+       },
+       "twitter": null,
+       "pixiv": null,
+       "melonBook": "https://www.melonbooks.co.jp/circle/index.php?circle_id=11000",
+       "fanBox": null,
+       "booth": null,
+       "namicomi": null,
+       "nicoVideo": null,
+       "skeb": null,
+       "fantia": null,
+       "tumblr": null,
+       "youtube": null,
+       "weibo": null,
+       "naver": null,
+       "website": "https://www.dlsite.com/maniax/circle/profile/=/maker_id/RG05959.html",
+       "createdAt": "2021-04-19T21:59:45+00:00",
+       "updatedAt": "2023-06-05T20:13:15+00:00",
+       "version": 2
+      }
+     },
+     {
+      "id": "3cbdab14-b784-4198-9f59-376eb4bd1cf9",
+      "type": "artist",
+      "attributes": {
+       "name": "Tetsujin",
+       "imageUrl": null,
+       "biography": {
+        "en": "**Alt names**:\n鉄人\n\n**Circle**: [Ojou no Yokushitsu](https://mangadex.org/author/0b1871dc-093c-4df1-bbbe-10716cddb566) (お嬢の浴室)"
+       },
+       "twitter": "https://twitter.com/tetsujinybc",
+       "pixiv": "https://www.pixiv.net/users/19383935",
+       "melonBook": null,
+       "fanBox": null,
+       "booth": null,
+       "namicomi": null,
+       "nicoVideo": null,
+       "skeb": null,
+       "fantia": null,
+       "tumblr": "https://ojounoyokushitsu.tumblr.com/",
+       "youtube": null,
+       "weibo": null,
+       "naver": null,
+       "website": null,
+       "createdAt": "2021-04-19T21:59:45+00:00",
+       "updatedAt": "2023-06-05T20:15:35+00:00",
+       "version": 2
+      }
+     },
+     {
+      "id": "c9f63fa2-4ac7-4bfa-9122-ee3269a29d82",
+      "type": "artist",
+      "attributes": {
+       "name": "Hiyo-san",
+       "imageUrl": null,
+       "biography": {
+        "en": "**Alt names**:\nHiyosan\nひよさん\n\n**Circle**: [Ojou no Yokushitsu](https://mangadex.org/author/0b1871dc-093c-4df1-bbbe-10716cddb566) (お嬢の浴室)"
+       },
+       "twitter": "https://twitter.com/hiyogeki",
+       "pixiv": "https://www.pixiv.net/users/463143",
+       "melonBook": null,
+       "fanBox": null,
+       "booth": null,
+       "namicomi": null,
+       "nicoVideo": null,
+       "skeb": null,
+       "fantia": null,
+       "tumblr": "https://hiyogeki.tumblr.com/",
+       "youtube": null,
+       "weibo": null,
+       "naver": null,
+       "website": null,
+       "createdAt": "2021-04-19T21:59:45+00:00",
+       "updatedAt": "2023-06-05T20:16:27+00:00",
+       "version": 2
+      }
+     },
+     {
+      "id": "7110a82c-fb05-4977-8472-ec2cc6261a10",
+      "type": "cover_art",
+      "attributes": {
+       "description": "",
+       "volume": "1",
+       "fileName": "ecc89d1c-598a-47a2-b5c2-242210e9ee38.png",
+       "locale": "ja",
+       "createdAt": "2024-03-14T04:14:43+00:00",
+       "updatedAt": "2024-03-14T04:14:43+00:00",
+       "version": 1
+      }
+     },
+     {
+      "id": "75251a47-952c-4e38-b1c6-3572b9bfd481",
+      "type": "manga",
+      "related": "based_on"
+     },
+     {
+      "id": "b0b721ff-c388-4486-aa0f-c2b0bb321512",
+      "type": "manga",
+      "related": "based_on"
+     },
+     {
+      "id": "08d52bea-8dfd-4761-b347-65cd53ab5b1f",
+      "type": "creator"
+     }
+    ]
+   },
+   {
+    "id": "03f3f742-e2da-4f3c-b057-0bb9da6757ee",
+    "type": "manga",
+    "attributes": {
+     "title": {
+      "en": "Sousou no Frieren - Gaku Paro na Shutaferu (Doujinshi)"
+     },
+     "altTitles": [
+      {
+       "ja": "葬送のフリーレン - 学パロなシュタフェル"
+      },
+      {
+       "en": "Frieren at the Funeral - Stark X Fern: School AU"
+      },
+      {
+       "en": "Frieren: Beyond Journey’s End - Stark X Fern: School AU"
+      },
+      {
+       "uk": "Фрірен: подорож після кінця. Старк x Ферн: Шкільний Всесвіт"
+      }
+     ],
+     "description": {
+      "en": "**Notes:**\n- The author skipped chapter 2."
+     },
+     "isLocked": false,
+     "links": {
+      "raw": "https://twitter.com/search?q=from%3Aryuka_sf%20%E3%82%B7%E3%83%A5%E3%82%BF%E3%83%95%E3%82%A7%E3%83%AB%E5%AD%A6%E3%83%91%E3%83%AD&src=typed_query&f=live"
+     },
+     "officialLinks": null,
+     "originalLanguage": "ja",
+     "lastVolume": "",
+     "lastChapter": "",
+     "publicationDemographic": null,
+     "status": "ongoing",
+     "year": 2024,
+     "contentRating": "suggestive",
+     "tags": [
+      {
+       "id": "423e2eae-a7a2-4a8b-ac03-a8351462d71d",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Romance"
+        },
+        "description": {},
+        "group": "genre",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "4d32cc48-9f00-4cca-9b5a-a839f0764984",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Comedy"
+        },
+        "description": {},
+        "group": "genre",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "b13b2a48-c720-44a9-9c77-39c9979373fb",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Doujinshi"
+        },
+        "description": {},
+        "group": "format",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "caaa44eb-cd40-4177-b930-79d3ef2afe87",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "School Life"
+        },
+        "description": {},
+        "group": "theme",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "e197df38-d0e7-43b5-9b09-2842d0c326dd",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Web Comic"
+        },
+        "description": {},
+        "group": "format",
+        "version": 1
+       },
+       "relationships": []
+      },
+      {
+       "id": "f5ba408b-0e7a-484d-8d49-4e9125ac96de",
+       "type": "tag",
+       "attributes": {
+        "name": {
+         "en": "Full Color"
+        },
+        "description": {},
+        "group": "format",
+        "version": 1
+       },
+       "relationships": []
+      }
+     ],
+     "state": "published",
+     "chapterNumbersResetOnNewVolume": false,
+     "createdAt": "2024-03-16T15:42:11+00:00",
+     "updatedAt": "2024-04-18T16:43:16+00:00",
+     "version": 8,
+     "availableTranslatedLanguages": [
+      "en",
+      "uk"
+     ],
+     "latestUploadedChapter": "df30e55f-10ae-49ad-8b14-7ded4e6721a9"
+    },
+    "relationships": [
+     {
+      "id": "081552d5-5033-4fc8-acf5-f0f96423a07f",
+      "type": "author",
+      "attributes": {
+       "name": "Echigawa Ryuuka",
+       "imageUrl": null,
+       "biography": {
+        "en": "**Alternative Names:**\n- 越川リューカ\n\n**Circle:** [Pucchu](https://mangadex.org/author/a54eeaf6-9f44-492a-85b1-5fce494f3a69/pucchu)\n\n**Links:**\n- Alternative Twitter - [@ryuka_sf](https://twitter.com/ryuka_sf)"
+       },
+       "twitter": "https://twitter.com/giginoko",
+       "pixiv": "https://www.pixiv.net/users/440611",
+       "melonBook": null,
+       "fanBox": null,
+       "booth": "https://ryuka-e.booth.pm/",
+       "namicomi": null,
+       "nicoVideo": null,
+       "skeb": "https://skeb.jp/@giginoko",
+       "fantia": "https://fantia.jp/fanclubs/144173",
+       "tumblr": null,
+       "youtube": null,
+       "weibo": null,
+       "naver": null,
+       "website": "https://lit.link/en/ryuka2929",
+       "createdAt": "2021-04-19T21:59:45+00:00",
+       "updatedAt": "2024-03-18T03:40:53+00:00",
+       "version": 5
+      }
+     },
+     {
+      "id": "081552d5-5033-4fc8-acf5-f0f96423a07f",
+      "type": "artist",
+      "attributes": {
+       "name": "Echigawa Ryuuka",
+       "imageUrl": null,
+       "biography": {
+        "en": "**Alternative Names:**\n- 越川リューカ\n\n**Circle:** [Pucchu](https://mangadex.org/author/a54eeaf6-9f44-492a-85b1-5fce494f3a69/pucchu)\n\n**Links:**\n- Alternative Twitter - [@ryuka_sf](https://twitter.com/ryuka_sf)"
+       },
+       "twitter": "https://twitter.com/giginoko",
+       "pixiv": "https://www.pixiv.net/users/440611",
+       "melonBook": null,
+       "fanBox": null,
+       "booth": "https://ryuka-e.booth.pm/",
+       "namicomi": null,
+       "nicoVideo": null,
+       "skeb": "https://skeb.jp/@giginoko",
+       "fantia": "https://fantia.jp/fanclubs/144173",
+       "tumblr": null,
+       "youtube": null,
+       "weibo": null,
+       "naver": null,
+       "website": "https://lit.link/en/ryuka2929",
+       "createdAt": "2021-04-19T21:59:45+00:00",
+       "updatedAt": "2024-03-18T03:40:53+00:00",
+       "version": 5
+      }
+     },
+     {
+      "id": "e4cf9402-325a-4492-b7f1-1f6d5bb51ba3",
+      "type": "cover_art",
+      "attributes": {
+       "description": "",
+       "volume": null,
+       "fileName": "0de533a1-c197-4e11-86b1-36f5ae864f68.jpg",
+       "locale": "ja",
+       "createdAt": "2024-03-16T15:42:14+00:00",
+       "updatedAt": "2024-03-16T15:42:14+00:00",
+       "version": 1
+      }
+     },
+     {
+      "id": "b0b721ff-c388-4486-aa0f-c2b0bb321512",
+      "type": "manga",
+      "related": "based_on"
+     },
+     {
+      "id": "f97a9a67-01cc-48d0-a542-59ea341174c0",
+      "type": "creator"
+     }
+    ]
+   }
+  ],
+  "limit": 20,
+  "offset": 0,
+  "total": 7
+ }
+}

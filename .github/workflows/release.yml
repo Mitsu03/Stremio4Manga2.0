@@ -59,10 +59,11 @@ jobs:
 
       - run: npm run build
 
-      # Offline only: the online half of the smoke test reaches real manga
-      # sites, and a source that is down for its own reasons is not a reason to
-      # block a release.
-      - run: npm run test:offline
+      # `--replay` covers the offline suite and the reader and downloader
+      # against recorded responses. Still nothing that reaches a real manga
+      # site: one that is down for its own reasons is not a reason to block a
+      # release. In step with ci.yml.
+      - run: npm run test:replay
 
       # Exactly what the Containerfile's runtime stage copies, and for the same
       # reason: it is everything the server opens at runtime and nothing else.

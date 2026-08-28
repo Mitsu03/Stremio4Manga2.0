@@ -56,10 +56,15 @@ jobs:
 
       - run: npm run build
 
-      # Offline only, for the same reason as the release: the online half
-      # reaches real manga sites, and a source that is down for its own reasons
-      # must not be able to fail somebody's pull request.
-      - run: npm run test:offline
+      # `--replay`, not `--offline`: the same suite, plus the 22 checks that
+      # search, read a chapter, resolve pages, store progress and download to
+      # disk — run against recorded responses in `test/fixtures/`. They used to
+      # run nowhere automated, because reaching a real manga site means a site
+      # down for its own reasons can fail somebody's pull request. Replaying
+      # separates the two questions: what the reader does with a response is
+      # deterministic and belongs here; whether the sites still answer that way
+      # is `npm test`, by hand, before a tag.
+      - run: npm run test:replay
 
       # The check that has no counterpart in release.yml, because by the time
       # release.yml runs it is too late to be useful. A tag whose version does
