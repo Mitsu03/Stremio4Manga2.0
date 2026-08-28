@@ -5,11 +5,19 @@
 // schema.graphql and schema.sql are loaded through esbuild's `text` loader so
 // the bundle carries them; there is no data directory to install next to it.
 import { build, context } from 'esbuild';
+import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const watch = process.argv.includes('--watch');
+
+// The workspace root's package.json is the single place a release version is
+// written. It is read here rather than at startup because a deployment gets the
+// built output and no manifests beside it — see src/version.ts. Keeping it to
+// one file is also what stops a tag and a running server disagreeing about
+// which version this is.
+const { version } = JSON.parse(readFileSync(join(root, '../package.json'), 'utf8'));
 
 /** @type {import('esbuild').BuildOptions} */
 const options = {
@@ -25,6 +33,7 @@ const options = {
   sourcemap: true,
   external: ['node:*'],
   loader: { '.graphql': 'text', '.sql': 'text' },
+  define: { __S4M_VERSION__: JSON.stringify(version) },
   logLevel: 'info',
   banner: {
     // esbuild's ESM output has no require(); a few transitive deps still reach

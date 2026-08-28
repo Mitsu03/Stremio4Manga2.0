@@ -1,0 +1,118 @@
+# Turns a tag into something a server can install without a toolchain.
+#
+# The build needs npm, esbuild, vite and roughly 200 MB of devDependencies. A
+# server needs none of that — it needs `node server/dist/main.js` and the files
+# that command reads. So the toolchain runs here, once, and the release carries
+# only the runtime payload: a few megabytes that extract straight over an
+# existing install.
+#
+# Cutting a release is `git tag v2.1.0 && git push --tags`. Everything else,
+# including the checks that stop a mislabelled one, is below. The full procedure
+# and what to verify afterwards is in docs/RELEASING.md.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+# The default token can write releases and packages; nothing here needs more.
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # The tag is what people install and package.json is what the running
+      # server reports as its version. If they disagree, `s4m update` compares a
+      # tag against a number that was never in that tarball and either offers an
+      # update that is already installed or hides one that is not. Cheaper to
+      # fail here than to debug there.
+      - name: Tag and package.json must agree
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          pkg=$(node -p "require('./package.json').version")
+          if [ "$tag" != "$pkg" ]; then
+            echo "::error::tag v$tag does not match package.json version $pkg."
+            echo "Bump package.json and re-tag; see docs/RELEASING.md."
+            exit 1
+          fi
+          echo "version=$tag" >> "$GITHUB_ENV"
+
+      - run: npm ci --no-audit --no-fund
+
+      - run: npm run lint
+
+      - run: npm run build
+
+      # Offline only: the online half of the smoke test reaches real manga
+      # sites, and a source that is down for its own reasons is not a reason to
+      # block a release.
+      - run: npm run test:offline
+
+      # Exactly what the Containerfile's runtime stage copies, and for the same
+      # reason: it is everything the server opens at runtime and nothing else.
+      # No node_modules — the bundle carries its dependencies — and no config,
+      # because a server's config.json is its own and an update must not touch
+      # it.
+      - name: Package the runtime payload
+        run: |
+          set -euo pipefail
+          name="stremio4manga-${{ env.version }}.tar.gz"
+          tar -czf "$name" \
+            server/dist \
+            server/bin \
+            server/catalog.json \
+            server/config.example.json \
+            web/dist
+          sha256sum "$name" > "$name.sha256"
+          echo "asset=$name" >> "$GITHUB_ENV"
+          ls -lh "$name"
+
+      # `s4m update` verifies the download against this before extracting
+      # anything, so the checksum is part of the release, not a courtesy.
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --title "$GITHUB_REF_NAME" \
+            --generate-notes \
+            "${{ env.asset }}" \
+            "${{ env.asset }}.sha256"
+
+  # The other way to keep a server current: let the container runtime do it.
+  # `podman auto-update` pulls a labelled image on a timer and rolls back if the
+  # new one fails to start, which is the whole update mechanism for free — but
+  # only for people running the container. The tarball above is for the systemd
+  # install that install.sh produces, which is the documented default.
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Containerfile
+          target: runtime
+          push: true
+          # Lowercase on purpose: ghcr rejects an uppercase path, and the owner
+          # here is spelled with a capital.
+          tags: |
+            ghcr.io/mitsu03/stremio4manga:${{ github.ref_name }}
+            ghcr.io/mitsu03/stremio4manga:latest
