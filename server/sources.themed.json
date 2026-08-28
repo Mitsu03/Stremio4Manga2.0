@@ -40,6 +40,27 @@
       "versionName": "1.0.0"
     },
     {
+      "pkgName": "pt.acervohentai",
+      "name": "Acervo Hentai",
+      "lang": "pt-BR",
+      "theme": "madaralegacy",
+      "baseUrl": "https://acervohentai.com",
+      "contentWarning": "NSFW",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "manhwa",
+        "chapterSource": "manga-ajax",
+        "selectors": {
+          "status": "div.post-status .summary-heading:contains(Status) + .summary-content"
+        },
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "en",
+        "minIntervalMs": 30000
+      },
+      "unportedOverrides": 4,
+      "id": "1000000000000000444"
+    },
+    {
       "pkgName": "en.akazascans",
       "name": "Akaza Scans",
       "lang": "en",
@@ -107,6 +128,23 @@
         "dateLocale": "en"
       },
       "id": "1000000000000000316"
+    },
+    {
+      "pkgName": "pt.amuy",
+      "name": "Amuy",
+      "lang": "pt-BR",
+      "theme": "madaralegacy",
+      "baseUrl": "https://apenasmaisumyaoi.com",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax",
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "pt",
+        "minIntervalMs": 2000
+      },
+      "unportedOverrides": 1,
+      "id": "1000000000000000445"
     },
     {
       "pkgName": "tr.anikiga",
@@ -210,11 +248,24 @@
       "pkgName": "en.aquamanga",
       "name": "Aqua Manga",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://aquareader.org",
-      "id": "1000000000000000016",
-      "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "selectors": {
+          "status": ".aqua-series-meta__status",
+          "title": ".aqua-series-info__title",
+          "description": ".aqua-series-synopsis",
+          "thumbnail": ".aqua-series-cover__img",
+          "author": ".aqua-series-info__creator-value a",
+          "artist": ".aqua-series-info__creator-value a",
+          "genre": ".aqua-series-genre-pill",
+          "chapterList": ".aqua-ch-item"
+        }
+      },
+      "unportedOverrides": 5,
+      "id": "1000000000000000016"
     },
     {
       "pkgName": "ar.arabtoons",
@@ -253,6 +304,19 @@
       },
       "unportedOverrides": 1,
       "id": "1000000000000000173"
+    },
+    {
+      "pkgName": "tr.araznovel",
+      "name": "ArazNovel",
+      "lang": "tr",
+      "theme": "madaralegacy",
+      "baseUrl": "https://araznovel.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "dd/MM/yyyy"
+      },
+      "id": "1000000000000000468"
     },
     {
       "pkgName": "ar.arbxcomix",
@@ -355,6 +419,22 @@
       "unportedOverrides": 9,
       "id": "1000000000000000358",
       "retired": "upstream rewrote the chapter list and builds the reader from JSON-LD; both are logic rather than data, so no chapter can be read here"
+    },
+    {
+      "pkgName": "pt.arthurscan",
+      "name": "Arthur Scan",
+      "lang": "pt-BR",
+      "theme": "madaralegacy",
+      "baseUrl": "https://arthurscan.xyz",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax",
+        "dateFormat": "MMMMM dd, yyyy",
+        "dateLocale": "pt",
+        "minIntervalMs": 2000
+      },
+      "id": "1000000000000000446"
     },
     {
       "pkgName": "en.aryascans",
@@ -470,6 +550,24 @@
       "id": "1000000000000000357"
     },
     {
+      "pkgName": "es.barmanga",
+      "name": "BarManga",
+      "lang": "es",
+      "theme": "madaralegacy",
+      "baseUrl": "https://archiviumbar.com",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0",
+      "config": {
+        "selectors": {
+          "title": ".breadcrumb > li:last-child > a"
+        },
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "en"
+      },
+      "unportedOverrides": 3,
+      "id": "1000000000000000420"
+    },
+    {
       "pkgName": "en.battleinfivesecondsaftermeeting",
       "name": "Battle In 5 Seconds After Meeting",
       "lang": "en",
@@ -490,6 +588,39 @@
       },
       "unportedOverrides": 1,
       "id": "1000000000000000021"
+    },
+    {
+      "pkgName": "es.begatranslation",
+      "name": "Bega Translation",
+      "lang": "es",
+      "theme": "madaralegacy",
+      "baseUrl": "https://begatranslation.com",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "series",
+        "chapterSource": "manga-ajax",
+        "dateFormat": "dd MMMM, yyyy",
+        "dateLocale": "es"
+      },
+      "unportedOverrides": 3,
+      "id": "1000000000000000421"
+    },
+    {
+      "pkgName": "es.bibliopanda",
+      "name": "Biblio Panda",
+      "lang": "es",
+      "theme": "madaralegacy",
+      "baseUrl": "https://bibliopanda.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax",
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "es",
+        "minIntervalMs": 20000
+      },
+      "id": "1000000000000000422"
     },
     {
       "pkgName": "es.bloomscans",
@@ -625,6 +756,21 @@
       "id": "1000000000000000293"
     },
     {
+      "pkgName": "th.catzaa",
+      "name": "Catzaa",
+      "lang": "th",
+      "theme": "madaralegacy",
+      "baseUrl": "https://catzaa.net",
+      "contentWarning": "NSFW",
+      "versionName": "1.0.0",
+      "config": {
+        "listingMode": "load-more",
+        "dateFormat": "d MMMM yyyy",
+        "dateLocale": "th"
+      },
+      "id": "1000000000000000460"
+    },
+    {
       "pkgName": "es.celestialmoon",
       "name": "Celestial Moon",
       "lang": "es",
@@ -650,6 +796,24 @@
       "id": "1000000000000000193"
     },
     {
+      "pkgName": "pt.cerisescans",
+      "name": "Cerise Scan",
+      "lang": "pt-BR",
+      "theme": "madaralegacy",
+      "baseUrl": "https://loverstoon.com",
+      "contentWarning": "NSFW",
+      "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax",
+        "listingMode": "load-more",
+        "dateFormat": "dd.MM.yyyy",
+        "dateLocale": "en",
+        "minIntervalMs": 667
+      },
+      "unportedOverrides": 1,
+      "id": "1000000000000000447"
+    },
+    {
       "pkgName": "en.cocomic",
       "name": "Cocomic",
       "lang": "en",
@@ -666,6 +830,23 @@
       },
       "unportedOverrides": 2,
       "id": "1000000000000000024"
+    },
+    {
+      "pkgName": "es.codexzero",
+      "name": "Codex Zero",
+      "lang": "es",
+      "theme": "madaralegacy",
+      "baseUrl": "https://codex.readkisho.me",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax",
+        "listingMode": "load-more",
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "en",
+        "minIntervalMs": 20000
+      },
+      "id": "1000000000000000423"
     },
     {
       "pkgName": "en.coffeemanga",
@@ -731,6 +912,23 @@
         "dateLocale": "en"
       },
       "id": "1000000000000000163"
+    },
+    {
+      "pkgName": "pt.covenscan",
+      "name": "Coven Scan",
+      "lang": "pt-BR",
+      "theme": "madaralegacy",
+      "baseUrl": "https://covendasbruxonas.com",
+      "contentWarning": "NSFW",
+      "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax",
+        "selectors": {
+          "author": "div.post-content_item:contains(Author) > div.summary-content"
+        },
+        "minIntervalMs": 2000
+      },
+      "id": "1000000000000000448"
     },
     {
       "pkgName": "en.crowscans",
@@ -881,6 +1079,25 @@
       "id": "1000000000000000322"
     },
     {
+      "pkgName": "th.doodmanga",
+      "name": "Doodmanga",
+      "lang": "th",
+      "theme": "madaralegacy",
+      "baseUrl": "https://www.doodmanga.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "filterNonMangaItems": false,
+        "selectors": {
+          "pageList": "div.text-center > p > img, div.text-center > img, div.text-center > script"
+        },
+        "dateFormat": "dd MMMMM yyyy",
+        "dateLocale": "th"
+      },
+      "unportedOverrides": 2,
+      "id": "1000000000000000461"
+    },
+    {
       "pkgName": "th.doujinmoon",
       "name": "Doujin Moon",
       "lang": "th",
@@ -910,6 +1127,42 @@
       "id": "1000000000000000294"
     },
     {
+      "pkgName": "es.doujinshell",
+      "name": "DoujinsHell",
+      "lang": "es",
+      "theme": "madaralegacy",
+      "baseUrl": "https://doujinshell.net",
+      "contentWarning": "NSFW",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "doujin",
+        "filterNonMangaItems": false,
+        "selectors": {
+          "chapterList": "div.listing-chapters_wrap li.wp-manga-chapter",
+          "pageList": ".reading-content img:not(.aligncenter)"
+        },
+        "dateFormat": "d MMMM, yyyy",
+        "dateLocale": "es"
+      },
+      "unportedOverrides": 3,
+      "id": "1000000000000000424"
+    },
+    {
+      "pkgName": "th.doujinza",
+      "name": "DoujinZa",
+      "lang": "th",
+      "theme": "madaralegacy",
+      "baseUrl": "https://doujinza.com",
+      "contentWarning": "NSFW",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "doujin",
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "th"
+      },
+      "id": "1000000000000000462"
+    },
+    {
       "pkgName": "en.dragontea",
       "name": "DragonTea",
       "lang": "en",
@@ -926,6 +1179,29 @@
       },
       "unportedOverrides": 1,
       "id": "1000000000000000032"
+    },
+    {
+      "pkgName": "es.dragontranslationorg",
+      "name": "DragonTranslation.org",
+      "lang": "es",
+      "theme": "madaralegacy",
+      "baseUrl": "https://dragontranslation.org",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0",
+      "config": {
+        "selectors": {
+          "status": "div.hcol > .htags > .htag--status",
+          "title": "div.hcol > .htitle",
+          "description": "div#syn > p",
+          "thumbnail": "div.hposter__card > img",
+          "genre": "div.hcol > .hchips--genres > a.chip"
+        },
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "es",
+        "minIntervalMs": 20000
+      },
+      "unportedOverrides": 5,
+      "id": "1000000000000000425"
     },
     {
       "pkgName": "en.drakescans",
@@ -972,6 +1248,29 @@
       },
       "unportedOverrides": 1,
       "id": "1000000000000000034"
+    },
+    {
+      "pkgName": "es.emperorscan",
+      "name": "Emperor Scan",
+      "lang": "es",
+      "theme": "madaralegacy",
+      "baseUrl": "https://imperiomanhua.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "selectors": {
+          "status": "div.hcol > .htags > .htag--status",
+          "title": "div.hcol > .htitle",
+          "description": "div#syn > p",
+          "thumbnail": "div.hposter__card > img",
+          "genre": "div.hcol > .hchips--genres > a.chip"
+        },
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "es",
+        "minIntervalMs": 30000
+      },
+      "unportedOverrides": 9,
+      "id": "1000000000000000426"
     },
     {
       "pkgName": "en.erisscans",
@@ -1075,6 +1374,23 @@
       "id": "1000000000000000186"
     },
     {
+      "pkgName": "pt.fenixproject",
+      "name": "Fenix Project",
+      "lang": "pt-BR",
+      "theme": "madaralegacy",
+      "baseUrl": "https://fenixproject.site",
+      "contentWarning": "NSFW",
+      "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax",
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "pt",
+        "minIntervalMs": 20000
+      },
+      "unportedOverrides": 2,
+      "id": "1000000000000000449"
+    },
+    {
       "pkgName": "th.finmanga",
       "name": "Fin Manga",
       "lang": "th",
@@ -1088,11 +1404,15 @@
       "pkgName": "en.firescans",
       "name": "Firescans",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://firescans.xyz",
-      "id": "1000000000000000037",
-      "contentWarning": "MIXED",
+      "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "minIntervalMs": 250
+      },
+      "unportedOverrides": 1,
+      "id": "1000000000000000037",
       "retired": "domain no longer resolves"
     },
     {
@@ -1149,14 +1469,15 @@
       "pkgName": "en.frierenonline",
       "name": "Frieren Online",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://ww5.frieren.online",
-      "id": "1000000000000000039",
-      "contentWarning": "MIXED",
+      "contentWarning": "SAFE",
       "versionName": "1.0.0",
       "config": {
         "listingMode": "load-more"
-      }
+      },
+      "unportedOverrides": 3,
+      "id": "1000000000000000039"
     },
     {
       "pkgName": "tr.gafeland",
@@ -1366,14 +1687,15 @@
       "pkgName": "en.gourmetscans",
       "name": "Gourmet Scans",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://gourmetsupremacy.com",
-      "id": "1000000000000000045",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
       "config": {
         "mangaPath": "project"
-      }
+      },
+      "unportedOverrides": 7,
+      "id": "1000000000000000045"
     },
     {
       "pkgName": "all.grabberzone",
@@ -1390,6 +1712,21 @@
       },
       "unportedOverrides": 1,
       "id": "1000000000000000164"
+    },
+    {
+      "pkgName": "es.gremorymangas",
+      "name": "Gremory Mangas",
+      "lang": "es",
+      "theme": "madaralegacy",
+      "baseUrl": "https://gremoryhistorias.org",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax",
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "es"
+      },
+      "id": "1000000000000000427"
     },
     {
       "pkgName": "en.grimscans",
@@ -1443,6 +1780,52 @@
       "id": "1000000000000000046"
     },
     {
+      "pkgName": "pt.noindexscan",
+      "name": "Hanami Heaven",
+      "lang": "pt-BR",
+      "theme": "madaralegacy",
+      "baseUrl": "https://hanamiheaven.org",
+      "contentWarning": "NSFW",
+      "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax",
+        "selectors": {
+          "status": "div.summary-heading:has(h5:contains(Status)) + div.summary-content",
+          "title": "div[class*='post-title'] h1"
+        },
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "en",
+        "minIntervalMs": 667
+      },
+      "unportedOverrides": 3,
+      "id": "1000000000000000456"
+    },
+    {
+      "pkgName": "es.haremdekira",
+      "name": "Harem de Kira",
+      "lang": "es",
+      "theme": "madaralegacy",
+      "baseUrl": "https://kiraproject.lat",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "serie",
+        "listingMode": "load-more",
+        "selectors": {
+          "status": "div.wp-manga div[alt=type]:eq(0) > span",
+          "title": "div.wp-manga div.grid > h1",
+          "description": "div.wp-manga div#expand_content",
+          "genre": "div.wp-manga div[alt=type]:gt(0) > span",
+          "chapterList": "ul#list-chapters li > a"
+        },
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "es",
+        "minIntervalMs": 333
+      },
+      "unportedOverrides": 6,
+      "id": "1000000000000000428"
+    },
+    {
       "pkgName": "fr.bananascan",
       "name": "Harmony-Scan",
       "lang": "fr",
@@ -1492,11 +1875,16 @@
       "pkgName": "en.hentai4free",
       "name": "Hentai4Free",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://hentai4free.net",
-      "id": "1000000000000000047",
-      "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "contentWarning": "NSFW",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "hentai",
+        "chapterSource": "manga-ajax"
+      },
+      "unportedOverrides": 3,
+      "id": "1000000000000000047"
     },
     {
       "pkgName": "en.hentaidex",
@@ -1518,11 +1906,17 @@
       "pkgName": "en.hentairead",
       "name": "HentaiRead",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://hentairead.com",
-      "id": "1000000000000000049",
-      "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "contentWarning": "NSFW",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "hentai",
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "en-US"
+      },
+      "unportedOverrides": 13,
+      "id": "1000000000000000049"
     },
     {
       "pkgName": "en.hentaisco",
@@ -1678,6 +2072,24 @@
       "id": "1000000000000000054"
     },
     {
+      "pkgName": "id.holotoon",
+      "name": "Holotoon",
+      "lang": "id",
+      "theme": "madaralegacy",
+      "baseUrl": "https://01.holotoon.site",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "komik",
+        "selectors": {
+          "status": "div.summary-heading:contains(Status) + div.summary-content"
+        },
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "en"
+      },
+      "id": "1000000000000000440"
+    },
+    {
       "pkgName": "pt.hotcabaretscan",
       "name": "Hot Cabaret Scan",
       "lang": "pt-BR",
@@ -1707,6 +2119,107 @@
         "dateLocale": "es"
       },
       "id": "1000000000000000196"
+    },
+    {
+      "pkgName": "pt.huntersscans",
+      "name": "Hunters Scans",
+      "lang": "pt-BR",
+      "theme": "madaralegacy",
+      "baseUrl": "https://readhunters.xyz",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "comics",
+        "listingMode": "load-more",
+        "selectors": {
+          "status": "div.summary-heading:contains(Status) + div"
+        },
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "pt",
+        "minIntervalMs": 30000
+      },
+      "unportedOverrides": 2,
+      "id": "1000000000000000450"
+    },
+    {
+      "pkgName": "es.infrafandub",
+      "name": "InfraFandub",
+      "lang": "es",
+      "theme": "madaralegacy",
+      "baseUrl": "https://infrafandub.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax",
+        "selectors": {
+          "status": "div.series-details div.detail-item:contains(Estado) span.detail-value",
+          "title": "h1.series-title",
+          "description": "div.summary-text",
+          "thumbnail": "aside.sidebar img.series-cover",
+          "author": "div.series-details div.detail-item:contains(Autor) span.detail-value",
+          "artist": "div.series-details div.detail-item:contains(Artista) span.detail-value",
+          "genre": "div.genres a.genre-tag",
+          "chapterList": "div.chapters-list a.chapter-item"
+        },
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "es",
+        "minIntervalMs": 500
+      },
+      "unportedOverrides": 4,
+      "id": "1000000000000000429"
+    },
+    {
+      "pkgName": "pt.inkapk",
+      "name": "Inkapk",
+      "lang": "pt-BR",
+      "theme": "madaralegacy",
+      "baseUrl": "https://inkapk.net",
+      "contentWarning": "NSFW",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "obras",
+        "chapterSource": "manga-ajax",
+        "selectors": {
+          "status": ".lbl:contains(Status) + span",
+          "title": ".ink-det-title",
+          "description": ".ink-det-desc",
+          "thumbnail": ".ink-det-cover img",
+          "author": ".lbl:contains(Autor) + span",
+          "artist": ".lbl:contains(Arte) + span",
+          "genre": ".ink-det-genres .ink-genre-pill",
+          "chapterList": ".ink-ch-list .ink-ch-item"
+        },
+        "dateFormat": "MM dd, yyyy",
+        "dateLocale": "pt",
+        "minIntervalMs": 30000
+      },
+      "unportedOverrides": 7,
+      "id": "1000000000000000451"
+    },
+    {
+      "pkgName": "es.inmortalscan",
+      "name": "Inmortal Scan",
+      "lang": "es",
+      "theme": "madaralegacy",
+      "baseUrl": "https://scan-inmortal.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "mg",
+        "chapterSource": "manga-ajax",
+        "selectors": {
+          "status": "span.scanim-series-status",
+          "title": "h1",
+          "description": "div.scanim-series-description p:not(.scanim-seo-info p)",
+          "thumbnail": "div.scanim-series-cover img",
+          "genre": "a[href*='manga-genre']",
+          "chapterList": "li.wp-manga-chapter:not(.premium-block)"
+        },
+        "dateFormat": "MMM dd, yyyy",
+        "dateLocale": "es"
+      },
+      "unportedOverrides": 7,
+      "id": "1000000000000000430"
     },
     {
       "pkgName": "es.inventariooculto",
@@ -1741,11 +2254,12 @@
       "pkgName": "en.isekaiscantop",
       "name": "IsekaiScan.top (unoriginal)",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://isekaiscan.top",
-      "id": "1000000000000000055",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "unportedOverrides": 6,
+      "id": "1000000000000000055",
       "retired": "stopped by its operator"
     },
     {
@@ -1778,6 +2292,42 @@
         "chapterSource": "manga-ajax"
       },
       "id": "1000000000000000056"
+    },
+    {
+      "pkgName": "tr.kabusmanga",
+      "name": "Kabus Manga",
+      "lang": "tr",
+      "theme": "madaralegacy",
+      "baseUrl": "https://kabusmanga.com",
+      "contentWarning": "NSFW",
+      "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax",
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "en"
+      },
+      "id": "1000000000000000469"
+    },
+    {
+      "pkgName": "id.yubikiri",
+      "name": "Kaguya",
+      "lang": "id",
+      "theme": "madaralegacy",
+      "baseUrl": "https://02.kaguya.pro",
+      "contentWarning": "NSFW",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "series",
+        "selectors": {
+          "status": "div.summary-heading:contains(Status) + div",
+          "title": "h1.post-title",
+          "thumbnail": "head meta[property='og:image']"
+        },
+        "dateFormat": "d MMMM",
+        "dateLocale": "en"
+      },
+      "unportedOverrides": 3,
+      "id": "1000000000000000443"
     },
     {
       "pkgName": "en.kaizenscan",
@@ -2129,11 +2679,16 @@
       "pkgName": "en.kunmangaonline",
       "name": "Kun Manga Online",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://www.kunmanga.online",
-      "id": "1000000000000000061",
       "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "versionName": "1.0.0",
+      "config": {
+        "minIntervalMs": 30000
+      },
+      "unportedOverrides": 11,
+      "id": "1000000000000000061",
+      "retired": "declares the slug chapter endpoint upstream and answers 404 on it; the page carries no chapter list and admin-ajax refuses, so all three routes are exhausted"
     },
     {
       "pkgName": "id.kuromanga",
@@ -2229,6 +2784,27 @@
       "id": "1000000000000000330"
     },
     {
+      "pkgName": "es.lectormangalat",
+      "name": "LectorManga.lat",
+      "lang": "es",
+      "theme": "madaralegacy",
+      "baseUrl": "https://lectormangass.com",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "biblioteca",
+        "chapterSource": "manga-ajax",
+        "selectors": {
+          "pageList": "div.reading-content div.page-break > img"
+        },
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "es",
+        "minIntervalMs": 500
+      },
+      "unportedOverrides": 3,
+      "id": "1000000000000000431"
+    },
+    {
       "pkgName": "fr.lelmanga",
       "name": "Lelmanga",
       "lang": "fr",
@@ -2245,6 +2821,21 @@
         "dateLocale": "en"
       },
       "id": "1000000000000000221"
+    },
+    {
+      "pkgName": "pt.lermangas",
+      "name": "Ler Mangas",
+      "lang": "pt-BR",
+      "theme": "madaralegacy",
+      "baseUrl": "https://lermangas.me",
+      "contentWarning": "NSFW",
+      "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "dd 'de' MMMMM 'de' yyyy",
+        "dateLocale": "pt",
+        "minIntervalMs": 2000
+      },
+      "id": "1000000000000000452"
     },
     {
       "pkgName": "en.lhtranslation",
@@ -2277,14 +2868,19 @@
       "pkgName": "en.lilymanga",
       "name": "Lily Manga",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://lilymanga.net",
-      "id": "1000000000000000064",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
       "config": {
-        "mangaPath": "gl"
-      }
+        "mangaPath": "gl",
+        "chapterSource": "manga-ajax",
+        "dateFormat": "dd.MM.yyyy",
+        "dateLocale": "en-US",
+        "minIntervalMs": 2000
+      },
+      "unportedOverrides": 1,
+      "id": "1000000000000000064"
     },
     {
       "pkgName": "en.linkmanga",
@@ -2298,6 +2894,29 @@
       "config": {
         "omitSort": true
       }
+    },
+    {
+      "pkgName": "pt.littletyrant",
+      "name": "Little Tyrant",
+      "lang": "pt-BR",
+      "theme": "madaralegacy",
+      "baseUrl": "https://tiraninha.world",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0",
+      "config": {
+        "selectors": {
+          "status": ".attr-item:has(.attr-label:contains(STATUS)) .attr-value",
+          "description": ".summary-content-box",
+          "author": ".attr-item:has(.attr-label:contains(AUTOR)) .attr-value",
+          "artist": ".attr-item:has(.attr-label:contains(ARTISTA)) .attr-value",
+          "genre": ".genres-tax-list a"
+        },
+        "dateFormat": "MMM dd, yyyy",
+        "dateLocale": "pt",
+        "minIntervalMs": 333
+      },
+      "unportedOverrides": 8,
+      "id": "1000000000000000453"
     },
     {
       "pkgName": "es.lunapieces",
@@ -2381,14 +3000,17 @@
       "pkgName": "en.madaradex",
       "name": "MadaraDex",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://madaradex.org",
-      "id": "1000000000000000067",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
       "config": {
-        "mangaPath": "title"
-      }
+        "mangaPath": "title",
+        "dateFormat": "MMM d, yyyy",
+        "dateLocale": "en-US"
+      },
+      "unportedOverrides": 1,
+      "id": "1000000000000000067"
     },
     {
       "pkgName": "en.magusmanga",
@@ -2469,42 +3091,84 @@
       "id": "1000000000000000251"
     },
     {
+      "pkgName": "es.mangacrab",
+      "name": "Manga Crab",
+      "lang": "es",
+      "theme": "madaralegacy",
+      "baseUrl": "https://mangacrab.org",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "series",
+        "selectors": {
+          "title": "h1.mb-2, h1.post-title, .post-title h1",
+          "description": "div.mv-synopsis, div.c-page__content div.modal-contenido",
+          "chapterList": "article.chapter-item > div > a, #mv-chapter-list a",
+          "pageList": "img.mv-secure-img, div.page-break:not([style*='display:none']) img:not([src]), div.reader-body img, #mv-reader-body img"
+        },
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "es",
+        "minIntervalMs": 200
+      },
+      "unportedOverrides": 21,
+      "id": "1000000000000000432"
+    },
+    {
       "pkgName": "en.mangadass",
       "name": "Manga Dass",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://mangadass.com",
-      "id": "1000000000000000070",
       "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "versionName": "1.0.0",
+      "config": {
+        "filterNonMangaItems": false,
+        "selectors": {
+          "chapterList": ".row-content-chapter li"
+        },
+        "dateFormat": "dd MMM yyyy",
+        "dateLocale": "en-US",
+        "minIntervalMs": 20000
+      },
+      "unportedOverrides": 7,
+      "id": "1000000000000000070",
+      "retired": "browses and lists chapters, but the reader carries none of the theme's markup - no page-break, no reading-content, no chapter images - so no chapter opens"
     },
     {
       "pkgName": "en.mangadistrict",
       "name": "Manga District",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://mangadistrict.com",
-      "id": "1000000000000000071",
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "series",
+        "selectors": {
+          "pageList": "div.page-break img:not(#image-99999)"
+        }
+      },
+      "unportedOverrides": 17,
+      "id": "1000000000000000071",
       "retired": "same site as the hand-written `mangadistrict` source, which is the better implementation and carries its own rate-limit floor"
     },
     {
       "pkgName": "en.mangadrama",
       "name": "Manga Drama",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://mangadrama.com",
-      "id": "1000000000000000072",
-      "contentWarning": "MIXED",
+      "contentWarning": "NSFW",
       "versionName": "1.0.0",
       "config": {
+        "chapterSource": "manga-ajax",
         "selectors": {
-          "searchItem": "div.manga-item-grid",
-          "searchTitle": "h2 a.uk-link-heading",
-          "thumbnail": "img.image-3-4"
+          "chapterList": "li.wp-manga-chapter.free-chap"
         }
-      }
+      },
+      "unportedOverrides": 2,
+      "id": "1000000000000000072",
+      "retired": "browses 458 titles and then exposes no chapter list by any of the three routes, and its series pages carry no title either"
     },
     {
       "pkgName": "en.mangakiss",
@@ -2736,11 +3400,23 @@
       "pkgName": "en.mangablaze",
       "name": "MangaBlaze",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://mangablaze.com",
-      "id": "1000000000000000077",
-      "contentWarning": "MIXED",
+      "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax",
+        "selectors": {
+          "status": ".hinfo .hi.ok",
+          "title": "h1.htitle",
+          "description": ".syn",
+          "thumbnail": ".poster img",
+          "genre": ".genres a.genre",
+          "chapterList": "li.wp-manga-chapter:not(.premium-block)"
+        }
+      },
+      "unportedOverrides": 13,
+      "id": "1000000000000000077",
       "retired": "domain no longer resolves"
     },
     {
@@ -2776,11 +3452,12 @@
       "pkgName": "en.mangaforfreecom",
       "name": "Mangaforfree.com",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://mangaforfree.com",
-      "id": "1000000000000000079",
-      "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "contentWarning": "NSFW",
+      "versionName": "1.0.0",
+      "unportedOverrides": 4,
+      "id": "1000000000000000079"
     },
     {
       "pkgName": "all.mangaforfree",
@@ -2843,11 +3520,14 @@
       "pkgName": "en.mangagofun",
       "name": "MangaGo.fun",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://www.mangago.fun",
-      "id": "1000000000000000082",
-      "contentWarning": "MIXED",
+      "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax"
+      },
+      "id": "1000000000000000082",
       "retired": "domain no longer resolves"
     },
     {
@@ -2907,6 +3587,26 @@
       "id": "1000000000000000222"
     },
     {
+      "pkgName": "th.mangaisekaithai",
+      "name": "MangaIsekaiThai",
+      "lang": "th",
+      "theme": "madaralegacy",
+      "baseUrl": "https://www.mangaisekaithai.net",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax",
+        "filterNonMangaItems": false,
+        "selectors": {
+          "pageList": ".reading-content img, .reading-content div.displayImage + script:containsData(p,a,c,k,e,d)"
+        },
+        "dateFormat": "d MMMM yyyy",
+        "dateLocale": "th"
+      },
+      "unportedOverrides": 1,
+      "id": "1000000000000000463"
+    },
+    {
       "pkgName": "en.mangaka",
       "name": "MangaKa",
       "lang": "en",
@@ -2948,6 +3648,22 @@
       },
       "unportedOverrides": 1,
       "id": "1000000000000000303"
+    },
+    {
+      "pkgName": "ar.mangalionz",
+      "name": "MangaLionz",
+      "lang": "ar",
+      "theme": "madaralegacy",
+      "baseUrl": "https://manga-lionz.org",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "listingMode": "load-more",
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "ar"
+      },
+      "unportedOverrides": 2,
+      "id": "1000000000000000415"
     },
     {
       "pkgName": "en.mangamaniacs",
@@ -3040,6 +3756,31 @@
       "id": "1000000000000000378"
     },
     {
+      "pkgName": "es.mangasnosekai",
+      "name": "Mangas No Sekai",
+      "lang": "es",
+      "theme": "madaralegacy",
+      "baseUrl": "https://mangasnosekai.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax",
+        "selectors": {
+          "status": "section#section-sinopsis div.d-flex:has(div:contains(Estado)) p",
+          "title": "div.thumble-container p.titleMangaSingle",
+          "description": "section#section-sinopsis > p",
+          "thumbnail": "div.thumble-container img.img-responsive",
+          "author": "section#section-sinopsis div.d-flex:has(div:contains(Autor)) p a",
+          "genre": "section#section-sinopsis div.d-flex:has(div:contains(Generos)) p a"
+        },
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "es",
+        "minIntervalMs": 500
+      },
+      "unportedOverrides": 9,
+      "id": "1000000000000000433"
+    },
+    {
       "pkgName": "fr.mangasscans",
       "name": "Mangas Scans",
       "lang": "fr",
@@ -3052,6 +3793,24 @@
         "dateLocale": "fr"
       },
       "id": "1000000000000000224"
+    },
+    {
+      "pkgName": "ar.mangaspark",
+      "name": "MangaSpark",
+      "lang": "ar",
+      "theme": "madaralegacy",
+      "baseUrl": "https://sparkmanga.net",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "listingMode": "load-more",
+        "selectors": {
+          "pageList": "div.wp-manga-chapter-img img, div.reading-content img"
+        },
+        "dateFormat": "d MMMM، yyyy",
+        "dateLocale": "ar"
+      },
+      "id": "1000000000000000416"
     },
     {
       "pkgName": "th.mangastep",
@@ -3128,6 +3887,21 @@
       "id": "1000000000000000379"
     },
     {
+      "pkgName": "ar.mangatuk",
+      "name": "MangaTuk",
+      "lang": "ar",
+      "theme": "madaralegacy",
+      "baseUrl": "https://mangatuk.com",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax",
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "ar"
+      },
+      "id": "1000000000000000417"
+    },
+    {
       "pkgName": "en.mangatx",
       "name": "MangaTX",
       "lang": "en",
@@ -3158,6 +3932,22 @@
         "dateFormat": "dd MMMM yyyy"
       },
       "id": "1000000000000000335"
+    },
+    {
+      "pkgName": "tr.mangawt",
+      "name": "MangaWT",
+      "lang": "tr",
+      "theme": "madaralegacy",
+      "baseUrl": "https://mangawt.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax",
+        "listingMode": "load-more",
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "tr"
+      },
+      "id": "1000000000000000470"
     },
     {
       "pkgName": "en.likemangain",
@@ -3230,14 +4020,36 @@
       "id": "1000000000000000092"
     },
     {
+      "pkgName": "th.manhuabug",
+      "name": "ManhuaBug",
+      "lang": "th",
+      "theme": "madaralegacy",
+      "baseUrl": "https://www.manhuabug.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "filterNonMangaItems": false,
+        "selectors": {
+          "pageList": ".reading-content img, .reading-content div.displayImage + script:containsData(p,a,c,k,e,d)"
+        },
+        "dateFormat": "d MMMM yyyy",
+        "dateLocale": "en"
+      },
+      "unportedOverrides": 1,
+      "id": "1000000000000000464"
+    },
+    {
       "pkgName": "en.manhuafastnet",
       "name": "ManhuaFast.net (unoriginal)",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://manhuafast.net",
-      "id": "1000000000000000093",
-      "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax"
+      },
+      "id": "1000000000000000093"
     },
     {
       "pkgName": "en.manhuahot",
@@ -3248,6 +4060,23 @@
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
       "id": "1000000000000000094"
+    },
+    {
+      "pkgName": "th.manhuakey",
+      "name": "ManhuaKey",
+      "lang": "th",
+      "theme": "madaralegacy",
+      "baseUrl": "https://www.manhuakey.com",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0",
+      "config": {
+        "filterNonMangaItems": false,
+        "selectors": {
+          "pageList": ".reading-content img, .reading-content div.displayImage + script:containsData(p,a,c,k,e,d)"
+        }
+      },
+      "unportedOverrides": 2,
+      "id": "1000000000000000465"
     },
     {
       "pkgName": "en.manhuanext",
@@ -3262,6 +4091,21 @@
       },
       "unportedOverrides": 2,
       "id": "1000000000000000095"
+    },
+    {
+      "pkgName": "all.manhuarm",
+      "name": "Manhuarm",
+      "lang": "all",
+      "theme": "madaralegacy",
+      "baseUrl": "https://manhuarmtl.com",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0",
+      "config": {
+        "minIntervalMs": 667
+      },
+      "unportedOverrides": 22,
+      "id": "1000000000000000413",
+      "retired": "manhuarmtl.com does not connect at all; no path answers"
     },
     {
       "pkgName": "en.manhuascanus",
@@ -3282,6 +4126,26 @@
       "unportedOverrides": 2,
       "id": "1000000000000000096",
       "retired": "domain no longer resolves"
+    },
+    {
+      "pkgName": "th.manhuathai",
+      "name": "ManhuaThai",
+      "lang": "th",
+      "theme": "madaralegacy",
+      "baseUrl": "https://www.manhuathai.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax",
+        "filterNonMangaItems": false,
+        "selectors": {
+          "pageList": ".reading-content img, .reading-content div.displayImage + script:containsData(p,a,c,k,e,d)"
+        },
+        "dateFormat": "d MMMM yyyy",
+        "dateLocale": "th"
+      },
+      "unportedOverrides": 1,
+      "id": "1000000000000000466"
     },
     {
       "pkgName": "en.manhuatop",
@@ -3389,6 +4253,28 @@
       "id": "1000000000000000101"
     },
     {
+      "pkgName": "es.manhwalatino",
+      "name": "Manhwa-Latino",
+      "lang": "es",
+      "theme": "madaralegacy",
+      "baseUrl": "https://manhwa-latino.com",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax",
+        "selectors": {
+          "status": "div.post-content_item:contains(Estado del comic) > div.summary-content",
+          "description": "div.post-content_item:contains(Resumen) div.summary-container",
+          "pageList": "div.page-break img.wp-manga-chapter-img"
+        },
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "es",
+        "minIntervalMs": 2000
+      },
+      "unportedOverrides": 2,
+      "id": "1000000000000000435"
+    },
+    {
       "pkgName": "all.manhwadashraw",
       "name": "Manhwa-raw",
       "lang": "all",
@@ -3409,14 +4295,41 @@
       "id": "1000000000000000169"
     },
     {
+      "pkgName": "all.manhwa18cc",
+      "name": "Manhwa18.cc",
+      "lang": "all",
+      "theme": "madaralegacy",
+      "baseUrl": "https://manhwa18.cc",
+      "contentWarning": "NSFW",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "webtoon",
+        "selectors": {
+          "description": "div.panel-story-description div.dsct",
+          "chapterList": "li.a-h",
+          "chapterDate": "span.chapter-time",
+          "pageList": "div.read-content img"
+        },
+        "dateFormat": "dd MMM yyyy",
+        "dateLocale": "en-US"
+      },
+      "unportedOverrides": 11,
+      "id": "1000000000000000414",
+      "retired": "the site is up but its archive is gone: /webtoon/ answers 404 and /manga/ answers 403, so nothing can be browsed"
+    },
+    {
       "pkgName": "en.manhwa18org",
       "name": "Manhwa18.org",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://manhwa18.org",
+      "contentWarning": "NSFW",
+      "versionName": "1.0.0",
+      "config": {
+        "filterNonMangaItems": false
+      },
       "id": "1000000000000000102",
-      "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "retired": "answers 521 on every path - Cloudflare reporting the origin is down, and it has been for the whole check"
     },
     {
       "pkgName": "en.manhwa68",
@@ -3433,6 +4346,25 @@
         "dateLocale": "en-US"
       },
       "id": "1000000000000000103"
+    },
+    {
+      "pkgName": "th.manhwabreakup",
+      "name": "ManhwaBreakup",
+      "lang": "th",
+      "theme": "madaralegacy",
+      "baseUrl": "https://www.manhwabreakup.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "filterNonMangaItems": false,
+        "selectors": {
+          "pageList": ".reading-content img, .reading-content div.displayImage + script:containsData(p,a,c,k,e,d)"
+        },
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "th"
+      },
+      "unportedOverrides": 1,
+      "id": "1000000000000000467"
     },
     {
       "pkgName": "all.manhwaclubnet",
@@ -3622,6 +4554,46 @@
       "id": "1000000000000000380"
     },
     {
+      "pkgName": "id.mgkomik",
+      "name": "MG Komik",
+      "lang": "id",
+      "theme": "madaralegacy",
+      "baseUrl": "https://id.mgkomik.cc",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "komik",
+        "listingMode": "load-more",
+        "selectors": {
+          "description": "div.description-summary div.summary__content p"
+        },
+        "dateFormat": "dd MMM yy",
+        "dateLocale": "en-US",
+        "minIntervalMs": 20000
+      },
+      "unportedOverrides": 5,
+      "id": "1000000000000000441"
+    },
+    {
+      "pkgName": "es.mhscans",
+      "name": "MHScans",
+      "lang": "es",
+      "theme": "madaralegacy",
+      "baseUrl": "https://mhscans.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "series",
+        "chapterSource": "manga-ajax",
+        "listingMode": "load-more",
+        "dateFormat": "dd 'de' MMMM 'de' yyyy",
+        "dateLocale": "es",
+        "minIntervalMs": 3000
+      },
+      "unportedOverrides": 3,
+      "id": "1000000000000000436"
+    },
+    {
       "pkgName": "all.miauscan",
       "name": "Miau Scan",
       "lang": "all",
@@ -3652,6 +4624,23 @@
       "versionName": "1.0.0",
       "unportedOverrides": 1,
       "id": "1000000000000000258"
+    },
+    {
+      "pkgName": "tr.milasub",
+      "name": "MilaSub",
+      "lang": "tr",
+      "theme": "madaralegacy",
+      "baseUrl": "https://www.millascan.com",
+      "contentWarning": "NSFW",
+      "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax",
+        "listingMode": "load-more",
+        "dateFormat": "d MMMM yyyy",
+        "dateLocale": "tr"
+      },
+      "unportedOverrides": 1,
+      "id": "1000000000000000471"
     },
     {
       "pkgName": "en.milftoon",
@@ -3697,6 +4686,45 @@
       },
       "unportedOverrides": 2,
       "id": "1000000000000000381"
+    },
+    {
+      "pkgName": "es.monopolyscan",
+      "name": "Monopoly Scan",
+      "lang": "es",
+      "theme": "madaralegacy",
+      "baseUrl": "https://monopolymanhua.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax",
+        "dateFormat": "MMM dd, yyyy",
+        "dateLocale": "es"
+      },
+      "id": "1000000000000000437"
+    },
+    {
+      "pkgName": "pt.montetai",
+      "name": "Monte Tai",
+      "lang": "pt-BR",
+      "theme": "madaralegacy",
+      "baseUrl": "https://montetaiscanlator.xyz",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "selectors": {
+          "status": ".mtx-pill-status",
+          "description": ".mtx-synopsis",
+          "thumbnail": ".mtx-cover img",
+          "author": ".mtx-side-item:contains(Autor) .mtx-side-value",
+          "artist": ".mtx-side-item:contains(Artista) .mtx-side-value",
+          "genre": ".mtx-chip-list a"
+        },
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "pt",
+        "minIntervalMs": 333
+      },
+      "unportedOverrides": 3,
+      "id": "1000000000000000454"
     },
     {
       "pkgName": "th.moodtoon",
@@ -3877,6 +4905,41 @@
       "id": "1000000000000000339"
     },
     {
+      "pkgName": "tr.niverafansub",
+      "name": "Nivera Fansub",
+      "lang": "tr",
+      "theme": "madaralegacy",
+      "baseUrl": "https://niverafansub.one",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "d MMMM yyyy",
+        "dateLocale": "tr"
+      },
+      "unportedOverrides": 1,
+      "id": "1000000000000000472"
+    },
+    {
+      "pkgName": "pt.nocturnesummer",
+      "name": "Nocturne Summer",
+      "lang": "pt-BR",
+      "theme": "madaralegacy",
+      "baseUrl": "https://nocfsb.com",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax",
+        "selectors": {
+          "status": "div.post-content_item:contains(Estado) > div.summary-content"
+        },
+        "dateFormat": "dd 'de' MMMMM 'de' yyyy",
+        "dateLocale": "pt",
+        "minIntervalMs": 2000
+      },
+      "unportedOverrides": 1,
+      "id": "1000000000000000455"
+    },
+    {
       "pkgName": "id.noromax",
       "name": "Noromax",
       "lang": "id",
@@ -3908,11 +4971,16 @@
       "pkgName": "en.novelcrow",
       "name": "NovelCrow",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://novelcrow.com",
-      "id": "1000000000000000114",
-      "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "contentWarning": "NSFW",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "comic",
+        "chapterSource": "manga-ajax"
+      },
+      "unportedOverrides": 4,
+      "id": "1000000000000000114"
     },
     {
       "pkgName": "en.noxenscans",
@@ -4141,11 +5209,12 @@
       "pkgName": "en.paritehaber",
       "name": "Paritehaber",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://www.paritehaber.com",
-      "id": "1000000000000000118",
-      "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "contentWarning": "NSFW",
+      "versionName": "1.0.0",
+      "unportedOverrides": 6,
+      "id": "1000000000000000118"
     },
     {
       "pkgName": "tr.patimanga",
@@ -4165,11 +5234,14 @@
       "pkgName": "en.pawmanga",
       "name": "Paw Manga",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://pawmanga.com",
-      "id": "1000000000000000119",
-      "contentWarning": "MIXED",
+      "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax"
+      },
+      "id": "1000000000000000119",
       "retired": "host unreachable"
     },
     {
@@ -4184,6 +5256,22 @@
         "dateFormat": "dd/MM/yyyy"
       },
       "id": "1000000000000000120"
+    },
+    {
+      "pkgName": "pt.pinkseaunicorn",
+      "name": "Pink Sea Unicorn",
+      "lang": "pt-BR",
+      "theme": "madaralegacy",
+      "baseUrl": "https://psunicorn.com",
+      "contentWarning": "NSFW",
+      "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax",
+        "dateFormat": "MMMMM dd, yyyy",
+        "dateLocale": "pt",
+        "minIntervalMs": 2000
+      },
+      "id": "1000000000000000457"
     },
     {
       "pkgName": "pt.pointzerotoons",
@@ -4235,6 +5323,20 @@
       "id": "1000000000000000226"
     },
     {
+      "pkgName": "id.pornhwa18",
+      "name": "Pornhwa18",
+      "lang": "id",
+      "theme": "madaralegacy",
+      "baseUrl": "https://pornhwa18.com",
+      "contentWarning": "NSFW",
+      "versionName": "1.0.0",
+      "config": {
+        "filterNonMangaItems": false
+      },
+      "unportedOverrides": 2,
+      "id": "1000000000000000442"
+    },
+    {
       "pkgName": "pt.portalyaoi",
       "name": "Portal Yaoi",
       "lang": "pt-BR",
@@ -4276,6 +5378,24 @@
       },
       "unportedOverrides": 2,
       "id": "1000000000000000122"
+    },
+    {
+      "pkgName": "es.ragnarokscanlation",
+      "name": "Ragnarok Scanlation",
+      "lang": "es",
+      "theme": "madaralegacy",
+      "baseUrl": "https://ragnarokscanlation.org",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "series",
+        "chapterSource": "manga-ajax",
+        "listingMode": "load-more",
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "en"
+      },
+      "unportedOverrides": 1,
+      "id": "1000000000000000438"
     },
     {
       "pkgName": "tr.raindropfansub",
@@ -4347,11 +5467,16 @@
       "pkgName": "en.rdscans",
       "name": "RD Scans",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://rdscans.com",
-      "id": "1000000000000000125",
-      "contentWarning": "MIXED",
+      "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "new",
+        "chapterSource": "manga-ajax"
+      },
+      "unportedOverrides": 4,
+      "id": "1000000000000000125",
       "retired": "origin rejects the TLS handshake"
     },
     {
@@ -5109,6 +6234,34 @@
       "id": "1000000000000000128"
     },
     {
+      "pkgName": "ar.rocksmanga",
+      "name": "Rocks Manga",
+      "lang": "ar",
+      "theme": "madaralegacy",
+      "baseUrl": "https://rocksmanga.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "filterNonMangaItems": false,
+        "selectors": {
+          "status": ".info p",
+          "title": ".info h1",
+          "description": "div.description",
+          "thumbnail": ".manga-poster img",
+          "author": "div.meta span:contains(المؤلف:) + a",
+          "artist": "div.meta span:contains(الرسام:) + a",
+          "genre": "div.meta span:contains(التصنيفات:) ~ a",
+          "chapterList": "div.list-body-hh ul li",
+          "chapterDate": "span.time",
+          "pageList": "#ch-images .img"
+        },
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "ar"
+      },
+      "unportedOverrides": 10,
+      "id": "1000000000000000418"
+    },
+    {
       "pkgName": "en.rokaricomics",
       "name": "RokariComics",
       "lang": "en",
@@ -5128,11 +6281,18 @@
       "pkgName": "en.rosesquadscans",
       "name": "Rose Squad Scans",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://rosesquadscans.aishiteru.org",
-      "id": "1000000000000000130",
-      "contentWarning": "MIXED",
+      "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax",
+        "selectors": {
+          "status": "div.post-content_item:contains(Status) > div.summary-content"
+        },
+        "minIntervalMs": 2000
+      },
+      "id": "1000000000000000130",
       "retired": "whole site redirects to a login; no longer public"
     },
     {
@@ -5149,6 +6309,20 @@
         "dateLocale": "en"
       },
       "id": "1000000000000000343"
+    },
+    {
+      "pkgName": "tr.ruyamanganet",
+      "name": "Rüya Manga.net",
+      "lang": "tr",
+      "theme": "madaralegacy",
+      "baseUrl": "https://ruyamanga.net",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "d MMMM yyyy",
+        "dateLocale": "tr"
+      },
+      "id": "1000000000000000473"
     },
     {
       "pkgName": "en.ryumanga",
@@ -5175,6 +6349,26 @@
         }
       },
       "id": "1000000000000000131"
+    },
+    {
+      "pkgName": "es.manhuaonline",
+      "name": "SamuraiScan",
+      "lang": "es",
+      "theme": "madaralegacy",
+      "baseUrl": "https://samurai.j5z.xyz",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "leer",
+        "chapterSource": "manga-ajax",
+        "selectors": {
+          "description": "div.summary__content"
+        },
+        "dateFormat": "dd MMMM, yyyy",
+        "dateLocale": "es",
+        "minIntervalMs": 20000
+      },
+      "id": "1000000000000000434"
     },
     {
       "pkgName": "en.sanascans",
@@ -5266,21 +6460,35 @@
       "pkgName": "en.setsuscans",
       "name": "Setsu Scans",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://setsuscans.com",
-      "id": "1000000000000000133",
-      "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax",
+        "listingMode": "load-more",
+        "selectors": {
+          "status": "div.summary-heading:contains(status) + div.summary-content"
+        },
+        "minIntervalMs": 30000
+      },
+      "id": "1000000000000000133"
     },
     {
       "pkgName": "en.shibamanga",
       "name": "Shiba Manga",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://shibamanga.com",
-      "id": "1000000000000000134",
-      "contentWarning": "MIXED",
+      "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax",
+        "filterNonMangaItems": false,
+        "dateFormat": "MM/dd/yyyy",
+        "dateLocale": "en-US"
+      },
+      "id": "1000000000000000134",
       "retired": "hosting account suspended"
     },
     {
@@ -5503,6 +6711,39 @@
       "id": "1000000000000000289"
     },
     {
+      "pkgName": "tr.strayfansub",
+      "name": "Stray Fansub",
+      "lang": "tr",
+      "theme": "madaralegacy",
+      "baseUrl": "https://strayfansub.net",
+      "contentWarning": "NSFW",
+      "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax",
+        "dateFormat": "MMMM d, yyyy",
+        "dateLocale": "tr",
+        "minIntervalMs": 20000
+      },
+      "unportedOverrides": 1,
+      "id": "1000000000000000474"
+    },
+    {
+      "pkgName": "tr.summertoon",
+      "name": "SummerToon",
+      "lang": "tr",
+      "theme": "madaralegacy",
+      "baseUrl": "https://summertoons.net",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "listingMode": "load-more",
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "tr",
+        "minIntervalMs": 1000
+      },
+      "id": "1000000000000000475"
+    },
+    {
       "pkgName": "tr.sunsetmanga",
       "name": "Sunset Manga",
       "lang": "tr",
@@ -5603,6 +6844,29 @@
       "id": "1000000000000000347"
     },
     {
+      "pkgName": "es.taurusfansub",
+      "name": "Taurus Fansub",
+      "lang": "es",
+      "theme": "madaralegacy",
+      "baseUrl": "https://lectortaurus.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax",
+        "listingMode": "load-more",
+        "selectors": {
+          "status": "div.manga-status span:last-child",
+          "title": "h1.post-title",
+          "description": "div.summary__content p"
+        },
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "en",
+        "minIntervalMs": 500
+      },
+      "unportedOverrides": 3,
+      "id": "1000000000000000439"
+    },
+    {
       "pkgName": "tr.tempestscans",
       "name": "Tempest Scans",
       "lang": "tr",
@@ -5626,6 +6890,28 @@
       },
       "unportedOverrides": 4,
       "id": "1000000000000000138"
+    },
+    {
+      "pkgName": "pt.tiamanhwa",
+      "name": "Tia Manhwa",
+      "lang": "pt-BR",
+      "theme": "madaralegacy",
+      "baseUrl": "https://tiamanhwa.com",
+      "contentWarning": "NSFW",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "manhwa",
+        "chapterSource": "manga-ajax",
+        "listingMode": "load-more",
+        "selectors": {
+          "status": "div.summary-heading:contains(Status) + div",
+          "chapterList": "li.wp-manga-chapter, li.chapter-item, div.chapter"
+        },
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "pt"
+      },
+      "unportedOverrides": 14,
+      "id": "1000000000000000458"
     },
     {
       "pkgName": "en.timelesstoons",
@@ -5721,11 +7007,11 @@
       "pkgName": "en.toon18",
       "name": "Toon18",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://toon18.to",
-      "id": "1000000000000000139",
-      "contentWarning": "MIXED",
+      "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "id": "1000000000000000139",
       "retired": "domain no longer resolves"
     },
     {
@@ -5748,21 +7034,35 @@
       "pkgName": "en.toonily",
       "name": "Toonily",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://toonily.com",
-      "id": "1000000000000000141",
       "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "serie",
+        "chapterSource": "manga-ajax",
+        "listingMode": "load-more",
+        "filterNonMangaItems": false,
+        "dateFormat": "MMM d, yy",
+        "dateLocale": "en-US"
+      },
+      "unportedOverrides": 6,
+      "id": "1000000000000000141"
     },
     {
       "pkgName": "en.toonizy",
       "name": "Toonizy",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://toonizy.com",
-      "id": "1000000000000000142",
       "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax",
+        "dateFormat": "MMM d, yy",
+        "dateLocale": "en"
+      },
+      "id": "1000000000000000142"
     },
     {
       "pkgName": "en.topmanhua",
@@ -5941,6 +7241,19 @@
       "id": "1000000000000000351"
     },
     {
+      "pkgName": "tr.turkcemangaokutr",
+      "name": "Turkce Manga Oku TR",
+      "lang": "tr",
+      "theme": "madaralegacy",
+      "baseUrl": "https://turkcemangaoku.com.tr",
+      "contentWarning": "NSFW",
+      "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax"
+      },
+      "id": "1000000000000000476"
+    },
+    {
       "pkgName": "es.uchuujinprojects",
       "name": "Uchuujin Projects",
       "lang": "es",
@@ -6080,21 +7393,30 @@
       "pkgName": "en.webtoonxyz",
       "name": "WebtoonXYZ",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://www.webtoon.xyz",
-      "id": "1000000000000000151",
       "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "read",
+        "dateFormat": "dd MMMM yyyy",
+        "dateLocale": "en-US"
+      },
+      "unportedOverrides": 1,
+      "id": "1000000000000000151"
     },
     {
       "pkgName": "en.whalemanga",
       "name": "Whale Manga",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://whalemanga.com",
-      "id": "1000000000000000152",
-      "contentWarning": "MIXED",
+      "contentWarning": "NSFW",
       "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax"
+      },
+      "id": "1000000000000000152",
       "retired": "hosting account suspended"
     },
     {
@@ -6118,11 +7440,11 @@
       "pkgName": "en.woopread",
       "name": "WoopRead",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://woopread.com",
-      "id": "1000000000000000154",
-      "contentWarning": "MIXED",
+      "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "id": "1000000000000000154",
       "retired": "rebuilt as a novel site; no longer runs the declared theme"
     },
     {
@@ -6172,14 +7494,39 @@
       "id": "1000000000000000227"
     },
     {
+      "pkgName": "pt.xxxyaoi",
+      "name": "XXX Yaoi",
+      "lang": "pt-BR",
+      "theme": "madaralegacy",
+      "baseUrl": "https://3xyaoi.com",
+      "contentWarning": "NSFW",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "bl",
+        "chapterSource": "manga-ajax",
+        "selectors": {
+          "status": "div.post-content_item:contains(Status) > div.summary-content"
+        },
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "en",
+        "minIntervalMs": 333
+      },
+      "unportedOverrides": 4,
+      "id": "1000000000000000459"
+    },
+    {
       "pkgName": "en.yakshacomics",
       "name": "YakshaComics",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://yakshacomics.com",
-      "id": "1000000000000000156",
-      "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "chapterSource": "manga-ajax",
+        "minIntervalMs": 60000
+      },
+      "id": "1000000000000000156"
     },
     {
       "pkgName": "tr.yaoiflix",
@@ -6209,6 +7556,20 @@
         "dateFormat": "d MMMM yyyy"
       },
       "id": "1000000000000000354"
+    },
+    {
+      "pkgName": "tr.yaoibar",
+      "name": "Yaoibar",
+      "lang": "tr",
+      "theme": "madaralegacy",
+      "baseUrl": "https://yaoibar.lol",
+      "contentWarning": "NSFW",
+      "versionName": "1.0.0",
+      "config": {
+        "dateFormat": "MMMM dd, yyyy",
+        "dateLocale": "tr"
+      },
+      "id": "1000000000000000477"
     },
     {
       "pkgName": "en.yaoihub",
@@ -6252,6 +7613,20 @@
         "dateLocale": "fr-FR"
       },
       "id": "1000000000000000231"
+    },
+    {
+      "pkgName": "ar.yonabar",
+      "name": "Yona Bar",
+      "lang": "ar",
+      "theme": "madaralegacy",
+      "baseUrl": "https://yonaber.com",
+      "contentWarning": "NSFW",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaPath": "yaoi"
+      },
+      "unportedOverrides": 3,
+      "id": "1000000000000000419"
     },
     {
       "pkgName": "pt.yuriverso",
@@ -6332,11 +7707,17 @@
       "pkgName": "en.zinmanganet",
       "name": "Zinmanga.net",
       "lang": "en",
-      "theme": "madara",
+      "theme": "madaralegacy",
       "baseUrl": "https://zinmanga.net",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "filterNonMangaItems": false,
+        "dateFormat": "MM/dd/yyyy",
+        "dateLocale": "en"
+      },
       "id": "1000000000000000161",
-      "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "retired": "same as kunmangaonline: the declared chapter endpoint 301s away and neither the page nor admin-ajax has the list"
     }
   ]
 }

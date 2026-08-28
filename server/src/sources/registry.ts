@@ -118,7 +118,15 @@ const THEMED: SourceDefinition[] = (themed.extensions as ThemedEntry[]).flatMap(
   // config type, and a table would have to erase all of them to one.
   let build: ((deps: SourceDeps) => Source) | undefined;
   switch (entry.theme) {
+    // Upstream splits Madara across two libraries and names the older one
+    // `madaralegacy`, which reads like a different engine and is not: every
+    // selector the two declare — title, status, description, thumbnail, genre,
+    // chapter row, chapter date, page list — is character-for-character the same
+    // string, and the whole of the difference is in how the listing and the
+    // chapter list are *requested*. Those are `listingMode` and `chapterSource`
+    // here, and both already exist because the modern library needs them too.
     case 'madara':
+    case 'madaralegacy':
       build = (deps) => createMadaraSource(shared, deps);
       break;
     case 'mangathemesia':
