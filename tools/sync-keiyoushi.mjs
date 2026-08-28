@@ -70,12 +70,21 @@ const OVERRIDES = join(root, 'server', 'sources.overrides.json');
  */
 const SUPPORTED = new Set([
   'madara',
+  // Upstream's older Madara library. Not a different engine: it declares the
+  // same selector strings, and differs only in how the listing and the chapter
+  // list are requested — both of which are already config here. See the note in
+  // `registry.ts`, where the two share a branch.
+  'madaralegacy',
   'mangathemesia',
   'iken',
   'keyoapp',
   'mangacatalog',
   'mangahub',
 ]);
+
+/** The engine a theme runs on, for themes upstream ships under two names. */
+const FAMILY = { madaralegacy: 'madara' };
+const familyOf = (theme) => FAMILY[theme] ?? theme;
 
 const TARBALL = 'https://codeload.github.com/keiyoushi/extensions-source/tar.gz/refs/heads/main';
 
@@ -239,7 +248,10 @@ function dateFormat(text) {
  * counted and reported rather than guessed at; the source still ships, with the
  * literals it *did* declare, which is strictly better than ignoring all of them.
  */
-function overrides(theme, dir) {
+function overrides(declared, dir) {
+  // The name upstream writes and the engine it runs on are not always the same
+  // word; everything below reasons about the engine.
+  const theme = familyOf(declared);
   const text = kotlinOf(dir);
   if (text === '') return { config: {}, code: 0 };
 
@@ -298,6 +310,16 @@ function overrides(theme, dir) {
     // meanwhile the source falls back to probing, which is what it did before.
     else if (mode) config.chapterMode = mode;
     if (base === 'MadaraNoAjax') config.variant = 'noajax';
+
+    // The older library spells the same two decisions differently, and 68 of
+    // its 105 extensions declare the first while 59 declare the second — so
+    // reading them is most of what makes those sources work rather than
+    // fall back to probing every request.
+    if (bool(text, 'useNewChapterEndpoint') === true) config.chapterSource = 'manga-ajax';
+    const loadMore = text.match(/useLoadMoreRequest\s*=\s*LoadMoreStrategy\.(\w+)/)?.[1];
+    // Only `Always` is a decision. `AutoDetect` and `Never` both mean "the
+    // archive answers", which is this engine's default anyway.
+    if (loadMore === 'Always') config.listingMode = 'load-more';
 
     const filter = bool(text, 'filterNonMangaItems');
     if (filter === false) config.filterNonMangaItems = false;

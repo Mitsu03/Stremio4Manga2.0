@@ -155,7 +155,7 @@ cannot be connected yet, rather than failing the whole query.
 
 ## Sources
 
-358 sites ship built in, across 13 languages. They come in two kinds.
+416 sites ship built in, across 13 languages. They come in two kinds.
 
 **Six are written out by hand**, because each is its own thing:
 
@@ -168,14 +168,14 @@ cannot be connected yet, rather than failing the whole query.
 | Asura Scans | `asurascans` | needs FlareSolverr |
 | Rizz Fables | `rizzfables` | |
 
-**The other 352 are data.** Most of the scanlation web is a handful of site
+**The other 410 are data.** Most of the scanlation web is a handful of site
 engines wearing different skins, so a site on a theme this build implements does
 not need code — it needs a row. `server/sources.themed.json` holds them, and
 `server/src/sources/themes/` holds the six engines they run on:
 
 | engine | sites | what it is |
 |---|---|---|
-| Madara | 185 | WordPress, `wp-manga`. The largest single theme upstream. |
+| Madara | 243 | WordPress, `wp-manga`. The largest single theme upstream by a wide margin. Upstream ships it under two names — `madara` and `madaralegacy` — which declare the same selectors and differ only in how the listing and the chapter list are requested, so both run on one engine here. |
 | MangaThemesia | 118 | WordPress, still widely called WPMangaStream. |
 | Keyoapp | 15 | Tailwind front end; covers are CSS, pages are ids resolved against a CDN host printed in a script. |
 | Iken | 12 | Not a scraper: a Next.js site over a JSON API on an `api.` sibling host. |
@@ -186,7 +186,7 @@ A row is not just the site's address. Almost every install differs from its
 theme somewhere — a renamed archive path, a moved status row, dates written in
 Turkish — so each row also carries a `config` describing those differences,
 read out of the upstream extension's own source by `tools/sync-keiyoushi.mjs`.
-284 of the 352 need one. Leaving them out is what once made two thirds of these
+356 of the 410 need one. Leaving them out is what once made two thirds of these
 sources return nothing at all; see the note on defaults below.
 
 What a `config` carries depends on the engine, and the difference is
@@ -216,7 +216,9 @@ deliberate:
   `tools/sync-keiyoushi.mjs`, add a case to the `switch` in
   `server/src/sources/registry.ts`, and re-run the script — every upstream
   extension on that theme arrives at once. 66 themes exist upstream and this
-  build has six, so this is still where the remaining coverage is.
+  build has six engines covering seven of those names, so this is still where the
+  remaining coverage is — though what is left is a long tail: 59 themes and 248
+  extensions, of which only 61 are in English.
 
   Raw extension counts are the wrong way to choose the next one. `madaralegacy`
   is the largest theme left at 105 extensions but only 35 of them are English,
@@ -224,7 +226,7 @@ deliberate:
   18 were. Count what the catalogue will actually offer, not what upstream ships.
 - **Source ids are permanent.** Decimal strings, stored on every manga row and
   in saved searches. Never reuse or renumber one. A site that dies keeps its row
-  and its id, marked `retired` with the reason, and is simply not built — 52 are
+  and its id, marked `retired` with the reason, and is simply not built — 59 are
   in that state, and they cost nothing per search.
 
 ### Corrections, and why defaults are dangerous here
