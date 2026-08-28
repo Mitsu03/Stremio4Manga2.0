@@ -5,6 +5,33 @@ report #11; 9–11 from report #14; 12–14 are the rest of report #11, deferred
 **rejected after inspection** are recorded here on purpose —
 the weekly scout reads this file and an unrecorded rejection comes back as a fresh finding.
 
+> ## Read this as a record, not as a description of the server
+>
+> This file was written across the version 1 → 2.0 rewrite and **is not maintained against the
+> current code**. Every section is accurate as of the day it was written, which is the point of
+> keeping it; several are no longer accurate about this repository, which is the point of this note.
+>
+> **React paths still resolve.** The UI came across the rewrite, so `LibraryPage.tsx`,
+> `SettingsPage.tsx`, `ReaderPage.tsx` and the rest are real files under `web/src/`. Line numbers in
+> the older sections moved long ago.
+>
+> **Kotlin paths do not.** `TrackerManager.kt`, `TachideskGraphQLSchema.kt`, `SettingsType` and
+> anything under `server/build/generated/` belonged to version 1's Suwayomi server. That server is
+> gone: 2.0 is a Node process and `server/src/` is TypeScript throughout.
+>
+> Two claims in sections 52–56 are load-bearing and were true of *that* server rather than this one,
+> so they are worth naming rather than leaving for somebody to trip over:
+>
+> - **KOReader sync is not in this build.** The section-56 note that the server side "has been pulled
+>   in, in full" was about version 1. There is no `koSync` anything in `server/src/` or `web/src/`.
+> - **AniList is the only tracker.** The six registered in version 1 did not come across.
+>   `server/src/tracker/` is `anilist.ts`, `credentials.ts` and `records.ts`. Other tracker names
+>   appear only under `server/src/backup/`, where a restored `.tachibk` reports them as *not*
+>   imported.
+>
+> For what the server does today, read [README.md](README.md) and [DEPLOY.md](DEPLOY.md), which are
+> checked against the code.
+
 ## Sections 1–3 — three features borrowed from the Tachimanga fork
 
 **Status: all three shipped, merged to `main`, and deployed (2026-08-11).** PR #6 (continue reading),
