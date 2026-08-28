@@ -417,6 +417,34 @@
     "en.readblackclovermangaonline": {
       "checked": "2026-08-28",
       "retired": "readblackclover.com and its ww10. host both resolve to 178.128.239.245 and refuse the connection; nothing answers on any path"
+    },
+    "all.manhuarm": {
+      "checked": "2026-08-28",
+      "retired": "manhuarmtl.com does not connect at all; no path answers"
+    },
+    "en.manhwa18org": {
+      "checked": "2026-08-28",
+      "retired": "answers 521 on every path - Cloudflare reporting the origin is down, and it has been for the whole check"
+    },
+    "all.manhwa18cc": {
+      "checked": "2026-08-28",
+      "retired": "the site is up but its archive is gone: /webtoon/ answers 404 and /manga/ answers 403, so nothing can be browsed"
+    },
+    "en.mangadass": {
+      "checked": "2026-08-28",
+      "retired": "browses and lists chapters, but the reader carries none of the theme's markup - no page-break, no reading-content, no chapter images - so no chapter opens"
+    },
+    "en.kunmangaonline": {
+      "checked": "2026-08-28",
+      "retired": "declares the slug chapter endpoint upstream and answers 404 on it; the page carries no chapter list and admin-ajax refuses, so all three routes are exhausted"
+    },
+    "en.zinmanganet": {
+      "checked": "2026-08-28",
+      "retired": "same as kunmangaonline: the declared chapter endpoint 301s away and neither the page nor admin-ajax has the list"
+    },
+    "en.mangadrama": {
+      "checked": "2026-08-28",
+      "retired": "browses 458 titles and then exposes no chapter list by any of the three routes, and its series pages carry no title either"
     }
   }
 }
