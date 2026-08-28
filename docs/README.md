@@ -220,10 +220,13 @@ deliberate:
   remaining coverage is — though what is left is a long tail: 59 themes and 248
   extensions, of which only 61 are in English.
 
-  Raw extension counts are the wrong way to choose the next one. `madaralegacy`
-  is the largest theme left at 105 extensions but only 35 of them are English,
-  and `zeistmanga` has 35 extensions of which *one* is; Keyoapp had 19 of which
-  18 were. Count what the catalogue will actually offer, not what upstream ships.
+  Raw extension counts are the wrong way to choose the next one, and the tail is
+  where that stops being a nuance. `zeistmanga` is the largest theme left at 35
+  extensions, of which *one* is English; `comiciviewer` has 17 and one; and
+  `gigaviewer` has 13 and none at all. The ones worth writing are further down
+  the list: `galleryadults` is 9 of 9, `masonry` 7 of 7. Keyoapp, when it was
+  chosen, was 18 of 19. Count what the catalogue will actually offer, not what
+  upstream ships.
 - **Source ids are permanent.** Decimal strings, stored on every manga row and
   in saved searches. Never reuse or renumber one. A site that dies keeps its row
   and its id, marked `retired` with the reason, and is simply not built — 70 are

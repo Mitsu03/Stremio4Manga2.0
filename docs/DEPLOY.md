@@ -239,6 +239,27 @@ Run it wherever you like — it is a separate service and this server only makes
 HTTP requests to it. Keep it on loopback or an internal network: anything that
 can reach it can use it as a general-purpose browser.
 
+## Source icons, and the one thing that leaves this machine
+
+A source's icon is fetched once, from the site itself, and cached. Nothing about
+that involves a reader's browser: the page asks this server, and this server
+serves the bytes it already has.
+
+The sites behind Cloudflare are the problem. A challenge covers every path,
+including the favicon, so around thirty sources have no icon this server can
+reach — and a solver does not help, because the *asset* stays blocked even once
+the HTML is readable.
+
+```json
+"icons": { "fallback": "google" }
+```
+
+Off by default, and deliberately opt-in rather than a sensible default: turning
+it on means telling Google which manga domains this server catalogues. It is one
+request per site, once, cached forever after, and it recovers most of the
+blocked icons. Leave it at `"none"` if that trade is not one you want to make;
+sources without an icon show a lettered placeholder and work identically.
+
 ### Why the rate limits exist
 
 Read `server/src/sources/http.ts` before changing any constant in it. Those
@@ -246,8 +267,9 @@ numbers are ban-avoidance limits, not performance tuning:
 
 | | |
 |---|---|
-| ~1.3 s between two requests to the same host, ±30% jitter | Roughly 0.8 requests a second, with no machine-perfect period. |
-| 4 requests in flight across *all* hosts | A multi-source search fans out over every enabled catalogue at once; without a ceiling that is a burst. |
+| 250 ms between two requests to the same host, ±30% jitter | The floor for a host that has never challenged us. Jittered so the period is never machine-perfect. |
+| ~1.3 s once a host *has* challenged, ±30% jitter | Roughly 0.8 requests a second. A host that runs a bot check has told us what it thinks of automated traffic, and the pace changes for good — including for the requests already queued behind the one that was challenged. |
+| 16 requests in flight across *all* hosts | A multi-source search fans out over every enabled catalogue at once; without a ceiling that is a burst. |
 | 3 attempts, backoff from 2 s, capped at 30 s | Retrying faster is what a scraper does. |
 | 5 consecutive failures, then 5 minutes of silence | A host that is angry is left alone rather than hammered. |
 | Manga District and Rizz Fables get 2 s instead of 1.3 s | Both are shared WordPress hosts, where an aggressive reader is noticed first. |
