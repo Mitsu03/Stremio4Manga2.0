@@ -33,9 +33,12 @@ range to reserve and no per-account directory to move.
 - **No build tools.** There are no native modules; `npm ci` is a download.
 - **A reverse proxy**, if this faces the internet. The server never terminates
   TLS. See [DEPLOY.md](DEPLOY.md).
-- **FlareSolverr — optional**, external, and only needed for the two sources
-  behind Cloudflare. Without it they fail with a message that says exactly that;
-  everything else works.
+- **FlareSolverr — optional**, external, and worth more than "optional" makes it
+  sound: at least 80 of the 405 sites sit behind Cloudflare, and for those it is
+  the difference between working and unreachable rather than between fast and
+  slow. Without it they fail with a message saying exactly what to configure and
+  nothing else is affected, so it really is optional — just not unimportant.
+  [DEPLOY.md](DEPLOY.md) has how to run one, with or without a container.
 
 ## Installing on Linux
 

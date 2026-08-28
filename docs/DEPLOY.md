@@ -83,6 +83,25 @@ That refusal is not politeness. A failed bind reaches Node as an unhandled
 said; and killing whatever holds 8080 is how somebody else's server disappears
 without anyone ever learning it was there.
 
+**If `schtasks` is denied, the task is not lost.** On some machines
+`schtasks /Create` answers `ERROR: Access is denied.` even for a logon task
+owned by the calling user — a policy or a hardening baseline, not elevation, and
+`install.ps1` cannot do anything about it beyond warning and carrying on. The
+PowerShell scheduler cmdlets go through a different interface and are not
+refused:
+
+```powershell
+$vbs = 'C:\path\to\Stremio4Manga2.0\deploy\windows\start-server.vbs'
+Register-ScheduledTask -TaskName 'Stremio4Manga' -Force `
+  -Action    (New-ScheduledTaskAction -Execute 'wscript.exe' -Argument "`"$vbs`"" -WorkingDirectory (Split-Path $vbs)) `
+  -Trigger   (New-ScheduledTaskTrigger -AtLogOn -User "$env:USERDOMAIN\$env:USERNAME") `
+  -Principal (New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Limited)
+```
+
+Verify with `Get-ScheduledTask -TaskName 'Stremio4Manga'`, and prove it rather
+than trust it: `Start-ScheduledTask -TaskName 'Stremio4Manga'`, then check that
+the port is held by this server's own `main.js`.
+
 **On Windows Server, `ONLOGON` is the wrong trigger** — the tray lives in an
 interactive session, so with nobody signed in there is no tray and no server.
 Use `ONSTART` with `/RU SYSTEM` from an elevated prompt, and set an explicit
@@ -239,6 +258,77 @@ Run it wherever you like — it is a separate service and this server only makes
 HTTP requests to it. Keep it on loopback or an internal network: anything that
 can reach it can use it as a general-purpose browser.
 
+### Running it on Linux
+
+"Wherever you like" is true and unhelpful when you are the one setting the
+machine up, so: **a container runtime is not required.** Upstream distributes a
+container image and most guides assume it, but the releases also carry a
+prebuilt Linux binary, and on a box already running this server under systemd
+that is the smaller thing to maintain — one more unit rather than a second
+runtime.
+
+```bash
+curl -fsSLO https://github.com/FlareSolverr/FlareSolverr/releases/latest/download/flaresolverr_linux_x64.tar.gz
+sudo tar -xzf flaresolverr_linux_x64.tar.gz -C /opt      # extracts /opt/flaresolverr
+sudo useradd --system --home-dir /opt/flaresolverr --no-create-home \
+             --shell /usr/sbin/nologin flaresolverr
+```
+
+The archive is around 230 MB because it carries its own Chromium. That is the
+whole reason this works without a container, and also the reason it wants
+somewhere near a gigabyte of memory while a challenge is being solved.
+
+`/etc/systemd/system/flaresolverr.service`:
+
+```ini
+[Unit]
+Description=FlareSolverr
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=flaresolverr
+ExecStart=/opt/flaresolverr/flaresolverr
+Environment=HOST=127.0.0.1
+Environment=PORT=8191
+Environment=LOG_LEVEL=info
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now flaresolverr
+curl -sX POST http://127.0.0.1:8191/v1 \
+     -H 'Content-Type: application/json' -d '{"cmd":"sessions.list"}'
+```
+
+That last command answering `{"status": "ok", …}` is the whole test.
+
+`HOST=127.0.0.1` is the line that matters: the default binds every interface,
+and this is a service that fetches any URL it is handed.
+
+Deliberately absent is the `ProtectSystem=strict` hardening the Stremio4Manga
+unit carries. A bundled browser wants far more of the filesystem than a Node
+process does, and a half-guessed sandbox that fails at the first challenge —
+rather than at start — is worse than none. Add hardening if you want it, and
+test it against a real solve rather than against startup.
+
+The container is still the better answer on a machine that already runs
+containers:
+
+```bash
+podman run -d --name flaresolverr --restart unless-stopped \
+  -p 127.0.0.1:8191:8191 ghcr.io/flaresolverr/flaresolverr:latest
+```
+
+`docker run` is the same command. Either way the server's side of it is one
+line of config, and `install.sh --flaresolverr http://127.0.0.1:8191` writes
+that line for you.
+
 ## Source icons, and the one thing that leaves this machine
 
 A source's icon is fetched once, from the site itself, and cached. Nothing about
@@ -305,6 +395,29 @@ the database file is not a substitute for them.
 
 `downloads/` is chapters kept for offline reading, and `cache/` and
 `thumbnails/` are rebuildable. None of the three need backing up.
+
+**Putting one back.** A backup nobody has restored is a hope, not a backup, so
+the procedure is worth reading before you need it — and worth rehearsing once,
+on a copy.
+
+```bash
+sudo systemctl stop stremio4manga
+sudo -u stremio4manga cp /srv/backups/stremio4manga.db \
+                         /var/lib/stremio4manga/stremio4manga.db
+sudo rm -f /var/lib/stremio4manga/stremio4manga.db-wal \
+           /var/lib/stremio4manga/stremio4manga.db-shm
+sudo systemctl start stremio4manga
+```
+
+Two details do the work. The `cp` runs **as the service user**, so the restored
+file is owned by the account that has to write to it rather than by root — a
+root-owned database fails on the first write, not at start. And the `-wal` and
+`-shm` files **have to go**: they describe a database that no longer exists, and
+leaving them beside a replaced `.db` is how a restore becomes corruption.
+
+Restoring a snapshot taken by the updater — after a release that migrated the
+schema — has one extra step, and [RELEASING.md](RELEASING.md#rolling-back)
+covers it.
 
 ## Moving a library in from the old Java server
 
