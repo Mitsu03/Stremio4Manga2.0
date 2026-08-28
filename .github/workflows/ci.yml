@@ -1,5 +1,5 @@
-# The same three checks the release runs, but on every pull request and every
-# push to main — which is the point.
+# The checks the release runs, on every pull request and every push to main —
+# which is the point.
 #
 # Before this existed the release workflow was the only thing that ran lint,
 # build and the tests on GitHub. That meant the first time a broken commit was
@@ -8,8 +8,10 @@
 # and anyone who fetched in between has it. Running the checks on the pull
 # request moves that discovery to where it costs nothing.
 #
-# Deliberately the same commands in the same order as release.yml, so a green
-# PR is real evidence about the tag that follows it. Keep them in step.
+# `check` is deliberately the same commands in the same order as release.yml, so
+# a green PR is real evidence about the tag that follows it. Keep them in step.
+# `container` has no counterpart there: the release publishes an image built by
+# the same Containerfile, but nothing in that workflow ever starts it.
 name: CI
 
 on:
@@ -17,7 +19,7 @@ on:
   push:
     branches: [main]
 
-# Read-only: this job reports, it does not publish.
+# Read-only: these jobs report, they do not publish.
 permissions:
   contents: read
 
@@ -43,6 +45,15 @@ jobs:
 
       - run: npm run lint
 
+      # `server/build.js` is esbuild, which strips types without checking them,
+      # so without this a type error in the server reaches main with a green
+      # tick. The web build runs `tsc -b` itself and is covered by `npm run
+      # build` below; this is the half that was not.
+      #
+      # Before the bundle, because a type error found in seconds is worth more
+      # than the same error found after two minutes of bundling.
+      - run: npm run typecheck
+
       - run: npm run build
 
       # Offline only, for the same reason as the release: the online half
@@ -61,3 +72,28 @@ jobs:
         run: |
           echo "package.json version: $(node -p "require('./package.json').version")"
           echo "A tag must be v<that>, or release.yml refuses it. See docs/RELEASING.md."
+
+  # The image is what the container path actually runs, and building it proves
+  # only that it builds. This starts it: the offline suite inside the image with
+  # no network at all, then the runtime image for real — a data volume, a
+  # published port, an account made through the CLI, a sign-in, and a redeploy to
+  # prove the volume is what survives.
+  #
+  # It catches what the `check` job structurally cannot: a dependency that
+  # resolved on the host and not in the image, a server running as root, a /data
+  # the server user cannot write, a port bound to the loopback *inside* the
+  # container. None of those are visible to a test run on the runner itself.
+  container:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Preinstalled on the GitHub-hosted Ubuntu images, but this job is the one
+      # thing standing between a broken image and a release that publishes it,
+      # so it does not depend on that staying true.
+      - name: Ensure podman
+        run: podman --version || (sudo apt-get update && sudo apt-get install -y podman)
+
+      # The script runs the same commands a person runs locally — no CI-only
+      # path, so a failure here reproduces with one command on a laptop.
+      - run: npm run test:podman

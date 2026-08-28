@@ -165,6 +165,10 @@ with the sign-in, a GraphQL call and the non-root user, against a throwaway
 container on port 18080. It runs rootless, and 18080 is deliberate: a real
 deployment on 8080 on the same machine is left alone.
 
+CI runs it on every pull request and every push to main, so an image that builds
+and then will not run is caught before it is published rather than by whoever
+pulls it.
+
 ## The config a public server needs
 
 Start from `server/config.example.json`. **Do not copy a working local config** —

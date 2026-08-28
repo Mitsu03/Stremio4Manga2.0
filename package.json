@@ -13,6 +13,7 @@
   "scripts": {
     "build": "npm run build -w server && npm run build -w web",
     "lint": "npm run lint -w server && npm run lint -w web",
+    "typecheck": "npm run typecheck -w server",
     "start": "node server/dist/main.js",
     "s4m": "node server/bin/s4m.js",
     "test": "node test/smoke.mjs",
