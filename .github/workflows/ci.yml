@@ -1,0 +1,63 @@
+# The same three checks the release runs, but on every pull request and every
+# push to main — which is the point.
+#
+# Before this existed the release workflow was the only thing that ran lint,
+# build and the tests on GitHub. That meant the first time a broken commit was
+# caught was after the tag had already been pushed, and a tag is the one thing
+# here that is awkward to take back: it has to be deleted locally and remotely,
+# and anyone who fetched in between has it. Running the checks on the pull
+# request moves that discovery to where it costs nothing.
+#
+# Deliberately the same commands in the same order as release.yml, so a green
+# PR is real evidence about the tag that follows it. Keep them in step.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# Read-only: this job reports, it does not publish.
+permissions:
+  contents: read
+
+# A second push to a branch makes the first run's answer irrelevant. Cancel it
+# rather than paying for both — except on main, where each commit's result is
+# worth keeping.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci --no-audit --no-fund
+
+      - run: npm run lint
+
+      - run: npm run build
+
+      # Offline only, for the same reason as the release: the online half
+      # reaches real manga sites, and a source that is down for its own reasons
+      # must not be able to fail somebody's pull request.
+      - run: npm run test:offline
+
+      # The check that has no counterpart in release.yml, because by the time
+      # release.yml runs it is too late to be useful. A tag whose version does
+      # not match package.json is refused there; here the same disagreement is
+      # visible while it is still a one-line fix on a branch.
+      #
+      # Not a failure — an unbumped package.json is the normal state of a branch
+      # that is not a release. It is a note for whoever is about to tag.
+      - name: Version note
+        run: |
+          echo "package.json version: $(node -p "require('./package.json').version")"
+          echo "A tag must be v<that>, or release.yml refuses it. See docs/RELEASING.md."
