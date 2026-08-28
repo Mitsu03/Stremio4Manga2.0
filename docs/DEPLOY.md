@@ -83,6 +83,25 @@ That refusal is not politeness. A failed bind reaches Node as an unhandled
 said; and killing whatever holds 8080 is how somebody else's server disappears
 without anyone ever learning it was there.
 
+**If `schtasks` is denied, the task is not lost.** On some machines
+`schtasks /Create` answers `ERROR: Access is denied.` even for a logon task
+owned by the calling user — a policy or a hardening baseline, not elevation, and
+`install.ps1` cannot do anything about it beyond warning and carrying on. The
+PowerShell scheduler cmdlets go through a different interface and are not
+refused:
+
+```powershell
+$vbs = 'C:\path\to\Stremio4Manga2.0\deploy\windows\start-server.vbs'
+Register-ScheduledTask -TaskName 'Stremio4Manga' -Force `
+  -Action    (New-ScheduledTaskAction -Execute 'wscript.exe' -Argument "`"$vbs`"" -WorkingDirectory (Split-Path $vbs)) `
+  -Trigger   (New-ScheduledTaskTrigger -AtLogOn -User "$env:USERDOMAIN\$env:USERNAME") `
+  -Principal (New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Limited)
+```
+
+Verify with `Get-ScheduledTask -TaskName 'Stremio4Manga'`, and prove it rather
+than trust it: `Start-ScheduledTask -TaskName 'Stremio4Manga'`, then check that
+the port is held by this server's own `main.js`.
+
 **On Windows Server, `ONLOGON` is the wrong trigger** — the tray lives in an
 interactive session, so with nobody signed in there is no tray and no server.
 Use `ONSTART` with `/RU SYSTEM` from an elevated prompt, and set an explicit
@@ -239,6 +258,129 @@ Run it wherever you like — it is a separate service and this server only makes
 HTTP requests to it. Keep it on loopback or an internal network: anything that
 can reach it can use it as a general-purpose browser.
 
+### Running it on Linux
+
+"Wherever you like" is true and unhelpful when you are the one setting the
+machine up, so: **a container runtime is not required.** Upstream distributes a
+container image and most guides assume it, but the releases also carry a
+prebuilt Linux binary, and on a box already running this server under systemd
+that is the smaller thing to maintain — one more unit rather than a second
+runtime.
+
+```bash
+curl -fsSLO https://github.com/FlareSolverr/FlareSolverr/releases/latest/download/flaresolverr_linux_x64.tar.gz
+sudo tar -xzf flaresolverr_linux_x64.tar.gz -C /opt      # extracts /opt/flaresolverr
+sudo useradd --system --home-dir /opt/flaresolverr --no-create-home \
+             --shell /usr/sbin/nologin flaresolverr
+```
+
+The archive is around 230 MB because it carries its own Chromium. That is the
+whole reason this works without a container, and also the reason it wants
+somewhere near a gigabyte of memory while a challenge is being solved.
+
+**It carries the browser, not the browser's dependencies.** On a minimal server
+the binary starts, finds its Chromium, and dies — first on
+`libxcb.so.1: cannot open shared object file`, and then, once the libraries are
+there, on `Could not find Xvfb`. Neither failure is in the release notes and
+both happen at *start*, which is the good case; the list below is what a
+`debian:bookworm-slim` needed before a challenge actually solved:
+
+```bash
+sudo apt install -y xvfb fonts-liberation \
+  libnss3 libnspr4 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 \
+  libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 \
+  libpango-1.0-0 libcairo2 libasound2 libxcb1 libx11-6 libxext6
+```
+
+Xvfb is the surprising one and it is not optional: FlareSolverr drives a real,
+headed browser inside a virtual display rather than a headless one, because
+headless is itself a signal Cloudflare reads. A desktop distribution has all of
+this already, which is why the failure only shows up on the machine you actually
+wanted to run it on.
+
+`/etc/systemd/system/flaresolverr.service`:
+
+```ini
+[Unit]
+Description=FlareSolverr
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=flaresolverr
+ExecStart=/opt/flaresolverr/flaresolverr
+Environment=HOST=127.0.0.1
+Environment=PORT=8191
+Environment=LOG_LEVEL=info
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now flaresolverr
+curl -sX POST http://127.0.0.1:8191/v1 \
+     -H 'Content-Type: application/json' -d '{"cmd":"sessions.list"}'
+```
+
+That last command answering `{"status": "ok", …}` is the whole test — and it is
+worth going one step further, because "the service started" and "it can solve a
+challenge" are different claims:
+
+```bash
+curl -sX POST http://127.0.0.1:8191/v1 -H 'Content-Type: application/json' \
+     -d '{"cmd":"request.get","url":"https://example.org/","maxTimeout":90000}' | head -c 120
+```
+
+`"message": "Challenge solved!"` — or `"Challenge not detected!"` on a host that
+was not defending itself — means the browser really launched. A missing Xvfb
+fails the first call, not this one, so run both.
+
+`HOST=127.0.0.1` is the line that matters: the default binds every interface,
+and this is a service that fetches any URL it is handed.
+
+Deliberately absent is the `ProtectSystem=strict` hardening the Stremio4Manga
+unit carries. A bundled browser wants far more of the filesystem than a Node
+process does, and a half-guessed sandbox that fails at the first challenge —
+rather than at start — is worse than none. Add hardening if you want it, and
+test it against a real solve rather than against startup.
+
+The container is still the better answer on a machine that already runs
+containers:
+
+```bash
+podman run -d --name flaresolverr --restart unless-stopped \
+  -p 127.0.0.1:8191:8191 ghcr.io/flaresolverr/flaresolverr:latest
+```
+
+`docker run` is the same command. Either way the server's side of it is one
+line of config, and `install.sh --flaresolverr http://127.0.0.1:8191` writes
+that line for you.
+
+## Source icons, and the one thing that leaves this machine
+
+A source's icon is fetched once, from the site itself, and cached. Nothing about
+that involves a reader's browser: the page asks this server, and this server
+serves the bytes it already has.
+
+The sites behind Cloudflare are the problem. A challenge covers every path,
+including the favicon, so around thirty sources have no icon this server can
+reach — and a solver does not help, because the *asset* stays blocked even once
+the HTML is readable.
+
+```json
+"icons": { "fallback": "google" }
+```
+
+Off by default, and deliberately opt-in rather than a sensible default: turning
+it on means telling Google which manga domains this server catalogues. It is one
+request per site, once, cached forever after, and it recovers most of the
+blocked icons. Leave it at `"none"` if that trade is not one you want to make;
+sources without an icon show a lettered placeholder and work identically.
+
 ### Why the rate limits exist
 
 Read `server/src/sources/http.ts` before changing any constant in it. Those
@@ -246,8 +388,9 @@ numbers are ban-avoidance limits, not performance tuning:
 
 | | |
 |---|---|
-| ~1.3 s between two requests to the same host, ±30% jitter | Roughly 0.8 requests a second, with no machine-perfect period. |
-| 4 requests in flight across *all* hosts | A multi-source search fans out over every enabled catalogue at once; without a ceiling that is a burst. |
+| 250 ms between two requests to the same host, ±30% jitter | The floor for a host that has never challenged us. Jittered so the period is never machine-perfect. |
+| ~1.3 s once a host *has* challenged, ±30% jitter | Roughly 0.8 requests a second. A host that runs a bot check has told us what it thinks of automated traffic, and the pace changes for good — including for the requests already queued behind the one that was challenged. |
+| 16 requests in flight across *all* hosts | A multi-source search fans out over every enabled catalogue at once; without a ceiling that is a burst. |
 | 3 attempts, backoff from 2 s, capped at 30 s | Retrying faster is what a scraper does. |
 | 5 consecutive failures, then 5 minutes of silence | A host that is angry is left alone rather than hammered. |
 | Manga District and Rizz Fables get 2 s instead of 1.3 s | Both are shared WordPress hosts, where an aggressive reader is noticed first. |
@@ -284,6 +427,29 @@ the database file is not a substitute for them.
 `downloads/` is chapters kept for offline reading, and `cache/` and
 `thumbnails/` are rebuildable. None of the three need backing up.
 
+**Putting one back.** A backup nobody has restored is a hope, not a backup, so
+the procedure is worth reading before you need it — and worth rehearsing once,
+on a copy.
+
+```bash
+sudo systemctl stop stremio4manga
+sudo -u stremio4manga cp /srv/backups/stremio4manga.db \
+                         /var/lib/stremio4manga/stremio4manga.db
+sudo rm -f /var/lib/stremio4manga/stremio4manga.db-wal \
+           /var/lib/stremio4manga/stremio4manga.db-shm
+sudo systemctl start stremio4manga
+```
+
+Two details do the work. The `cp` runs **as the service user**, so the restored
+file is owned by the account that has to write to it rather than by root — a
+root-owned database fails on the first write, not at start. And the `-wal` and
+`-shm` files **have to go**: they describe a database that no longer exists, and
+leaving them beside a replaced `.db` is how a restore becomes corruption.
+
+Restoring a snapshot taken by the updater — after a release that migrated the
+schema — has one extra step, and [RELEASING.md](RELEASING.md#rolling-back)
+covers it.
+
 ## Moving a library in from the old Java server
 
 Version 1 kept everything in an H2 database that no Node process can open. The
@@ -300,8 +466,17 @@ v1's library is usually the larger half. `install.ps1 -DataDir D:\S4M` keeps
 them apart; `--data-dir` is the same flag on Linux, where the installer's own
 `/var/lib/stremio4manga` never overlapped anything.
 
-Export a backup from the old server, then, **signed in as the account it should
-land in**:
+On the old server, signed in as the account whose library you are moving:
+
+> **Settings → Backup & restore → Export a backup**
+> *(a Portuguese interface says **Definições → Cópias e reposição → Exportar uma
+> cópia de segurança**)*
+
+That writes the `.tachibk`. Do it per account: a v1 backup carries one library,
+not the server's, so a machine with three accounts is three exports and three
+imports.
+
+Then, on this server, **signed in as the account it should land in**:
 
 > **Settings → Backup & restore → Restore → Choose a backup file**
 
