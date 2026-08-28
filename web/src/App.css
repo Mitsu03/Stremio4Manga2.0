@@ -231,9 +231,17 @@
 .discover-source-copy strong { font: 800 1rem/1.18 Bahnschrift, "Arial Narrow", sans-serif; }
 .discover-source-copy small { margin-top: 0.18rem; color: var(--ink-soft); font: 700 0.68rem/1 ui-monospace, Consolas, monospace; letter-spacing: 0.08em; text-transform: uppercase; }
 .discover-modes { display: flex; align-items: center; gap: 0.38rem; padding: 0.3rem; background: color-mix(in srgb, var(--surface) 78%, transparent); border: 1px solid var(--line); border-radius: 999px; }
-.discover-modes button { width: 36px; height: 36px; display: grid; place-items: center; padding: 0; color: var(--ink-soft); background: transparent; border: 0; border-radius: 50%; cursor: pointer; transition: color 160ms ease, background-color 160ms ease, transform 160ms ease; }
+.discover-modes button { position: relative; width: 36px; height: 36px; display: grid; place-items: center; padding: 0; color: var(--ink-soft); background: transparent; border: 0; border-radius: 50%; cursor: pointer; transition: color 160ms ease, background-color 160ms ease, transform 160ms ease; }
+/* The glyphs stay 36px so the group stays a pill rather than a bar; the tap area does not have to.
+   The pad is narrower than the gap between them, so no button steals its neighbour's edge. */
+.discover-modes button::after { content: ""; position: absolute; inset: -3px; border-radius: 50%; }
 .discover-modes button:hover { color: var(--ink); background: var(--paper); }
 .discover-modes button.active { color: var(--aqua-ink); background: var(--aqua-soft); box-shadow: inset 0 -2px 0 var(--aqua); }
+/* Patience is not a fourth way of browsing — it modifies the globe next to it. The hairline says as
+   much, so an on-state that looks exactly like "Latest is selected" is not read as a fourth mode.
+   `::before` because the padded tap area lives on `::after`. */
+.discover-modes .discover-patience { margin-left: 0.34rem; }
+.discover-modes .discover-patience::before { content: ""; position: absolute; left: -0.36rem; top: 16%; bottom: 16%; width: 1px; background: var(--line); }
 .discover-source-picker { grid-column: 1 / -1; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 1rem; align-items: center; padding: 0.75rem 0.2rem 0.05rem; border-top: 1px solid var(--line); animation: discover-picker-in 160ms ease-out; }
 .discover-source-picker > p { margin: 0; color: var(--ink-soft); font: 700 0.68rem/1 ui-monospace, Consolas, monospace; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; }
 .discover-source-picker > div { display: flex; min-width: 0; gap: 0.48rem; padding: 0.12rem 0.1rem 0.28rem; overflow-x: auto; }
@@ -420,9 +428,36 @@ button.result-row { width: 100%; text-align: left; cursor: pointer; font: inheri
 /* The sweep button and the patience toggle sit together: one starts the wait, the other sets it. */
 .search-all-row { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
 .search-all-row .search-all-sources { margin-bottom: 0; }
-.wait-longer { display: inline-flex; align-items: center; gap: 0.45rem; }
-.wait-longer svg { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
-.wait-longer.active { color: var(--accent); border-color: currentColor; }
+
+/* How patient the search is: a setting, not an errand. It used to borrow `.button quiet`, which made
+   it the identical twin of "Search again" standing beside it — one pill saying do this, another pill
+   the same shape and weight saying you are already like this. So it stops being a pill. A recessed
+   track on the panel's surface, a knob that travels, and the squared bottom-right corner the app puts
+   on every card and menu: unmistakably from here, unmistakably not a verb.
+   (The old `.active` rule reached for `--accent`, a token this palette never defined, so the one cue
+   the two states had was silently dropped — the on state differed by wording alone.) */
+.patience-switch { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 42px; padding: 0.4rem 0.95rem 0.4rem 0.5rem; color: var(--ink-soft); background: var(--paper); border: 1px solid var(--line); border-radius: 999px 999px 16px 999px; cursor: pointer; white-space: nowrap; font-size: 0.85rem; font-weight: 700; line-height: 1.2; transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease, transform 160ms ease; }
+.patience-switch:hover { color: var(--ink); border-color: var(--aqua); }
+/* Down, not up. `.button` lifts on hover because it is about to send you somewhere; a switch is a
+   thing you press into place. */
+.patience-switch:active { transform: translateY(1px); }
+.patience-switch.active { color: var(--aqua-ink); background: var(--aqua-soft); border-color: var(--aqua); }
+.patience-switch svg { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+/* The glass only holds sand while the app is actually willing to wait for it. A filled shape reads as
+   on with the colour taken away, which is what the accent-only version could not do. */
+.patience-switch.active svg, .discover-patience.active svg { fill: color-mix(in srgb, currentColor 26%, transparent); }
+.patience-track { position: relative; flex: none; width: 32px; height: 18px; background: var(--line); border-radius: 999px; transition: background-color 160ms ease; }
+/* A little overshoot on the knob: the flick lands before the search settings have any chance to show
+   for it, so the control answers instead of the app going quiet. */
+.patience-track::after { content: ""; position: absolute; top: 3px; left: 3px; width: 12px; height: 12px; background: var(--ink-soft); border-radius: 50%; transition: transform 220ms cubic-bezier(0.34, 1.45, 0.64, 1), background-color 160ms ease; }
+.patience-switch.active .patience-track { background: var(--aqua); }
+.patience-switch.active .patience-track::after { background: var(--surface); transform: translateX(14px); }
+/* The global reduce rule already cuts every duration to nothing; this kills the springy easing
+   outright rather than leaving a 0.01ms overshoot to be optimised away by luck. */
+@media (prefers-reduced-motion: reduce) {
+  .patience-track::after { transition: none; }
+}
+
 .result-row { display: grid; grid-template-columns: 82px minmax(0, 1fr) auto; gap: 1.2rem; align-items: center; padding: 1rem; background: var(--surface); border: 1px solid var(--line); border-radius: 6px 6px 18px 6px; }
 .result-row img { width: 82px; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 3px 3px 10px 3px; }
 .result-copy h2 { margin-bottom: 0.5rem; }

@@ -694,8 +694,13 @@ export default function SearchPage() {
             {/* Not a third way of browsing but a wider way of searching: popular and latest still come
                 from the source in the pill, and only a typed search fans out. */}
             <button type="button" className={allSources ? 'active' : ''} onClick={() => setAllSources((on) => !on)} aria-label={allSources ? t('Search only the chosen source') : t('Search every installed source')} aria-pressed={allSources} title={t('Every source')}><Icon name="globe" /></button>
+            {/* The same setting as the switch on a title's page, so it carries the same name and the
+                same tooltip; with no room for a label, the state is the sand in the glass and the
+                fill behind it. The name stays put in both positions and `aria-pressed` says which
+                way it is set — an action-shaped label ("Stop waiting…") next to `aria-pressed`
+                announces the opposite of what it does. */}
             {allSources && (
-              <button type="button" className={waitLonger ? 'active' : ''} onClick={toggleWaitLonger} aria-label={waitLonger ? t('Stop waiting for slow sources') : t('Wait longer for slow sources')} aria-pressed={waitLonger} title={waitLonger ? t('Waiting for slow sources') : t('Skip slow sources')}><Icon name="hourglass" /></button>
+              <button type="button" className={`discover-patience${waitLonger ? ' active' : ''}`} onClick={toggleWaitLonger} aria-label={t('Wait for slow sources')} aria-pressed={waitLonger} title={waitLonger ? t('Slow sources are waited for. Searches take longer and find more.') : t('Slow sources are skipped. Searches are quicker and may miss some.')}><Icon name="hourglass" /></button>
             )}
           </div>
 
