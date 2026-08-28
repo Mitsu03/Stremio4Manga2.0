@@ -135,10 +135,25 @@ In order, `add`:
    internet.
 4. **Hashes it**, then inserts the row in a transaction.
 
-A new account starts with an empty library and every source available to switch
-on. There is nothing to seed and nothing to download — the sources are compiled
-into the server, and "installing" one is a row in `source_state` that the person
-themselves toggles from the app.
+A new account starts with an empty library and, in the same transaction, the
+English and multi-language half of the catalogue already installed — 166 of the
+405 sources, everything whose language is `en` or `all`. Nothing is downloaded:
+the sources are compiled into the server, and "installing" one is a row in
+`source_state`.
+
+The other twelve languages — Spanish, Turkish, Portuguese, Indonesian, Thai,
+Arabic, French and the rest — are listed on the Sources page from the first
+sign-in and switched on from there. They are off by default because search fans
+out across every *installed* source, so seeding all 405 made every query wait on
+hundreds of sites in languages the reader cannot read. An account that starts
+with nothing has the opposite problem — an empty Sources page and a search that
+reaches nothing looks like a broken install — which is why the seed is a subset
+rather than none.
+
+Seeding is guarded on "this account has no `source_state` rows at all", never on
+"nothing is installed", so uninstalling everything is a choice the server never
+overrides. Accounts created before this narrowed keep all 405: they have rows,
+so the seed does not touch them.
 
 ## Changing a password
 

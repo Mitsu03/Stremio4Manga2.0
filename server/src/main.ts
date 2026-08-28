@@ -46,7 +46,9 @@ async function main(): Promise<void> {
   // deliberate choice, and it is a no-op on every boot after the first.
   for (const row of db.all<{ username: string }>('SELECT username FROM users')) {
     const seeded = seedDefaults(db, row.username);
-    if (seeded > 0) log.info(`installed ${seeded} built-in sources for "${row.username}"`);
+    if (seeded > 0) {
+      log.info(`installed ${seeded} English and multi-language sources for "${row.username}"`);
+    }
   }
 
   const graphql = createGraphQLHandler({ config, db, log });

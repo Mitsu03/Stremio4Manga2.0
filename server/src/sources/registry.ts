@@ -287,18 +287,44 @@ export function isInstalled(db: Db, userId: string, pkgName: string): boolean {
 }
 
 /**
- * Give a brand-new account the built-in catalogue, already installed.
+ * Which languages a brand-new account starts with switched on.
+ *
+ * `all` is the language of the sources that are not in one language at all —
+ * aggregators that serve every translation from the same catalogue — so it
+ * belongs with `en` rather than with a language somebody would have to pick.
+ *
+ * The other twelve languages are not missing: the whole catalogue is on the
+ * Sources page from the first sign-in, every row switchable (see the
+ * `extensions` resolver, which never filters on install state). This decides
+ * what is *already on*, not what exists.
+ */
+const SEEDED_LANGS = new Set(['en', 'all']);
+
+/** The subset of the catalogue a new account is seeded with. */
+const SEEDED = DEFINITIONS.filter((definition) => SEEDED_LANGS.has(definition.lang));
+
+/**
+ * Give a brand-new account the English and multi-language catalogue, already
+ * installed.
  *
  * Version 1 did this too — its gateway installed a frozen list of 299 keiyoushi
  * packages the moment an account was created — and without it the Sources page,
  * Discover and every search open empty on a first sign-in, which reads as the
  * app being broken rather than as a choice waiting to be made.
  *
+ * Seeding *everything* had the opposite failure: a search fanned out across all
+ * 405 sources, most of them in languages the reader does not have, so the wait
+ * and the shelves of nothing were paid for on every query. Turkish, Spanish,
+ * Arabic and the rest stay one toggle away on the Sources page instead — which
+ * is a choice worth making, unlike an empty install.
+ *
  * The guard is "no rows at all", never "nothing installed". Uninstalling leaves
  * the row behind with `installed = 0` (see `uninstall`), so somebody who has
  * deliberately cleared their sources still has rows and is never re-seeded.
  * Only an account that has never been seeded has none, which is what makes this
- * safe to run over existing accounts at boot as well as at creation.
+ * safe to run over existing accounts at boot as well as at creation — including
+ * accounts seeded with all 405 before this narrowed: they have rows, so nothing
+ * here touches them.
  *
  * Returns how many were installed, so a caller can say so.
  */
@@ -310,9 +336,9 @@ export function seedDefaults(db: Db, userId: string): number {
   if (seen !== undefined) return 0;
 
   db.transaction(() => {
-    for (const definition of DEFINITIONS) install(db, userId, definition.pkgName);
+    for (const definition of SEEDED) install(db, userId, definition.pkgName);
   });
-  return DEFINITIONS.length;
+  return SEEDED.length;
 }
 
 export function install(db: Db, userId: string, pkgName: string): void {
