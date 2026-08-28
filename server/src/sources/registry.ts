@@ -26,6 +26,10 @@ import type {
 import themed from '../../sources.themed.json' with { type: 'json' };
 import { createMadaraSource } from './themes/madara.js';
 import { createMangaThemesiaSource } from './themes/mangathemesia.js';
+import { createIkenSource } from './themes/iken.js';
+import { createKeyoappSource } from './themes/keyoapp.js';
+import { createMangaCatalogSource } from './themes/mangacatalog.js';
+import { createMangaHubSource } from './themes/mangahub.js';
 
 interface ThemedEntry {
   pkgName: string;
@@ -106,12 +110,35 @@ const THEMED: SourceDefinition[] = (themed.extensions as ThemedEntry[]).flatMap(
     // they collide, which they cannot: the generator never emits those keys.
     ...entry.config,
   };
-  const build =
-    entry.theme === 'madara'
-      ? (deps: SourceDeps) => createMadaraSource(shared, deps)
-      : entry.theme === 'mangathemesia'
-        ? (deps: SourceDeps) => createMangaThemesiaSource(shared, deps)
-        : undefined;
+  // Adding an engine is three edits and no new concept: write it beside its
+  // siblings under `themes/`, add its name to `SUPPORTED` in
+  // `tools/sync-keiyoushi.mjs`, and add a case here. Every upstream extension on
+  // that theme then arrives at once, which is the whole point of themed sources.
+  // Written out rather than kept in a table because each engine takes its own
+  // config type, and a table would have to erase all of them to one.
+  let build: ((deps: SourceDeps) => Source) | undefined;
+  switch (entry.theme) {
+    case 'madara':
+      build = (deps) => createMadaraSource(shared, deps);
+      break;
+    case 'mangathemesia':
+      build = (deps) => createMangaThemesiaSource(shared, deps);
+      break;
+    case 'iken':
+      build = (deps) => createIkenSource(shared, deps);
+      break;
+    case 'keyoapp':
+      build = (deps) => createKeyoappSource(shared, deps);
+      break;
+    case 'mangacatalog':
+      build = (deps) => createMangaCatalogSource(shared, deps);
+      break;
+    case 'mangahub':
+      build = (deps) => createMangaHubSource(shared, deps);
+      break;
+    default:
+      build = undefined;
+  }
   if (!build) return [];
 
   return [
