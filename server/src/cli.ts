@@ -12,11 +12,21 @@ import { createInterface, type Interface } from 'node:readline';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
-import { ConfigError, dataPaths, defaultConfigPath, loadConfig } from './config.js';
+import { ConfigError, dataPaths, defaultConfigPath, loadConfig, type Config } from './config.js';
 import { openDb, type Db } from './db/open.js';
 import { hashPassword } from './http/crypto.js';
 import { importTachibk } from './backup/tachibk.js';
 import { seedDefaults } from './sources/registry.js';
+import { VERSION } from './version.js';
+import {
+  assertComparable,
+  installRelease,
+  isNewer,
+  latestRelease,
+  restartService,
+  rollback,
+  UpdateError,
+} from './update.js';
 
 const MIN_PASSWORD_LENGTH = 10;
 
@@ -31,6 +41,8 @@ interface Options {
   yes: boolean;
   passwordStdin: boolean;
   dryRun: boolean;
+  check: boolean;
+  restart: boolean;
 }
 
 interface UserRow {
@@ -123,6 +135,12 @@ export function usernameProblem(name: string): string | null {
 const here = dirname(fileURLToPath(import.meta.url));
 // dist/ sits one level below the workspace root, which is where config.json lives.
 const serverRoot = resolve(here, '..');
+// One level above that is the install root — the directory a release tarball
+// extracts over, holding both server/ and web/.
+const installRoot = resolve(serverRoot, '..');
+
+/** The unit `--restart` restarts. install.sh installs it under this name. */
+const SERVICE_UNIT = process.env.S4M_SERVICE ?? 'stremio4manga';
 
 function open(): Db {
   try {
@@ -255,6 +273,133 @@ function list(): void {
   }
 }
 
+// ----------------------------------------------------------------- update --
+
+/**
+ * Report a failure without calling `process.exit`.
+ *
+ * `fail` tears the process down where it stands, which is right for a command
+ * that has only touched the database. It is wrong here: `fetch` leaves a socket
+ * and its libuv handle alive for a moment after the response, and exiting on
+ * top of one aborts the runtime on Windows with an assertion from async.c
+ * instead of the message that was meant to be printed. Setting the code and
+ * returning lets the loop drain and exits with 1 on its own.
+ */
+function reportFailure(text: string): void {
+  process.stderr.write(`${text}
+`);
+  process.exitCode = 1;
+}
+
+/** The config, for the one command that needs it without opening the database. */
+function config(): Config {
+  try {
+    return loadConfig(defaultConfigPath(serverRoot));
+  } catch (error) {
+    if (error instanceof ConfigError) fail(error.message);
+    fail(String((error as Error)?.stack ?? error));
+  }
+}
+
+/**
+ * `s4m update` — install the latest release over this one.
+ *
+ * Three shapes, and the default is the cautious one: with no flags it reports
+ * what is available and stops, because an update restarts the server and that
+ * is not something to do as a side effect of asking a question. `--check` is
+ * the same report with an exit code a script can branch on; `--yes` is the one
+ * that actually installs.
+ */
+async function update(_positional: string[], options: Options): Promise<void> {
+  try {
+    assertComparable();
+    const release = await latestRelease();
+
+    out(`Installed: ${VERSION}`);
+    out(`Latest:    ${release.version}${release.notesUrl ? `  ${release.notesUrl}` : ''}`);
+
+    if (!isNewer(release)) {
+      out('');
+      out('Already up to date.');
+      return;
+    }
+
+    if (options.check) {
+      // 10 rather than 1: a script needs to tell "an update is waiting" apart
+      // from "the check itself failed", and 1 is what every other failure here
+      // exits with.
+      out('');
+      out('An update is available. Install it with: s4m update --yes');
+      process.exitCode = 10;
+      return;
+    }
+
+    if (!options.yes) {
+      out('');
+      out('This replaces the built server and UI in place and needs a restart to');
+      out('take effect. config.json, the database and downloads are not touched,');
+      out('and the build being replaced is kept for `s4m rollback`.');
+      out('');
+      out('Re-run with --yes to install, or --yes --restart to install and restart.');
+      return;
+    }
+
+    out('');
+    const result = await installRelease(release, installRoot, config(), out);
+    out('');
+    out(`Updated ${result.from} -> ${result.to}.`);
+
+    if (!options.restart) {
+      out(`Restart to load it: systemctl restart ${SERVICE_UNIT}`);
+      return;
+    }
+
+    const restarted = restartService(SERVICE_UNIT);
+    if (restarted.ok) {
+      out(`Restarted ${SERVICE_UNIT}.`);
+      return;
+    }
+    // Not a failure of the update — the new build is installed either way, so
+    // say that plainly rather than leaving the impression it has to be redone.
+    out('');
+    out(`The update is installed, but restarting ${SERVICE_UNIT} failed: ${restarted.detail}`);
+    out(`Restart it by hand, or run \`s4m rollback\` to go back to ${result.from}.`);
+    process.exitCode = 1;
+  } catch (error) {
+    if (error instanceof UpdateError) {
+      reportFailure(error.message);
+      return;
+    }
+    throw error;
+  }
+}
+
+/** `s4m rollback` — put back the build the last update replaced. */
+function rollbackCommand(_positional: string[], options: Options): void {
+  try {
+    if (!options.yes) {
+      out('This restores the build replaced by the last `s4m update`, and needs a');
+      out('restart to take effect. If that update ran a database migration, the');
+      out('older build will refuse to open the database until the pre-update');
+      out('snapshot in the backups directory is restored too — see docs/RELEASING.md.');
+      out('');
+      out('Re-run with --yes to confirm.');
+      return;
+    }
+
+    const version = rollback(installRoot, out);
+    out('');
+    out(`Rolled back to ${version}.`);
+    out(`Restart to load it: systemctl restart ${SERVICE_UNIT}`);
+  } catch (error) {
+    if (error instanceof UpdateError) {
+      reportFailure(error.message);
+      return;
+    }
+    throw error;
+  }
+}
+
 // --------------------------------------------------------------- dispatch --
 
 interface Command {
@@ -340,6 +485,18 @@ const COMMANDS: Record<string, Command> = {
     usage: 's4m import <file.tachibk> <username> [--dry-run]',
     run: importBackup,
   },
+  version: {
+    usage: 's4m version',
+    run: () => out(VERSION),
+  },
+  update: {
+    usage: 's4m update [--check] [--yes] [--restart]',
+    run: update,
+  },
+  rollback: {
+    usage: 's4m rollback [--yes]',
+    run: rollbackCommand,
+  },
   users: {
     usage: 's4m users add|passwd|remove|list',
     run: (positional, options) => {
@@ -363,13 +520,21 @@ const COMMANDS: Record<string, Command> = {
  * regardless would read a flag as a username and then quietly drop it.
  */
 function parseArgs(argv: string[]): { options: Options; positional: string[] } {
-  const options: Options = { yes: false, passwordStdin: false, dryRun: false };
+  const options: Options = {
+    yes: false,
+    passwordStdin: false,
+    dryRun: false,
+    check: false,
+    restart: false,
+  };
   const positional: string[] = [];
 
   for (const arg of argv) {
     if (arg === '--yes' || arg === '-y') options.yes = true;
     else if (arg === '--password-stdin') options.passwordStdin = true;
     else if (arg === '--dry-run') options.dryRun = true;
+    else if (arg === '--check') options.check = true;
+    else if (arg === '--restart') options.restart = true;
     // A password on the command line is a password in `ps` and in the shell
     // history, so there is deliberately no flag that takes one.
     else if (arg.startsWith('-')) fail(`Unknown option: ${arg}`);
@@ -380,9 +545,16 @@ function parseArgs(argv: string[]): { options: Options; positional: string[] } {
 }
 
 function help(): void {
-  out('Stremio4Manga — server administration');
+  out(`Stremio4Manga ${VERSION} — server administration`);
   out('');
   usersHelp();
+  out('');
+  out('Releases:');
+  out(`  ${COMMANDS.update.usage}`);
+  out('  Installs the latest release over this one. Reports and stops without --yes.');
+  out(`  ${COMMANDS.rollback.usage}`);
+  out('  Restores the build the last update replaced.');
+  out(`  ${COMMANDS.version.usage}`);
   out('');
   out('Migration:');
   out(`  ${COMMANDS.import.usage}`);

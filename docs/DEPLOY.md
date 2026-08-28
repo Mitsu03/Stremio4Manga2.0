@@ -366,6 +366,12 @@ systemctl restart stremio4manga                   # after editing config.json
 The config is read once at boot, so every change to it needs a restart. Accounts
 are not: adding, changing and removing one takes effect on the next request.
 
+Moving to a newer release is `sudo s4m update --check` to see whether there is
+one and `sudo s4m update --yes --restart` to take it. It replaces the built
+server and UI and nothing else — the config, the database and the downloads are
+untouched, and the build it replaced is kept for `sudo s4m rollback`.
+[RELEASING.md](RELEASING.md) has the rest, including how to run it on a timer.
+
 On Windows the equivalents are **Ver log** in the tray, and
 `server.out.log` / `server.err.log` in the data directory — which is where a
 crash that happens before the logger starts lands, and nowhere else.
