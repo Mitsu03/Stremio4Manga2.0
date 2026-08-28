@@ -323,6 +323,10 @@ export const PT: Record<string, string> = {
   // — One title, every source —
   'Every source': 'Todas as fontes',
   'Search every installed source': 'Procurar em todas as fontes instaladas',
+  // The switch names the setting; the two sentences are its tooltip, one per side.
+  'Wait for slow sources': 'Esperar pelas fontes lentas',
+  'Slow sources are waited for. Searches take longer and find more.': 'Espera-se pelas fontes lentas. As pesquisas demoram mais e encontram mais.',
+  'Slow sources are skipped. Searches are quicker and may miss some.': 'As fontes lentas são ignoradas. As pesquisas são mais rápidas e podem falhar algumas.',
   'Search only the chosen source': 'Procurar só na fonte escolhida',
   'Results from every source': 'Resultados de todas as fontes',
   '{done} of {total} sources asked': '{done} de {total} fontes perguntadas',

@@ -1047,18 +1047,25 @@ function FindOnSource({ mangaId, title, eyebrow, onPick, onCancel, onUseOwnSourc
         <div className="source-picker-controls">
           {onUseOwnSource && <button type="button" className="button quiet" onClick={onUseOwnSource.onUse}>{t('Use {source}', { source: onUseOwnSource.name })}</button>}
           {/* Always here, not only when a tail is left to sweep: it governs every search this panel
-              runs, and the one that is always available is "Search again". */}
+              runs, and the one that is always available is "Search again".
+
+              A switch rather than a button, and the label names the setting instead of reporting the
+              state: what the reader is choosing does not change when they click, only which way it is
+              set, and a control whose words swap on click reads as two buttons rather than one mode.
+              The state lives in the knob, the fill and the sand in the glass; the consequence of each
+              side lives in the tooltip, where a sentence belongs. */}
           <button
             type="button"
-            className={`button quiet wait-longer${waitLonger ? ' active' : ''}`}
+            className={`patience-switch${waitLonger ? ' active' : ''}`}
             onClick={toggleWaitLonger}
             aria-pressed={waitLonger}
             title={waitLonger
               ? t('Slow sources are waited for. Searches take longer and find more.')
               : t('Slow sources are skipped. Searches are quicker and may miss some.')}
           >
+            <span className="patience-track" aria-hidden="true" />
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10M7 21h10" /><path d="M8 3v4l4 5 4-5V3" /><path d="M8 21v-4l4-5 4 5v4" /></svg>
-            <span>{waitLonger ? t('Waiting for slow sources') : t('Skipping slow sources')}</span>
+            <span>{t('Wait for slow sources')}</span>
           </button>
           {!finding && <button type="button" className="button quiet" onClick={() => startSearch(searchedAll ? searchSources : topSources, false, searchedAll ? 'all' : 'top')}>{t('Search again')}</button>}
           {onCancel && (
