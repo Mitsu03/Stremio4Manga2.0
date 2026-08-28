@@ -16,7 +16,7 @@
  * Exits non-zero on the first failed assertion, naming what was expected.
  */
 import { spawn, spawnSync } from 'node:child_process';
-import { mkdtempSync, rmSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -188,7 +188,86 @@ function teardown() {
 
 // ------------------------------------------------------------------ checks --
 
+/**
+ * The generated source catalogue, checked before a server is even started.
+ *
+ * `sources.themed.json` is written by a script that reads somebody else's
+ * repository, so a bad upstream parse arrives here as data rather than as a
+ * crash — and the failure it causes is silent: sources that install and then
+ * answer nothing. These are the invariants that were actually violated the last
+ * time that happened, which is the only reason each one is here.
+ */
+function checkCatalogueData() {
+  section('Generated source catalogue');
+  const themed = JSON.parse(readFileSync(join(serverDir, 'sources.themed.json'), 'utf8')).extensions;
+
+  check('the themed catalogue is not empty', themed.length > 0, `${themed.length} rows`);
+
+  // Ids are written onto manga rows, so a duplicate silently repoints a library.
+  const ids = themed.map((entry) => entry.id);
+  const duplicates = ids.filter((id, index) => ids.indexOf(id) !== index);
+  check('every source id is unique', duplicates.length === 0, duplicates.join(', '));
+
+  const incomplete = themed.filter((entry) => !entry.id || !entry.pkgName || !entry.baseUrl);
+  check(
+    'every row has an id, a package name and a base URL',
+    incomplete.length === 0,
+    incomplete.map((entry) => entry.pkgName ?? '(nameless)').join(', '),
+  );
+
+  // A retired row keeps its id reserved but has to say why, or nobody can tell a
+  // deliberate retirement from a row that lost its fields.
+  const mute = themed.filter((entry) => 'retired' in entry && !entry.retired);
+  check(
+    'every retired source gives a reason',
+    mute.length === 0,
+    mute.map((entry) => entry.pkgName).join(', '),
+  );
+
+  // A config key no engine reads yet is carried on purpose — it is how a value
+  // survives until an engine gains a use for it — but a *misspelt* key is
+  // indistinguishable from that unless the intended set is written down.
+  const KNOWN = new Set([
+    'mangaPath',
+    'listPath',
+    'searchMode',
+    'variant',
+    'chapterSource',
+    'chapterMode',
+    'filterNonMangaItems',
+    'hasProjectPage',
+    'pageSelector',
+    'selectors',
+    'dateFormat',
+    'dateLocale',
+    'minIntervalMs',
+    'omitSort',
+    'listingMode',
+    'genres',
+    'headers',
+    'usesCloudflare',
+  ]);
+  const strange = [
+    ...new Set(
+      themed.flatMap((entry) => Object.keys(entry.config ?? {})).filter((key) => !KNOWN.has(key)),
+    ),
+  ];
+  check(
+    'every config key is one the generator meant to emit',
+    strange.length === 0,
+    strange.join(', '),
+  );
+
+  // If nothing carries an archive path, the generator has stopped reading the
+  // Kotlin and every site that renames its archive is back to a 404 per request
+  // — which is the failure this data was added to fix, and it looks like
+  // success from everywhere else.
+  const withPath = themed.filter((entry) => entry.config?.mangaPath).length;
+  check('sites that rename their archive carry a path', withPath > 0, `${withPath} rows`);
+}
+
 async function run() {
+  checkCatalogueData();
   setup();
 
   section('Server and accounts');

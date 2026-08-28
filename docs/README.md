@@ -155,7 +155,9 @@ cannot be connected yet, rather than failing the whole query.
 
 ## Sources
 
-Six sites ship built in:
+311 sites ship built in, across 13 languages. They come in two kinds.
+
+**Six are written out by hand**, because each is its own thing:
 
 | | | |
 |---|---|---|
@@ -166,22 +168,61 @@ Six sites ship built in:
 | Asura Scans | `asurascans` | needs FlareSolverr |
 | Rizz Fables | `rizzfables` | |
 
-Three things about them are different from version 1, and all three are
+**The other 305 are data.** Most of the scanlation web is a handful of
+WordPress themes wearing different skins, so a site on a theme this build
+implements does not need code — it needs a row. `server/sources.themed.json`
+holds them: 186 on Madara and 119 on MangaThemesia, the two engines under
+`server/src/sources/themes/`.
+
+A row is not just the site's address. Almost every install differs from its
+theme somewhere — a renamed archive path, a moved status row, dates written in
+Turkish — so each row also carries a `config` describing those differences,
+read out of the upstream extension's own source by `tools/sync-keiyoushi.mjs`.
+248 of the 305 need one. Leaving them out is what once made two thirds of these
+sources return nothing at all; see the note on defaults below.
+
+Several things here are different from version 1, and all of them are
 deliberate:
 
-- **They are native TypeScript, not extensions.** Each is a module in
-  `server/src/sources/sites/` compiled into the bundle. Nothing is downloaded,
-  nothing is loaded at runtime, there is no dex and no embedded browser.
-- **The catalogue is the server's own.** `server/catalog.json` is the index —
-  it replaces the keiyoushi APK repository the old server fetched. "Installing"
-  a source is one row in `source_state`, and it is per account, so two people
-  sharing a server do not have to share a taste in scanlation sites.
-- **Adding a site means adding a file.** Write a module in
-  `server/src/sources/sites/` that exports a `SourceDefinition` (see
+- **Nothing is downloaded or loaded at runtime.** Version 1 fetched Android
+  APKs from the keiyoushi repository and loaded dex behind an embedded browser.
+  A source is now either a compiled-in module or a row of data, `import` is the
+  only loader, and there is nothing to update while the server runs.
+- **The catalogue is the server's own.** `server/catalog.json` and
+  `server/sources.themed.json` are the index. "Installing" a source is one row
+  in `source_state`, per account, so two people sharing a server do not have to
+  share a taste in scanlation sites.
+- **Adding a bespoke site means adding a file.** Write a module in
+  `server/src/sources/sites/` exporting a `SourceDefinition` (see
   `server/src/sources/types.ts`), register it in
   `server/src/sources/registry.ts`, and add its entry to `server/catalog.json`.
-  Source ids are decimal strings, stable forever — they are stored on every
-  manga row and in saved searches, so never reuse or renumber one.
+- **Adding a themed site means adding a theme.** Implement the engine under
+  `server/src/sources/themes/`, add its name to `SUPPORTED` in
+  `tools/sync-keiyoushi.mjs`, and re-run the script — every upstream extension
+  on that theme arrives at once. 66 themes exist upstream and this build has
+  two, so this is where the remaining coverage is.
+- **Source ids are permanent.** Decimal strings, stored on every manga row and
+  in saved searches. Never reuse or renumber one. A site that dies keeps its row
+  and its id, marked `retired` with the reason, and is simply not built — 43 are
+  in that state, and they cost nothing per search.
+
+### Corrections, and why defaults are dangerous here
+
+`server/sources.overrides.json` holds fixes checked against the live site and
+merged over whatever upstream says. It exists because upstream is not always
+current: a site moves its archive or its domain and its extension is not updated
+for months, and a source that 404s on every request is worse than one nobody
+offered. Twenty-two sites are corrected there, each carrying the date it was
+checked — re-check before trusting an old entry.
+
+One trap is worth naming, because it once cost this build two thirds of its
+MangaThemesia sources. An upstream extension only declares what it *overrides*,
+so reading a theme's defaults off a sample of extensions shows you precisely the
+sites that disagree with the default. The most common override gets mistaken for
+the default; every site relying on the real one then asks for a path that does
+not exist, and they all fail identically — which reads as the integration being
+broken rather than as one wrong constant. Take defaults from the theme, never
+from its subclasses.
 
 The server is polite to these sites on purpose: one request at a time per host,
 spaced out with jitter, with a ceiling on concurrent hosts and a circuit

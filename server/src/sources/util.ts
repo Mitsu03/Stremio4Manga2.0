@@ -75,6 +75,113 @@ export function parseDate(text: string | undefined | null): number {
   return Number.isNaN(parsed) ? 0 : parsed;
 }
 
+/**
+ * Month name → 1-based number for a locale, both the full and the short form.
+ *
+ * Built from `Intl` rather than a table, because the table would be sixty
+ * languages long and wrong the first time a site changed locale. Lowercased and
+ * stripped of the trailing dot that short forms carry in several languages.
+ */
+const monthNames = new Map<string, Map<string, number>>();
+function monthsFor(locale: string): Map<string, number> {
+  const cached = monthNames.get(locale);
+  if (cached) return cached;
+
+  const table = new Map<string, number>();
+  for (const width of ['long', 'short'] as const) {
+    let format: Intl.DateTimeFormat;
+    try {
+      format = new Intl.DateTimeFormat(locale, {
+        month: width,
+        timeZone: 'UTC',
+      });
+    } catch {
+      // An unknown tag is a bad row upstream, not a reason to fail the source.
+      continue;
+    }
+    for (let month = 0; month < 12; month += 1) {
+      const name = format
+        .format(Date.UTC(2020, month, 15))
+        .toLowerCase()
+        .replace(/\.$/, '')
+        .trim();
+      // Several locales render months as digits, which would match anything.
+      if (name !== '' && !/^\d+$/.test(name)) table.set(name, month + 1);
+    }
+  }
+  monthNames.set(locale, table);
+  return table;
+}
+
+/**
+ * A chapter date read the way the site writes it.
+ *
+ * `Date.parse` understands English and ISO and nothing else, so a Turkish or
+ * Thai month name silently became 0 — "no date" — on every chapter of the 147
+ * sources that declare a non-English locale. Two things are needed and both
+ * come from the extension: the locale, to know the month names, and the
+ * pattern, to settle `03/04/2024`, which is two different days depending on
+ * whether the site writes `dd/MM` or `MM/dd` and cannot be told from the value.
+ *
+ * Falls back to `parseDate` whenever the pattern does not fit, so a wrong
+ * format degrades to the previous behaviour rather than to a wrong date.
+ */
+export function parseDateWith(
+  text: string | undefined | null,
+  pattern: string | undefined,
+  locale: string | undefined,
+): number {
+  const value = clean(text);
+  if (value === '') return 0;
+  if (pattern === undefined || pattern === '') return parseDate(value);
+
+  // Relative dates ignore the pattern: a site writes those in words whatever
+  // its absolute format is.
+  if (/\d+\s*\w+\s*ago/i.test(value) || /^(just now|today|yesterday)$/i.test(value)) {
+    return parseDate(value);
+  }
+
+  const lower = value.toLowerCase();
+
+  // A month written as a word. Longest name first, so "march" cannot win over a
+  // locale whose shorter month name is a prefix of it.
+  const named = [...monthsFor(locale ?? 'en')].sort((a, b) => b[0].length - a[0].length);
+  for (const [name, month] of named) {
+    if (name.length < 3 || !lower.includes(name)) continue;
+    const numbers = [...lower.replace(name, ' ').matchAll(/\d+/g)].map((m) => Number(m[0]));
+    const year = numbers.find((n) => n > 31);
+    const day = numbers.find((n) => n <= 31);
+    if (year === undefined || day === undefined) continue;
+    return Date.UTC(year, month - 1, day);
+  }
+
+  // All-numeric: the pattern says which field is which.
+  const numbers = [...value.matchAll(/\d+/g)].map((m) => Number(m[0]));
+  const order = [...pattern.matchAll(/([dMy])\1*/g)].map((m) => m[1]);
+  if (numbers.length >= 3 && order.length >= 3) {
+    const at = (field: string): number | undefined => {
+      const index = order.indexOf(field);
+      return index === -1 ? undefined : numbers[index];
+    };
+    const day = at('d');
+    const month = at('M');
+    const year = at('y');
+    if (
+      day !== undefined &&
+      month !== undefined &&
+      year !== undefined &&
+      month >= 1 &&
+      month <= 12 &&
+      day >= 1 &&
+      day <= 31
+    ) {
+      return Date.UTC(year < 100 ? 2000 + year : year, month - 1, day);
+    }
+  }
+
+  return parseDate(value);
+}
+
 const STATUS_WORDS: [RegExp, MangaStatus][] = [
   [/hiatus|on hold|paused/i, 'ON_HIATUS'],
   [/cancel|dropped|abandon/i, 'CANCELLED'],

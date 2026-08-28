@@ -36,6 +36,31 @@ interface ThemedEntry {
   id: string;
   contentWarning: 'SAFE' | 'MIXED' | 'NSFW';
   versionName: string;
+  /**
+   * How this site differs from its theme's defaults, read off the extension's
+   * own Kotlin by `tools/sync-keiyoushi.mjs`.
+   *
+   * Absent only for a site that overrides nothing — 30 of 315 upstream, which
+   * is why leaving this out was never the harmless simplification it looked
+   * like. The fields are a subset of each engine's own config type; a key the
+   * engine does not know is ignored rather than rejected, so the generator can
+   * carry a value across before the engine has a use for it.
+   */
+  config?: Record<string, unknown>;
+  /**
+   * How many *functions* the upstream extension overrode. Those are logic, not
+   * data, so none of them came across; the count is kept so a source that is
+   * only approximately right can say so instead of looking exact.
+   */
+  unportedOverrides?: number;
+  /**
+   * Why this site is gone, when it has been checked and found gone.
+   *
+   * The row stays — its id is on somebody's manga rows and must never be handed
+   * to a second site — but the source is not built, so a dead host stops costing
+   * a slot and a timeout in every sweep.
+   */
+  retired?: string;
 }
 
 import { definition as mangadex } from './sites/mangadex.js';
@@ -51,21 +76,35 @@ import { definition as rizzfables } from './sites/rizzfables.js';
  * Most of what the old server installed was not bespoke code: a keiyoushi
  * extension is very often one WordPress theme pointed at one domain, which is
  * why `sites/mangadistrict.ts` and `sites/rizzfables.ts` are twenty lines each
- * around an engine that does the work. `sources.themed.json` carries the same
- * four values for every such site a v1 install had, so they cost a row of data
- * instead of a file of code.
+ * around an engine that does the work. `sources.themed.json` carries one row per
+ * such site, so they cost data instead of a file of code.
+ *
+ * A row is not only the site's identity. Nearly every install differs from its
+ * theme somewhere — a renamed URL path, a moved selector, dates in another
+ * language — and each row carries those differences in `config`, spread into the
+ * engine below. Leaving them out was not the harmless simplification it looked
+ * like: it is what made two thirds of these sources return nothing.
  *
  * A theme this build does not have is skipped rather than guessed at: the entry
  * disappears from the catalogue, which is the honest outcome — better than a
- * source that installs and then fails on every search.
+ * source that installs and then fails on every search. A site checked and found
+ * gone is `retired` for the same reason, and keeps its row so its id stays
+ * reserved.
  */
 const THEMED: SourceDefinition[] = (themed.extensions as ThemedEntry[]).flatMap((entry) => {
+  // Checked and found gone. Keeping the row keeps the id reserved; building the
+  // source would only spend a request per sweep to rediscover that.
+  if (entry.retired !== undefined) return [];
+
   const shared = {
     id: entry.id,
     name: entry.name,
     lang: entry.lang,
     baseUrl: entry.baseUrl,
     contentWarning: entry.contentWarning,
+    // Spread last so a site's own values win over the identity fields only if
+    // they collide, which they cannot: the generator never emits those keys.
+    ...entry.config,
   };
   const build =
     entry.theme === 'madara'
@@ -258,7 +297,11 @@ export function install(db: Db, userId: string, pkgName: string): void {
  * person knows about this source" once they turn it back on.
  */
 export function uninstall(db: Db, userId: string, pkgName: string): void {
-  db.run('UPDATE source_state SET installed = 0 WHERE user_id = ? AND pkg_name = ?', userId, pkgName);
+  db.run(
+    'UPDATE source_state SET installed = 0 WHERE user_id = ? AND pkg_name = ?',
+    userId,
+    pkgName,
+  );
 }
 
 // -------------------------------------------------------- filter transport --
@@ -361,10 +404,7 @@ export function sanitizeFilterChanges(
 }
 
 /** Both halves in one call, for the resolvers that only ever need this. */
-export function prepareFilters(
-  id: SourceId,
-  changes: FilterChange[] | undefined,
-): FilterChange[] {
+export function prepareFilters(id: SourceId, changes: FilterChange[] | undefined): FilterChange[] {
   const source = getSource(id);
   return source ? sanitizeFilterChanges(source.getFilters(), changes) : [];
 }
