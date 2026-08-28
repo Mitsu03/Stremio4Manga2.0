@@ -341,6 +341,49 @@ export function seedDefaults(db: Db, userId: string): number {
   return SEEDED.length;
 }
 
+/**
+ * What it would take to bring an account back to the seed a new one gets.
+ *
+ * Seeding is one-shot by design — the guard in `seedDefaults` is "no rows at
+ * all" — which is right for a server that must never override somebody's
+ * choices at boot, and useless to the person who wants their own account moved
+ * to a default that changed after they created it. This is that move, computed
+ * rather than applied, because turning sources off is not something to do as a
+ * side effect of asking what would happen.
+ *
+ * Both directions matter. An account seeded before the catalogue narrowed has
+ * sources to switch *off*; an account that predates seeding entirely, or one
+ * that cleared everything, has sources to switch on.
+ */
+export interface SeedDiff {
+  install: string[];
+  uninstall: string[];
+}
+
+export function diffAgainstSeed(db: Db, userId: string): SeedDiff {
+  const installed = installedPkgNames(db, userId);
+  const seeded = new Set(SEEDED.map((definition) => definition.pkgName));
+  return {
+    install: SEEDED.filter((definition) => !installed.has(definition.pkgName)).map(
+      (definition) => definition.pkgName,
+    ),
+    uninstall: DEFINITIONS.filter(
+      (definition) => !seeded.has(definition.pkgName) && installed.has(definition.pkgName),
+    ).map((definition) => definition.pkgName),
+  };
+}
+
+/**
+ * One transaction, so an interrupted reseed leaves the account as it was rather
+ * than half-way between two defaults.
+ */
+export function applySeedDiff(db: Db, userId: string, diff: SeedDiff): void {
+  db.transaction(() => {
+    for (const pkgName of diff.install) install(db, userId, pkgName);
+    for (const pkgName of diff.uninstall) uninstall(db, userId, pkgName);
+  });
+}
+
 export function install(db: Db, userId: string, pkgName: string): void {
   db.run(
     `INSERT INTO source_state (user_id, pkg_name, installed, installed_at)

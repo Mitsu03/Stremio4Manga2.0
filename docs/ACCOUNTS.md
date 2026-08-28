@@ -19,6 +19,7 @@ in the [README](README.md).
 node server/dist/cli.js users add    <username> [--password-stdin]
 node server/dist/cli.js users passwd <username> [--password-stdin]
 node server/dist/cli.js users remove <username> [--yes]
+node server/dist/cli.js users reseed <username> [--yes]
 node server/dist/cli.js users list
 ```
 
@@ -153,7 +154,8 @@ rather than none.
 Seeding is guarded on "this account has no `source_state` rows at all", never on
 "nothing is installed", so uninstalling everything is a choice the server never
 overrides. Accounts created before this narrowed keep all 405: they have rows,
-so the seed does not touch them.
+so the seed does not touch them — `users reseed` below is how one of them moves
+to the current default, if its owner wants to.
 
 ## Changing a password
 
@@ -174,6 +176,34 @@ Expect to sign in again on the phone; that is the feature working.
 security question — each of those would be an anonymous path into an account,
 which is precisely what this design does not have. A forgotten password is fixed
 by whoever runs the server.
+
+## Moving an account to the current default sources
+
+```bash
+node server/dist/cli.js users reseed mitsu          # explains, changes nothing
+node server/dist/cli.js users reseed mitsu --yes    # actually applies it
+```
+
+Seeding happens exactly once, guarded on "this account has no `source_state`
+rows at all", so the server can never override a choice somebody made. The cost
+of that guarantee is that when the default changes, everybody who came before
+stays on the old one — with no way back that is not several hundred toggles in a
+browser.
+
+`reseed` is that way back, per account rather than as a migration: it installs
+every `en` and `all` source the account is missing and uninstalls everything
+else. Both directions are used — an account seeded before the catalogue narrowed
+has sources to switch off, and an account that predates seeding entirely, or one
+whose sources were all cleared, has sources to switch on.
+
+Without `--yes` it prints what it would do and stops, including how many titles
+in the library come from a source it would switch off. Those titles are not lost
+and neither is their progress — an uninstalled source keeps its rows, and the
+app still draws them — but new chapters stop being fetched until the source is
+switched back on. Everything it uninstalls stays on the Sources page.
+
+Running it on an account that already matches the default says so and changes
+nothing.
 
 ## Removing an account
 
