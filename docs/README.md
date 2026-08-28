@@ -266,6 +266,24 @@ for months, and a source that 404s on every request is worse than one nobody
 offered. Twenty sites are corrected there, each carrying the date it was
 checked — re-check before trusting an old entry.
 
+Seventy more are `retired` in the same file, and those go stale in the direction
+nobody notices. A retirement is a fact about one afternoon: a host refused the
+connection, an archive answered 404, an API had removed its endpoint. Sites come
+back, and nothing here re-checks — the entry simply goes on being
+true-when-written and wrong-now, quietly, because a source that is not built
+cannot fail loudly.
+
+Un-retiring is deliberately cheap, so that re-checking is worth doing: delete
+the entry — or the whole block of them — from `server/sources.overrides.json`
+and re-run `node tools/sync-keiyoushi.mjs`. Ids are untouched by any of it,
+because they live in the catalogue row rather than in the override, so a source
+that comes back comes back to the library rows it always had.
+
+Worth a pass over the dated entries every few months, starting with the ones
+whose reason was an outage rather than a rewrite: `522`, `refused the
+connection` and `origin down` are temporary in a way that `no longer a Keyoapp
+install` is not.
+
 One trap is worth naming, because it once cost this build two thirds of its
 MangaThemesia sources. An upstream extension only declares what it *overrides*,
 so reading a theme's defaults off a sample of extensions shows you precisely the
