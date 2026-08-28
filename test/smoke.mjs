@@ -548,6 +548,30 @@ async function liveChecks(a, b) {
     results[0]?.thumbnailUrl,
   );
 
+  // Page two has to actually be page two. A source whose API takes a `page`
+  // parameter and ignores it answers every request with the first page, and
+  // "load more" fills the grid with the titles already on it — which is what
+  // asuracomic.net did until its listing was moved onto `offset`. The paging
+  // contract is the same for every source, so it is checked on the one this
+  // suite already talks to, and on the popular listing rather than on a search:
+  // a search for one title may well fit on a single page.
+  const listing = (page) =>
+    gql(
+      a,
+      `mutation($s:LongString!){fetchSourceManga(input:{source:$s,type:POPULAR,page:${page}}){hasNextPage mangas{id}}}`,
+      { s: MANGADEX_ID },
+    );
+  const firstPage = await listing(1);
+  const secondPage = await listing(2);
+  const first = firstPage.data?.fetchSourceManga?.mangas ?? [];
+  const second = secondPage.data?.fetchSourceManga?.mangas ?? [];
+  const repeated = second.filter((manga) => first.some((earlier) => earlier.id === manga.id));
+  check(
+    'page two brings titles page one did not',
+    first.length > 0 && second.length > 0 && repeated.length === 0,
+    `${first.length} then ${second.length} results, ${repeated.length} of them repeats`,
+  );
+
   // Not every title on a catalogue has chapters here: a licensed one lists only
   // links to the publisher. Walk the results until one does, rather than
   // asserting on a title whose availability is somebody else's decision.

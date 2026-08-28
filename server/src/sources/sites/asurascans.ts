@@ -8,7 +8,7 @@
  * would return nothing at all — silently — so this talks to the API the site
  * itself uses, which was mapped against the live host:
  *
- *   GET /api/series?page=&search=          → { data: [...], meta: { has_more } }
+ *   GET /api/series?offset=&search=        → { data: [...], meta: { total, has_more } }
  *   GET /api/series/{slug}                 → { series: {...} }
  *   GET /api/series/{slug}/chapters        → { data: [...] }
  *   GET /api/series/{slug}/chapters/{slug} → { data: { chapter: { pages } } }
@@ -29,6 +29,14 @@ import { NoResultsError } from '../types.js';
 import { parseStatus } from '../util.js';
 
 const API = 'https://api.asurascans.com/api';
+/**
+ * What one request off `/api/series` answers with, and the step between pages.
+ *
+ * The endpoint reports `per_page: 20` and holds to it. It is a constant here
+ * rather than read back off the answer because the offset has to be known
+ * before the request that would report it.
+ */
+const PAGE_SIZE = 20;
 const SITE = 'https://asuracomic.net';
 
 interface SeriesSummary {
@@ -89,14 +97,31 @@ function build(deps: SourceDeps): Source {
   const TYPE = ['', 'manga', 'manhwa', 'manhua'];
   const ORDER = ['', 'update', 'bookmarks', 'rating', 'title'];
 
-  async function list(params: URLSearchParams): Promise<MangaPage<SourceManga>> {
+  /**
+   * One page of the catalogue.
+   *
+   * `page` is not a parameter this API has: it accepts one and ignores it, and
+   * answers every request with the first twenty series. Paging is by `offset`,
+   * which is what the site's own app sends. Asking for `page=2` therefore
+   * returned page one again, and the grid filled with the titles already on it.
+   *
+   * `total` is what says whether there is more, and it is checked before
+   * `has_more` because the API drops `has_more` from the last page rather than
+   * setting it false — treating a missing flag as "maybe" is what would add an
+   * empty page to the end of every listing.
+   */
+  async function list(page: number, params: URLSearchParams): Promise<MangaPage<SourceManga>> {
+    const offset = Math.max(0, page - 1) * PAGE_SIZE;
+    params.set('offset', String(offset));
     const body = await http.json<SeriesList>(`${API}/series?${params.toString()}`);
     const data = body.data ?? [];
+    const total = body.meta?.total;
     return {
       items: data.map(toManga),
-      // `has_more` is authoritative; a full page is not, because the API caps
-      // per_page below what it was asked for.
-      hasNextPage: body.meta?.has_more ?? data.length > 0,
+      hasNextPage:
+        typeof total === 'number'
+          ? offset + data.length < total
+          : (body.meta?.has_more ?? data.length > 0),
     };
   }
 
@@ -108,11 +133,11 @@ function build(deps: SourceDeps): Source {
     supportsLatest: true,
     contentWarning: 'SAFE',
 
-    getPopular: (page) => list(new URLSearchParams({ page: String(page), order: 'bookmarks' })),
-    getLatest: (page) => list(new URLSearchParams({ page: String(page), order: 'update' })),
+    getPopular: (page) => list(page, new URLSearchParams({ order: 'bookmarks' })),
+    getLatest: (page) => list(page, new URLSearchParams({ order: 'update' })),
 
     async search(query, page, changes = []) {
-      const params = new URLSearchParams({ page: String(page) });
+      const params = new URLSearchParams();
       if (query) params.set('search', query);
       for (const change of changes) {
         const spec = filters[change.position];
@@ -121,7 +146,7 @@ function build(deps: SourceDeps): Source {
         if (spec.name === 'Type') params.set('type', TYPE[change.selectState] ?? '');
         if (spec.name === 'Order') params.set('order', ORDER[change.selectState] ?? '');
       }
-      return list(params);
+      return list(page, params);
     },
 
     getFilters: () => filters,
