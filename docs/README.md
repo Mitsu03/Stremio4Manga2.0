@@ -155,7 +155,7 @@ cannot be connected yet, rather than failing the whole query.
 
 ## Sources
 
-308 sites ship built in, across 13 languages. They come in two kinds.
+358 sites ship built in, across 13 languages. They come in two kinds.
 
 **Six are written out by hand**, because each is its own thing:
 
@@ -168,18 +168,33 @@ cannot be connected yet, rather than failing the whole query.
 | Asura Scans | `asurascans` | needs FlareSolverr |
 | Rizz Fables | `rizzfables` | |
 
-**The other 302 are data.** Most of the scanlation web is a handful of
-WordPress themes wearing different skins, so a site on a theme this build
-implements does not need code — it needs a row. `server/sources.themed.json`
-holds them: 184 on Madara and 118 on MangaThemesia, the two engines under
-`server/src/sources/themes/`.
+**The other 352 are data.** Most of the scanlation web is a handful of site
+engines wearing different skins, so a site on a theme this build implements does
+not need code — it needs a row. `server/sources.themed.json` holds them, and
+`server/src/sources/themes/` holds the six engines they run on:
+
+| engine | sites | what it is |
+|---|---|---|
+| Madara | 185 | WordPress, `wp-manga`. The largest single theme upstream. |
+| MangaThemesia | 118 | WordPress, still widely called WPMangaStream. |
+| Keyoapp | 15 | Tailwind front end; covers are CSS, pages are ids resolved against a CDN host printed in a script. |
+| Iken | 12 | Not a scraper: a Next.js site over a JSON API on an `api.` sibling host. |
+| MangaHub | 11 | Eleven front ends over one GraphQL API, keyed by an access cookie the site issues. |
+| MangaCatalog | 11 | One franchise per host. The catalogue is a list the extension names, so browsing costs no request at all. |
 
 A row is not just the site's address. Almost every install differs from its
 theme somewhere — a renamed archive path, a moved status row, dates written in
 Turkish — so each row also carries a `config` describing those differences,
 read out of the upstream extension's own source by `tools/sync-keiyoushi.mjs`.
-246 of the 302 need one. Leaving them out is what once made two thirds of these
+284 of the 352 need one. Leaving them out is what once made two thirds of these
 sources return nothing at all; see the note on defaults below.
+
+What a `config` carries depends on the engine, and the difference is
+instructive: a Madara row moves selectors and a URL segment, because everything
+about that theme is markup; a MangaHub row carries one word — the enum naming
+which catalogue the shared API should answer from — and a MangaCatalog row
+carries the site's entire list of titles, because on those sites the list is not
+discoverable at all.
 
 Several things here are different from version 1, and all of them are
 deliberate:
@@ -198,12 +213,18 @@ deliberate:
   `server/src/sources/registry.ts`, and add its entry to `server/catalog.json`.
 - **Adding a themed site means adding a theme.** Implement the engine under
   `server/src/sources/themes/`, add its name to `SUPPORTED` in
-  `tools/sync-keiyoushi.mjs`, and re-run the script — every upstream extension
-  on that theme arrives at once. 66 themes exist upstream and this build has
-  two, so this is where the remaining coverage is.
+  `tools/sync-keiyoushi.mjs`, add a case to the `switch` in
+  `server/src/sources/registry.ts`, and re-run the script — every upstream
+  extension on that theme arrives at once. 66 themes exist upstream and this
+  build has six, so this is still where the remaining coverage is.
+
+  Raw extension counts are the wrong way to choose the next one. `madaralegacy`
+  is the largest theme left at 105 extensions but only 35 of them are English,
+  and `zeistmanga` has 35 extensions of which *one* is; Keyoapp had 19 of which
+  18 were. Count what the catalogue will actually offer, not what upstream ships.
 - **Source ids are permanent.** Decimal strings, stored on every manga row and
   in saved searches. Never reuse or renumber one. A site that dies keeps its row
-  and its id, marked `retired` with the reason, and is simply not built — 46 are
+  and its id, marked `retired` with the reason, and is simply not built — 52 are
   in that state, and they cost nothing per search.
 
 ### Corrections, and why defaults are dangerous here

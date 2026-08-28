@@ -172,6 +172,20 @@ class CookieJar {
   put(host: string, name: string, value: string): void {
     this.store(host, [`${name}=${value}`]);
   }
+
+  /**
+   * One cookie's value, for the rare source that has to *read* what a site set
+   * rather than just send it back.
+   *
+   * MangaHub is the case this exists for: the site hands out an `mhub_access`
+   * cookie and its API — on a different host, so the jar would never send it —
+   * wants that same value in an `x-mhub-access` header. Reading it here is the
+   * alternative to letting a source parse `Set-Cookie` itself, which would mean
+   * a second, unshared jar going stale beside this one.
+   */
+  value(host: string, name: string): string | undefined {
+    return this.byHost.get(host)?.get(name);
+  }
 }
 
 // ------------------------------------------------------- global concurrency --
@@ -566,6 +580,14 @@ export function createHttpClient(config: Pick<Config, 'flaresolverr'>): HttpClie
             return JSON.parse(unwrapSolvedBody(raw)) as T;
           } catch {
             throw new Error(`${url} did not answer with JSON`);
+          }
+        },
+
+        cookie(url, name) {
+          try {
+            return jar.value(new URL(url).hostname, name);
+          } catch {
+            return undefined;
           }
         },
 

@@ -246,6 +246,18 @@ function checkCatalogueData() {
     'genres',
     'headers',
     'usesCloudflare',
+    // Iken
+    'apiUrl',
+    'perPage',
+    'sortPagesByFilename',
+    // Keyoapp
+    'popularSelector',
+    'typeSelector',
+    'altNameSelector',
+    // MangaHub — which catalogue this front end serves, as the API's own enum
+    'mangaSource',
+    // MangaCatalog — the titles a single-franchise host carries
+    'series',
   ]);
   const strange = [
     ...new Set(

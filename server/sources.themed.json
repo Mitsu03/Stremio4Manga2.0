@@ -6,6 +6,19 @@
   },
   "extensions": [
     {
+      "pkgName": "en.onemangaco",
+      "name": "1Manga.co",
+      "lang": "en",
+      "theme": "mangahub",
+      "baseUrl": "https://1manga.co",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaSource": "mn03"
+      },
+      "id": "1000000000000000385"
+    },
+    {
       "pkgName": "en.novel24h",
       "name": "24HNovel",
       "lang": "en",
@@ -140,8 +153,8 @@
           "title": ".am-manga-hero__title",
           "description": ".am-manga-summary__text",
           "thumbnail": ".am-manga-hero__cover img",
-          "author": ".am-manga-meta tr:has(td:matchesOwn(Author\\\\(s\\\\))) td:nth-child(2) a",
-          "artist": ".am-manga-meta tr:has(td:matchesOwn(Artist\\\\(s\\\\))) td:nth-child(2) a",
+          "author": ".am-manga-meta tr:has(td:matchesOwn(Author\\(s\\))) td:nth-child(2) a",
+          "artist": ".am-manga-meta tr:has(td:matchesOwn(Artist\\(s\\))) td:nth-child(2) a",
           "genre": ".am-genres-wrap a"
         },
         "dateFormat": "MM/dd/yyyy",
@@ -286,7 +299,9 @@
           "author": ".info-label:contains(المؤلف) + span",
           "artist": ".info-label:contains(الرسام) + span",
           "genre": "div.filter-tags a",
-          "details": "div.legendary-single-page"
+          "details": "div.legendary-single-page",
+          "chapterList": "#chapters-list-container .ch-item",
+          "searchItem": ".listupd .manga-card-v"
         },
         "dateFormat": "yyyy/MM/dd",
         "dateLocale": "ar"
@@ -324,6 +339,24 @@
       "id": "1000000000000000018"
     },
     {
+      "pkgName": "en.artlapsa",
+      "name": "Art Lapsa",
+      "lang": "en",
+      "theme": "keyoapp",
+      "baseUrl": "https://artlapsa.com",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0",
+      "config": {
+        "typeSelector": "[alt=Type]",
+        "selectors": {
+          "status": "[alt=Status]"
+        }
+      },
+      "unportedOverrides": 9,
+      "id": "1000000000000000358",
+      "retired": "upstream rewrote the chapter list and builds the reader from JSON-LD; both are logic rather than data, so no chapter can be read here"
+    },
+    {
       "pkgName": "en.aryascans",
       "name": "Arya Scans",
       "lang": "en",
@@ -351,6 +384,21 @@
       "id": "1000000000000000188"
     },
     {
+      "pkgName": "en.asmotoon",
+      "name": "Asmodeus Scans",
+      "lang": "en",
+      "theme": "keyoapp",
+      "baseUrl": "https://asmotoon.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "popularSelector": "div:contains(Trending) + div .group:not([data-type=novel])",
+        "minIntervalMs": 1667
+      },
+      "unportedOverrides": 8,
+      "id": "1000000000000000360"
+    },
+    {
       "pkgName": "id.astralscans",
       "name": "Astral Scans",
       "lang": "id",
@@ -359,7 +407,10 @@
       "contentWarning": "NSFW",
       "versionName": "1.0.0",
       "config": {
-        "hasProjectPage": true
+        "hasProjectPage": true,
+        "selectors": {
+          "chapterList": "div#kumpulan-bab-area .astral-item, div.eplister li"
+        }
       },
       "unportedOverrides": 4,
       "id": "1000000000000000232"
@@ -409,6 +460,16 @@
       "id": "1000000000000000020"
     },
     {
+      "pkgName": "ar.azora",
+      "name": "Azora",
+      "lang": "ar",
+      "theme": "iken",
+      "baseUrl": "https://azorafly.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "id": "1000000000000000357"
+    },
+    {
       "pkgName": "en.battleinfivesecondsaftermeeting",
       "name": "Battle In 5 Seconds After Meeting",
       "lang": "en",
@@ -445,7 +506,8 @@
           "title": ".lrs-title",
           "description": ".lrs-syn-wrap",
           "thumbnail": "img.lrs-cover",
-          "genre": ".lrs-genre"
+          "genre": ".lrs-genre",
+          "chapterList": "#lrs-native-chapterlist li"
         },
         "dateFormat": "MMMM d, yyyy",
         "dateLocale": "es"
@@ -597,6 +659,9 @@
       "versionName": "1.0.0",
       "config": {
         "chapterSource": "manga-ajax",
+        "selectors": {
+          "chapterList": "li.wp-manga-chapter:not(.premium)"
+        },
         "minIntervalMs": 2000
       },
       "unportedOverrides": 2,
@@ -628,7 +693,9 @@
           "title": ".comic-title-content",
           "description": ".comic-content.mobile",
           "thumbnail": "img[alt=poster]",
-          "genre": "div.hidden div:contains(Genres) + div > a"
+          "genre": "div.hidden div:contains(Genres) + div > a",
+          "chapterList": ".chapter-items",
+          "searchItem": ".grid > a[href*=manga]"
         },
         "dateFormat": "MMMM d yyyy",
         "dateLocale": "en-US",
@@ -898,8 +965,23 @@
       "baseUrl": "https://elftoon.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "selectors": {
+          "chapterList": "#chapterlist li:not(:has(.gem-price-icon))"
+        }
+      },
       "unportedOverrides": 1,
       "id": "1000000000000000034"
+    },
+    {
+      "pkgName": "en.erisscans",
+      "name": "Eris Scans",
+      "lang": "en",
+      "theme": "keyoapp",
+      "baseUrl": "https://erisscans.com",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0",
+      "id": "1000000000000000361"
     },
     {
       "pkgName": "en.ero18x",
@@ -931,6 +1013,16 @@
       },
       "unportedOverrides": 1,
       "id": "1000000000000000194"
+    },
+    {
+      "pkgName": "es.eternalmangas",
+      "name": "EternalMangas",
+      "lang": "es",
+      "theme": "iken",
+      "baseUrl": "https://eternalmangas.org",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0",
+      "id": "1000000000000000410"
     },
     {
       "pkgName": "pt.euphoriascan",
@@ -1162,6 +1254,20 @@
       "id": "1000000000000000043"
     },
     {
+      "pkgName": "en.suryascans",
+      "name": "Genz Toons",
+      "lang": "en",
+      "theme": "keyoapp",
+      "baseUrl": "https://genztoons.org",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "minIntervalMs": 20000
+      },
+      "unportedOverrides": 1,
+      "id": "1000000000000000406"
+    },
+    {
       "pkgName": "pt.ghostscan",
       "name": "Ghost Scan",
       "lang": "pt-BR",
@@ -1284,6 +1390,16 @@
       },
       "unportedOverrides": 1,
       "id": "1000000000000000164"
+    },
+    {
+      "pkgName": "en.grimscans",
+      "name": "Grim Scans",
+      "lang": "en",
+      "theme": "keyoapp",
+      "baseUrl": "https://grimscans.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "id": "1000000000000000362"
     },
     {
       "pkgName": "es.hadesnofansub",
@@ -1494,6 +1610,16 @@
       "id": "1000000000000000180"
     },
     {
+      "pkgName": "en.hijalascans",
+      "name": "Hijala Scans",
+      "lang": "en",
+      "theme": "iken",
+      "baseUrl": "https://en-hijala.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "id": "1000000000000000363"
+    },
+    {
       "pkgName": "fr.histoiredhentai",
       "name": "HistoireDHentai",
       "lang": "fr",
@@ -1507,6 +1633,17 @@
         "dateLocale": "fr"
       },
       "id": "1000000000000000219"
+    },
+    {
+      "pkgName": "en.infernalvoidscans",
+      "name": "Hive Scans",
+      "lang": "en",
+      "theme": "iken",
+      "baseUrl": "https://hivetoons.org",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "unportedOverrides": 2,
+      "id": "1000000000000000364"
     },
     {
       "pkgName": "ar.hizomanga",
@@ -1643,6 +1780,16 @@
       "id": "1000000000000000056"
     },
     {
+      "pkgName": "en.kaizenscan",
+      "name": "Kaizen Scan",
+      "lang": "en",
+      "theme": "keyoapp",
+      "baseUrl": "https://kaizenscan.com",
+      "contentWarning": "NSFW",
+      "versionName": "1.0.0",
+      "id": "1000000000000000365"
+    },
+    {
       "pkgName": "pt.kamisamaexplorer",
       "name": "Kami Sama Explorer",
       "lang": "pt-BR",
@@ -1673,6 +1820,19 @@
       "id": "1000000000000000236"
     },
     {
+      "pkgName": "en.kaynscans",
+      "name": "Kayn Scans",
+      "lang": "en",
+      "theme": "iken",
+      "baseUrl": "https://kaynscan.org",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "sortPagesByFilename": true
+      },
+      "id": "1000000000000000366"
+    },
+    {
       "pkgName": "es.kazokuden",
       "name": "Kazoku Den",
       "lang": "es",
@@ -1685,6 +1845,26 @@
         "variant": "noajax"
       },
       "id": "1000000000000000198"
+    },
+    {
+      "pkgName": "en.kenscans",
+      "name": "Ken Scans",
+      "lang": "en",
+      "theme": "iken",
+      "baseUrl": "https://kencomics.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "id": "1000000000000000367"
+    },
+    {
+      "pkgName": "en.kewnscans",
+      "name": "Kewn Scans",
+      "lang": "en",
+      "theme": "keyoapp",
+      "baseUrl": "https://kewnscans.org",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "id": "1000000000000000368"
     },
     {
       "pkgName": "en.kingofshojo",
@@ -1720,6 +1900,9 @@
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
       "config": {
+        "selectors": {
+          "chapterList": "ul li:has(div.chbox:not(:has(> span.mcl-price-num))):has(div.eph-num)"
+        },
         "dateFormat": "MMMM d, yyyy",
         "dateLocale": "en"
       },
@@ -2147,6 +2330,17 @@
       "id": "1000000000000000331"
     },
     {
+      "pkgName": "en.lunatoons",
+      "name": "Luna Toons",
+      "lang": "en",
+      "theme": "keyoapp",
+      "baseUrl": "https://lunatoons.org",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0",
+      "unportedOverrides": 1,
+      "id": "1000000000000000369"
+    },
+    {
       "pkgName": "id.Luvyaa",
       "name": "Luvyaa",
       "lang": "id",
@@ -2195,6 +2389,21 @@
       "config": {
         "mangaPath": "title"
       }
+    },
+    {
+      "pkgName": "en.magusmanga",
+      "name": "Magus Manga",
+      "lang": "en",
+      "theme": "iken",
+      "baseUrl": "https://magustoon.org",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "sortPagesByFilename": true,
+        "minIntervalMs": 60000
+      },
+      "unportedOverrides": 1,
+      "id": "1000000000000000370"
     },
     {
       "pkgName": "en.mahouirexnohentaikarte",
@@ -2332,6 +2541,7 @@
       "versionName": "1.0.0",
       "config": {
         "selectors": {
+          "chapterList": ".listing-chapters-wrap .chapter-box",
           "chapterDate": ".chapter-date"
         },
         "dateFormat": "dd 'de' MMMM 'de' yyyy",
@@ -2441,7 +2651,8 @@
       "config": {
         "mangaPath": "lista",
         "selectors": {
-          "description": "b:contains(Sinopsis) + span"
+          "description": "b:contains(Sinopsis) + span",
+          "chapterList": "#chapterlist ul.clstyle li:has(.dt a)"
         },
         "dateFormat": "yyyy-MM-dd",
         "dateLocale": "en"
@@ -2587,6 +2798,19 @@
       "id": "1000000000000000167"
     },
     {
+      "pkgName": "en.mangafoxfun",
+      "name": "MangaFox.fun",
+      "lang": "en",
+      "theme": "mangahub",
+      "baseUrl": "https://mangafox.fun",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaSource": "mf01"
+      },
+      "id": "1000000000000000371"
+    },
+    {
       "pkgName": "en.mangafree",
       "name": "Mangafree",
       "lang": "en",
@@ -2638,6 +2862,32 @@
       "id": "1000000000000000083"
     },
     {
+      "pkgName": "en.mangahereonl",
+      "name": "MangaHere.onl",
+      "lang": "en",
+      "theme": "mangahub",
+      "baseUrl": "https://mangahere.onl",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaSource": "mh01"
+      },
+      "id": "1000000000000000372"
+    },
+    {
+      "pkgName": "en.mangahubio",
+      "name": "MangaHub",
+      "lang": "en",
+      "theme": "mangahub",
+      "baseUrl": "https://mangahub.io",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaSource": "m01"
+      },
+      "id": "1000000000000000373"
+    },
+    {
       "pkgName": "fr.mangahubfr",
       "name": "MangaHub.fr",
       "lang": "fr",
@@ -2647,6 +2897,9 @@
       "versionName": "1.0.0",
       "config": {
         "chapterSource": "manga-ajax",
+        "selectors": {
+          "chapterList": "li.wp-manga-chapter:not(.vip-permission)"
+        },
         "dateFormat": "d MMMM yyyy",
         "dateLocale": "fr"
       },
@@ -2666,6 +2919,19 @@
       },
       "id": "1000000000000000084",
       "retired": "domain no longer resolves"
+    },
+    {
+      "pkgName": "en.mangakakalotfun",
+      "name": "Mangakakalot.fun",
+      "lang": "en",
+      "theme": "mangahub",
+      "baseUrl": "https://mangakakalot.fun",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaSource": "mn01"
+      },
+      "id": "1000000000000000374"
     },
     {
       "pkgName": "th.mangakimi",
@@ -2694,6 +2960,32 @@
       "id": "1000000000000000085"
     },
     {
+      "pkgName": "en.manganel",
+      "name": "MangaNel",
+      "lang": "en",
+      "theme": "mangahub",
+      "baseUrl": "https://manganel.me",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaSource": "mn05"
+      },
+      "id": "1000000000000000375"
+    },
+    {
+      "pkgName": "en.mangaonlinefun",
+      "name": "MangaOnline.fun",
+      "lang": "en",
+      "theme": "mangahub",
+      "baseUrl": "https://mangaonline.fun",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaSource": "m02"
+      },
+      "id": "1000000000000000376"
+    },
+    {
       "pkgName": "en.mangaowlio",
       "name": "MangaOwl.io (unoriginal)",
       "lang": "en",
@@ -2708,6 +3000,19 @@
       "id": "1000000000000000086"
     },
     {
+      "pkgName": "en.mangapandaonl",
+      "name": "MangaPanda.onl",
+      "lang": "en",
+      "theme": "mangahub",
+      "baseUrl": "https://mangapanda.onl",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaSource": "mr02"
+      },
+      "id": "1000000000000000377"
+    },
+    {
       "pkgName": "en.mangareadorg",
       "name": "MangaRead.org",
       "lang": "en",
@@ -2720,6 +3025,19 @@
         "dateLocale": "en-US"
       },
       "id": "1000000000000000087"
+    },
+    {
+      "pkgName": "en.mangareadersite",
+      "name": "MangaReader.site",
+      "lang": "en",
+      "theme": "mangahub",
+      "baseUrl": "https://mangareader.site",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaSource": "mr01"
+      },
+      "id": "1000000000000000378"
     },
     {
       "pkgName": "fr.mangasscans",
@@ -2795,6 +3113,19 @@
       },
       "unportedOverrides": 1,
       "id": "1000000000000000334"
+    },
+    {
+      "pkgName": "en.mangatoday",
+      "name": "MangaToday",
+      "lang": "en",
+      "theme": "mangahub",
+      "baseUrl": "https://mangatoday.fun",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaSource": "m03"
+      },
+      "id": "1000000000000000379"
     },
     {
       "pkgName": "en.mangatx",
@@ -3277,6 +3608,20 @@
       "id": "1000000000000000204"
     },
     {
+      "pkgName": "en.meitoon",
+      "name": "MeiToon",
+      "lang": "en",
+      "theme": "keyoapp",
+      "baseUrl": "https://meitoon.org",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "popularSelector": ".series-splide .splide__slide:not(.splide__slide--clone)"
+      },
+      "unportedOverrides": 2,
+      "id": "1000000000000000380"
+    },
+    {
       "pkgName": "all.miauscan",
       "name": "Miau Scan",
       "lang": "all",
@@ -3338,6 +3683,20 @@
       },
       "unportedOverrides": 1,
       "id": "1000000000000000282"
+    },
+    {
+      "pkgName": "en.mistscans",
+      "name": "Mist Scans",
+      "lang": "en",
+      "theme": "keyoapp",
+      "baseUrl": "https://mistscans.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "popularSelector": ".series-splide .splide__slide"
+      },
+      "unportedOverrides": 2,
+      "id": "1000000000000000381"
     },
     {
       "pkgName": "th.moodtoon",
@@ -3478,6 +3837,11 @@
       "baseUrl": "https://nikatoons.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "selectors": {
+          "chapterList": "#chapterlist li.chapter-item:not(.premium)"
+        }
+      },
       "unportedOverrides": 1,
       "id": "1000000000000000113"
     },
@@ -3558,6 +3922,11 @@
       "baseUrl": "https://noxenscan.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "selectors": {
+          "chapterList": "#chapterlist li:not(:has(svg))"
+        }
+      },
       "unportedOverrides": 1,
       "id": "1000000000000000115",
       "retired": "parked, redirects to a lander"
@@ -3575,6 +3944,40 @@
         "dateLocale": "th"
       },
       "id": "1000000000000000307"
+    },
+    {
+      "pkgName": "en.nyanukafe",
+      "name": "Nyanu Kafe",
+      "lang": "en",
+      "theme": "keyoapp",
+      "baseUrl": "https://nyanukafe.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "popularSelector": ".series-splide .splide__slide:not(.splide__slide--clone)"
+      },
+      "unportedOverrides": 1,
+      "id": "1000000000000000382"
+    },
+    {
+      "pkgName": "en.nyrascans",
+      "name": "Nyra Scans",
+      "lang": "en",
+      "theme": "keyoapp",
+      "baseUrl": "https://nyrascans.com",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0",
+      "id": "1000000000000000383"
+    },
+    {
+      "pkgName": "en.nyxscans",
+      "name": "Nyx Scans",
+      "lang": "en",
+      "theme": "iken",
+      "baseUrl": "https://nyxscans.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "id": "1000000000000000384"
     },
     {
       "pkgName": "en.octopusmanga",
@@ -3602,6 +4005,19 @@
       },
       "id": "1000000000000000261",
       "retired": "rebuilt on a bespoke stack; no longer runs the declared theme"
+    },
+    {
+      "pkgName": "en.onemangainfo",
+      "name": "OneManga.info",
+      "lang": "en",
+      "theme": "mangahub",
+      "baseUrl": "https://onemanga.info",
+      "contentWarning": "MIXED",
+      "versionName": "1.0.0",
+      "config": {
+        "mangaSource": "mh01"
+      },
+      "id": "1000000000000000386"
     },
     {
       "pkgName": "tr.opiatoon",
@@ -3644,6 +4060,16 @@
         "minIntervalMs": 2000
       },
       "id": "1000000000000000286"
+    },
+    {
+      "pkgName": "en.orionscans",
+      "name": "Orion Scans",
+      "lang": "en",
+      "theme": "iken",
+      "baseUrl": "https://orion-scans.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "id": "1000000000000000387"
     },
     {
       "pkgName": "id.otascans",
@@ -3698,6 +4124,18 @@
         }
       },
       "id": "1000000000000000185"
+    },
+    {
+      "pkgName": "en.paradisescans",
+      "name": "Paradise Scans",
+      "lang": "en",
+      "theme": "keyoapp",
+      "baseUrl": "https://paradisescans.com",
+      "contentWarning": "NSFW",
+      "versionName": "1.0.0",
+      "unportedOverrides": 1,
+      "id": "1000000000000000388",
+      "retired": "rebuilt and no longer a Keyoapp install: /series/ answers 404 and the home page carries none of the theme's markup"
     },
     {
       "pkgName": "en.paritehaber",
@@ -3831,6 +4269,11 @@
       "baseUrl": "https://ragescans.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "selectors": {
+          "chapterList": "li:has(.chbox .eph-num):not(:has([data-bs-target='#lockedChapterModal']))"
+        }
+      },
       "unportedOverrides": 2,
       "id": "1000000000000000122"
     },
@@ -3891,7 +4334,11 @@
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
       "config": {
-        "mangaPath": "series"
+        "mangaPath": "series",
+        "selectors": {
+          "chapterList": "#chapterlist li:not([data-num*='🔒'])",
+          "searchItem": ".listupd .bs .bsx:not(:has(.novelabel))"
+        }
       },
       "unportedOverrides": 2,
       "id": "1000000000000000124"
@@ -3908,6 +4355,663 @@
       "retired": "origin rejects the TLS handshake"
     },
     {
+      "pkgName": "en.readattackontitanshingekinokyojinmanga",
+      "name": "Read Attack on Titan Shingeki no Kyojin Manga",
+      "lang": "en",
+      "theme": "mangacatalog",
+      "baseUrl": "https://ww12.readsnk.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "series": [
+          {
+            "name": "Shingeki No Kyojin",
+            "url": "/manga/shingeki-no-kyojin/"
+          },
+          {
+            "name": "Colored",
+            "url": "/manga/shingeki-no-kyojin-colored/"
+          },
+          {
+            "name": "Before the Fall",
+            "url": "/manga/shingeki-no-kyojin-before-the-fall/"
+          },
+          {
+            "name": "Lost Girls",
+            "url": "/manga/shingeki-no-kyojin-lost-girls/"
+          },
+          {
+            "name": "No Regrets",
+            "url": "/manga/attack-on-titan-no-regrets/"
+          },
+          {
+            "name": "Junior High",
+            "url": "/manga/attack-on-titan-junior-high/"
+          },
+          {
+            "name": "Guidebook",
+            "url": "/manga/attack-on-titan-guidebook-inside-outside/"
+          },
+          {
+            "name": "Harsh Mistress",
+            "url": "/manga/attack-on-titan-harsh-mistress-of-the-city/"
+          },
+          {
+            "name": "Anthology",
+            "url": "/manga/attack-on-titan-anthology/"
+          },
+          {
+            "name": "Art Book",
+            "url": "/manga/attack-on-titan-exclusive-art-book/"
+          },
+          {
+            "name": "Spoof",
+            "url": "/manga/spoof-on-titan/"
+          },
+          {
+            "name": "No Regrets Colored",
+            "url": "/manga/attack-on-titan-no-regrets-colored/"
+          },
+          {
+            "name": "BTF Light Novel",
+            "url": "/manga/attack-on-titan-before-the-fall-light-novel/"
+          },
+          {
+            "name": "Best of SNK",
+            "url": "/manga/the-best-of-attack-on-titan-in-color/"
+          }
+        ],
+        "selectors": {
+          "chapterList": "div.w-full div.grid div.col-span-4"
+        }
+      },
+      "unportedOverrides": 2,
+      "id": "1000000000000000389"
+    },
+    {
+      "pkgName": "en.readberserkmanga",
+      "name": "Read Berserk Manga",
+      "lang": "en",
+      "theme": "mangacatalog",
+      "baseUrl": "https://readberserk.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "series": [
+          {
+            "name": "Berserk",
+            "url": "/manga/berserk/"
+          },
+          {
+            "name": "Guidebook",
+            "url": "/manga/berserk-official-guidebook/"
+          },
+          {
+            "name": "Colored",
+            "url": "/manga/berserk-colored/"
+          },
+          {
+            "name": "Duranki",
+            "url": "/manga/duranki/"
+          },
+          {
+            "name": "Gigantomakhia",
+            "url": "/manga/gigantomakhia/"
+          },
+          {
+            "name": "Futatabi",
+            "url": "/manga/futatabi/"
+          },
+          {
+            "name": "Berserk Spoilers & RAW",
+            "url": "/manga/berserk-spoilers-raw/"
+          }
+        ],
+        "selectors": {
+          "chapterList": "tbody > tr"
+        },
+        "dateFormat": "MMM dd, yyyy",
+        "dateLocale": "en-US"
+      },
+      "unportedOverrides": 4,
+      "id": "1000000000000000390"
+    },
+    {
+      "pkgName": "en.readblackclovermangaonline",
+      "name": "Read Black Clover Manga Online",
+      "lang": "en",
+      "theme": "mangacatalog",
+      "baseUrl": "https://ww10.readblackclover.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "series": [
+          {
+            "name": "Black Clover",
+            "url": "/manga/black-clover/"
+          },
+          {
+            "name": "Fan Colored",
+            "url": "/manga/black-clover-colored/"
+          },
+          {
+            "name": "Hungry Joker",
+            "url": "/manga/hungry-joker/"
+          },
+          {
+            "name": "Gaiden",
+            "url": "/manga/black-clover-gaiden-quartet-knights/"
+          }
+        ]
+      },
+      "id": "1000000000000000391",
+      "retired": "readblackclover.com and its ww10. host both resolve to 178.128.239.245 and refuse the connection; nothing answers on any path"
+    },
+    {
+      "pkgName": "en.readchainsawmanmangaonline",
+      "name": "Read Chainsaw Man Manga Online",
+      "lang": "en",
+      "theme": "mangacatalog",
+      "baseUrl": "https://ww6.readchainsawman.com",
+      "contentWarning": "NSFW",
+      "versionName": "1.0.0",
+      "config": {
+        "series": [
+          {
+            "name": "Chainsaw Man",
+            "url": "/manga/chainsaw-man/"
+          },
+          {
+            "name": "17-21",
+            "url": "/manga/17-21-fujimoto-tatsuki-tanpenshuu/"
+          },
+          {
+            "name": "Fire Punch",
+            "url": "/manga/fire-punch/"
+          },
+          {
+            "name": "Nayuta",
+            "url": "/manga/yogen-no-nayuta/"
+          },
+          {
+            "name": "Look Back",
+            "url": "/manga/look-back/"
+          },
+          {
+            "name": "Light Novel",
+            "url": "/manga/chainsaw-man-buddy-stories/"
+          },
+          {
+            "name": "Colored",
+            "url": "/manga/chainsaw-man-colored/"
+          },
+          {
+            "name": "Listen to Song",
+            "url": "/manga/futsuu-ni-kiite-kure/"
+          },
+          {
+            "name": "Goodbye, Eri",
+            "url": "/manga/sayonara-eri-goodbye-eri/"
+          },
+          {
+            "name": "22-26",
+            "url": "/manga/22-26-fujimoto-tatsuki-tanpenshuu/"
+          },
+          {
+            "name": "Chainsaw Man Colored",
+            "url": "/manga/chainsaw-man-colored/"
+          },
+          {
+            "name": "Chainsaw Man: Buddy Stories",
+            "url": "/manga/chainsaw-man-buddy-stories/"
+          }
+        ]
+      },
+      "id": "1000000000000000392"
+    },
+    {
+      "pkgName": "en.readfairytailedenszeromangaonline",
+      "name": "Read Fairy Tail & Edens Zero Manga Online",
+      "lang": "en",
+      "theme": "mangacatalog",
+      "baseUrl": "https://ww8.readfairytail.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "series": [
+          {
+            "name": "Eden's Zero",
+            "url": "/manga/edens-zero/"
+          },
+          {
+            "name": "Fairy Tail",
+            "url": "/manga/fairy-tail/"
+          },
+          {
+            "name": "FT Zero",
+            "url": "/manga/fairy-tail-zero/"
+          },
+          {
+            "name": "FT City Hero",
+            "url": "/manga/fairy-tail-city-hero/"
+          },
+          {
+            "name": "Hero’s",
+            "url": "/manga/heros/"
+          },
+          {
+            "name": "FT Happy Adv",
+            "url": "/manga/fairy-tail-happys-grand-adventure/"
+          },
+          {
+            "name": "FT 100 Year",
+            "url": "/manga/fairy-tail-100-years-quest/"
+          },
+          {
+            "name": "FT Ice Trail",
+            "url": "/manga/fairy-tail-ice-trail/"
+          },
+          {
+            "name": "FT x Taizai",
+            "url": "/manga/fairy-tail-x-nanatsu-no-taizai-christmas-special/"
+          },
+          {
+            "name": "Parasyte x FT",
+            "url": "/manga/parasyte-x-fairy-tail/"
+          },
+          {
+            "name": "Gaiden 1",
+            "url": "/manga/fairy-tail-gaiden-raigo-issen/"
+          },
+          {
+            "name": "FT x Rave",
+            "url": "/manga/fairy-tail-x-rave/"
+          },
+          {
+            "name": "Monster Hunter",
+            "url": "/manga/monster-hunter-orage/"
+          },
+          {
+            "name": "Rave Master",
+            "url": "/manga/rave-master/"
+          },
+          {
+            "name": "Dead Rock",
+            "url": "/manga/dead-rock/"
+          },
+          {
+            "name": "Fairy Girls",
+            "url": "/manga/fairy-girls/"
+          },
+          {
+            "name": "Gaiden 4",
+            "url": "/manga/fairy-tail-gaiden-raigo-issen/"
+          },
+          {
+            "name": "Gaiden 2",
+            "url": "/manga/fairy-tail-gaiden-kengami-no-souryuu/"
+          },
+          {
+            "name": "Gaiden 3",
+            "url": "/manga/fairy-tail-gaiden-road-knight/"
+          },
+          {
+            "name": "FT x 7DS",
+            "url": "/manga/fairy-tail-x-nanatsu-no-taizai-christmas-special/"
+          }
+        ]
+      },
+      "id": "1000000000000000393"
+    },
+    {
+      "pkgName": "en.readjujutsukaisenmangaonline",
+      "name": "Read Jujutsu Kaisen Manga Online",
+      "lang": "en",
+      "theme": "mangacatalog",
+      "baseUrl": "https://ww6.readjujutsukaisen.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "series": [
+          {
+            "name": "Jujutsu Kaisen",
+            "url": "/manga/jujutsu-kaisen/"
+          },
+          {
+            "name": "Jujutsu Kaisen 0",
+            "url": "/manga/jujutsu-kaisen-0/"
+          },
+          {
+            "name": "JJK Colored",
+            "url": "/manga/jujutsu-kaisen-colored/"
+          },
+          {
+            "name": "Fan Scan",
+            "url": "/manga/jujutsu-kaisen-fan-scan/"
+          },
+          {
+            "name": "JJK Light Novel",
+            "url": "/manga/jujutsu-kaisen-first-light-novel/"
+          },
+          {
+            "name": "2nd Light Novel",
+            "url": "/manga/jujutsu-kaisen-second-light-novel/"
+          },
+          {
+            "name": "No.9",
+            "url": "/manga/no-9/"
+          },
+          {
+            "name": "Fanbook",
+            "url": "/manga/jujutsu-kaisen-official-fanbook/"
+          }
+        ]
+      },
+      "id": "1000000000000000394"
+    },
+    {
+      "pkgName": "en.readkingdommangaonline",
+      "name": "Read Kingdom Manga Online",
+      "lang": "en",
+      "theme": "mangacatalog",
+      "baseUrl": "https://ww6.readkingdom.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "series": [
+          {
+            "name": "Kingdom",
+            "url": "/manga/kingdom/"
+          },
+          {
+            "name": "Li Mu",
+            "url": "/manga/li-mu/"
+          },
+          {
+            "name": "Meng Wu & Chu Zi",
+            "url": "/manga/meng-wu-and-chu-zi-one-shot/"
+          }
+        ]
+      },
+      "id": "1000000000000000395"
+    },
+    {
+      "pkgName": "en.readnanatsunotaizai7deadlysinsmangaonline",
+      "name": "Read Nanatsu no Taizai 7 Deadly Sins Manga Online",
+      "lang": "en",
+      "theme": "mangacatalog",
+      "baseUrl": "https://ww7.read7deadlysins.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "series": [
+          {
+            "name": "Four Horsemen of the Apocalypse",
+            "url": "/manga/four-horsemen-of-the-apocalypse/"
+          },
+          {
+            "name": "7DS: School",
+            "url": "/manga/mayoe-nanatsu-no-taizai-gakuen/"
+          },
+          {
+            "name": "7DS:7 Days",
+            "url": "/manga/nanatsu-no-taizai-seven-days/"
+          },
+          {
+            "name": "7DS:Vampires",
+            "url": "/manga/nanatsu-no-taizai-vampires-of-edinburgh/"
+          },
+          {
+            "name": "Queen of Altar",
+            "url": "/manga/the-queen-of-the-altar/"
+          },
+          {
+            "name": "7DS: 7 Colors",
+            "url": "/manga/nanatsu-no-taizai-nanairo-no-tsuioku/"
+          },
+          {
+            "name": "7DS x FT",
+            "url": "/manga/fairy-tail-x-nanatsu-no-taizai-christmas-special/"
+          },
+          {
+            "name": "Kongou Banchou",
+            "url": "/manga/kongou-banchou/"
+          },
+          {
+            "name": "7DS:7 Scars",
+            "url": "/manga/nanatsu-no-taizai-the-seven-scars-which-they-left-behind/"
+          },
+          {
+            "name": "7 Deadly Sins",
+            "url": "/manga/nanatsu-no-taizai/"
+          },
+          {
+            "name": "Mokushiroku no Yonkishi",
+            "url": "/manga/four-horsemen-of-the-apocalypse/"
+          }
+        ]
+      },
+      "id": "1000000000000000396"
+    },
+    {
+      "pkgName": "en.readonepiecemangaonline",
+      "name": "Read One Piece Manga Online",
+      "lang": "en",
+      "theme": "mangacatalog",
+      "baseUrl": "https://ww13.readonepiece.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "series": [
+          {
+            "name": "One Piece",
+            "url": "/manga/one-piece/"
+          },
+          {
+            "name": "Colored",
+            "url": "/manga/one-piece-digital-colored-comics/"
+          },
+          {
+            "name": "Soma x Sanji",
+            "url": "/manga/shokugeki-no-sanji-one-shot/"
+          },
+          {
+            "name": "OP x Toriko",
+            "url": "/manga/one-piece-x-toriko/"
+          },
+          {
+            "name": "Party",
+            "url": "/manga/one-piece-party/"
+          },
+          {
+            "name": "DB x OP",
+            "url": "/manga/dragon-ball-x-one-piece/"
+          },
+          {
+            "name": "Wanted!",
+            "url": "/manga/wanted-one-piece/"
+          },
+          {
+            "name": "Ace's Story",
+            "url": "/manga/one-piece-ace-s-story/"
+          },
+          {
+            "name": "Omake",
+            "url": "/manga/one-piece-omake/"
+          },
+          {
+            "name": "Vivre Card",
+            "url": "/manga/vivre-card-databook/"
+          },
+          {
+            "name": "Pirate Recipes",
+            "url": "/manga/one-piece-pirate-recipes/"
+          },
+          {
+            "name": "Databook",
+            "url": "/manga/one-piece-databook/"
+          },
+          {
+            "name": "Ace's Story Manga",
+            "url": "/manga/one-piece-ace-story-manga/"
+          },
+          {
+            "name": "OP Academy",
+            "url": "/manga/one-piece-academy/"
+          },
+          {
+            "name": "MONSTERS",
+            "url": "/manga/monsters/"
+          },
+          {
+            "name": "Zoro Novel",
+            "url": "/manga/one-piece-novel-zoro/"
+          },
+          {
+            "name": "OP in Love",
+            "url": "/manga/one-piece-in-love/"
+          },
+          {
+            "name": "Heroines",
+            "url": "/manga/one-piece-novel-heroines/"
+          }
+        ]
+      },
+      "id": "1000000000000000397"
+    },
+    {
+      "pkgName": "en.readonepunchmanmangaonlinetwo",
+      "name": "Read One-Punch Man Manga Online",
+      "lang": "en",
+      "theme": "mangacatalog",
+      "baseUrl": "https://ww7.readopm.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "series": [
+          {
+            "name": "One Punch Man",
+            "url": "/manga/one-punch-man/"
+          },
+          {
+            "name": "Official",
+            "url": "/manga/one-punch-man-official/"
+          },
+          {
+            "name": "Onepunch-Man (ONE)",
+            "url": "/manga/onepunch-man-one/"
+          },
+          {
+            "name": "Colored",
+            "url": "/manga/one-punch-man-colored/"
+          },
+          {
+            "name": "Mob Psycho 100",
+            "url": "/manga/mob-psycho-100/"
+          },
+          {
+            "name": "Reigen",
+            "url": "/manga/reigen/"
+          },
+          {
+            "name": "Versus (ONE)",
+            "url": "/manga/versus/"
+          },
+          {
+            "name": "Bug Ego",
+            "url": "/manga/bug-ego/"
+          },
+          {
+            "name": "Eyeshield 21",
+            "url": "/manga/eyeshield-21/"
+          }
+        ],
+        "selectors": {
+          "chapterList": "tbody > tr"
+        },
+        "dateFormat": "MMM dd, yyyy",
+        "dateLocale": "en-US"
+      },
+      "unportedOverrides": 3,
+      "id": "1000000000000000398"
+    },
+    {
+      "pkgName": "en.readsololevelingmangamanhwaonline",
+      "name": "Read Solo Leveling Manga Manhwa Online",
+      "lang": "en",
+      "theme": "mangacatalog",
+      "baseUrl": "https://ww4.readsololeveling.org",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "series": [
+          {
+            "name": "Solo Leveling Manhwa",
+            "url": "/manga/solo-leveling/"
+          },
+          {
+            "name": "Solo Leveling Light Novel",
+            "url": "/manga/solo-leveling-light-novel/"
+          },
+          {
+            "name": "Solo Leveling : Ragnarok",
+            "url": "/manga/solo-leveling-ragnarok/"
+          },
+          {
+            "name": "SL: Ragnarok Novel",
+            "url": "/manga/solo-leveling-ragnarok-novel/"
+          }
+        ]
+      },
+      "id": "1000000000000000399"
+    },
+    {
+      "pkgName": "en.readtokyoghoulretokyoghoulmangaonline",
+      "name": "Read Tokyo Ghoul Re & Tokyo Ghoul Manga Online",
+      "lang": "en",
+      "theme": "mangacatalog",
+      "baseUrl": "https://ww12.tokyoghoulre.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "series": [
+          {
+            "name": "Tokyo Ghoul",
+            "url": "/manga/tokyo-ghoul/"
+          },
+          {
+            "name": "Tokyo Ghoul Jack",
+            "url": "/manga/tokyo-ghoul-jack/"
+          },
+          {
+            "name": "Tokyo Ghoul: re Colored",
+            "url": "/manga/tokyo-ghoulre-colored/"
+          },
+          {
+            "name": "Gorilla",
+            "url": "/manga/this-gorilla-will-die-in-1-day/"
+          },
+          {
+            "name": "Zakki",
+            "url": "/manga/tokyo-ghoul-zakki/"
+          },
+          {
+            "name": "Light Novel",
+            "url": "/manga/tokyo-ghoul-re-light-novels/"
+          },
+          {
+            "name": "Choujin X",
+            "url": "/manga/choujin-x/"
+          },
+          {
+            "name": "Tokyo Ghoul re",
+            "url": "/manga/tokyo-ghoulre/"
+          }
+        ]
+      },
+      "id": "1000000000000000400"
+    },
+    {
       "pkgName": "th.reapertrans",
       "name": "ReaperTrans",
       "lang": "th",
@@ -3916,6 +5020,16 @@
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
       "id": "1000000000000000309"
+    },
+    {
+      "pkgName": "en.renascans",
+      "name": "Renascans",
+      "lang": "en",
+      "theme": "iken",
+      "baseUrl": "https://renascans.net",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "id": "1000000000000000401"
     },
     {
       "pkgName": "en.restscans",
@@ -3937,12 +5051,33 @@
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
       "config": {
+        "selectors": {
+          "chapterList": "li.wp-manga-chapter:not(.premium-block)"
+        },
         "dateFormat": "MMMM dd, yyyy",
         "dateLocale": "en",
         "minIntervalMs": 500
       },
       "unportedOverrides": 2,
       "id": "1000000000000000208"
+    },
+    {
+      "pkgName": "en.ritharscans",
+      "name": "RitharScans",
+      "lang": "en",
+      "theme": "keyoapp",
+      "baseUrl": "https://ritharscans.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "typeSelector": "[alt=Type]",
+        "selectors": {
+          "status": "[alt=Status]"
+        }
+      },
+      "unportedOverrides": 7,
+      "id": "1000000000000000402",
+      "retired": "browse, details and the chapter list work, but the reader is one of the seven functions upstream rewrote and no chapter opens - a chapter list nothing can open is worse than no source"
     },
     {
       "pkgName": "en.rizzcomic",
@@ -3981,6 +5116,11 @@
       "baseUrl": "https://rokaricomics.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "selectors": {
+          "chapterList": "#chapterlist li:has(div.chbox):has(div.eph-num):has(a[href]):not(:has(.text-gold))"
+        }
+      },
       "unportedOverrides": 7,
       "id": "1000000000000000129"
     },
@@ -4011,6 +5151,17 @@
       "id": "1000000000000000343"
     },
     {
+      "pkgName": "en.ryumanga",
+      "name": "Ryumanga",
+      "lang": "en",
+      "theme": "keyoapp",
+      "baseUrl": "https://ryumanga.org",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "id": "1000000000000000403",
+      "retired": "answers on every path but publishes no Keyoapp listing markup on either / or /series/, so every browse returns nothing"
+    },
+    {
       "pkgName": "en.s2manga",
       "name": "S2Manga",
       "lang": "en",
@@ -4020,10 +5171,24 @@
       "versionName": "1.0.0",
       "config": {
         "selectors": {
-          "pageList": "div.page-break img[src*=\\"
+          "pageList": "div.page-break img[src*=\"https\"]"
         }
       },
       "id": "1000000000000000131"
+    },
+    {
+      "pkgName": "en.sanascans",
+      "name": "Sana Scans",
+      "lang": "en",
+      "theme": "iken",
+      "baseUrl": "https://sanascans.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "perPage": 30,
+        "sortPagesByFilename": true
+      },
+      "id": "1000000000000000404"
     },
     {
       "pkgName": "id.sasangeyou",
@@ -4174,6 +5339,30 @@
       "id": "1000000000000000310"
     },
     {
+      "pkgName": "en.sirenscans",
+      "name": "Siren Scans",
+      "lang": "en",
+      "theme": "keyoapp",
+      "baseUrl": "https://sirenscans.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "id": "1000000000000000405"
+    },
+    {
+      "pkgName": "fr.sirenscansfr",
+      "name": "Siren Scans FR",
+      "lang": "fr",
+      "theme": "keyoapp",
+      "baseUrl": "https://sirenscans.fr",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "popularSelector": "section.splide.series-splide a.splide__slide"
+      },
+      "unportedOverrides": 1,
+      "id": "1000000000000000411"
+    },
+    {
       "pkgName": "en.skymanga",
       "name": "Sky Manga",
       "lang": "en",
@@ -4260,7 +5449,10 @@
       "versionName": "1.0.0",
       "config": {
         "hasProjectPage": true,
-        "pageSelector": "div#readerarea img:not([src*='.gif'])"
+        "pageSelector": "div#readerarea img:not([src*='.gif'])",
+        "selectors": {
+          "searchItem": ".listupd .bs .bsx:not(:has(.novelabel))"
+        }
       },
       "unportedOverrides": 2,
       "id": "1000000000000000267",
@@ -4434,6 +5626,23 @@
       },
       "unportedOverrides": 4,
       "id": "1000000000000000138"
+    },
+    {
+      "pkgName": "en.timelesstoons",
+      "name": "TimelessToons",
+      "lang": "en",
+      "theme": "keyoapp",
+      "baseUrl": "https://timelesstoons.org",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "popularSelector": "div:has(> h2:contains(Trending)) + div .group",
+        "selectors": {
+          "genre": "div.grid:has(>h1) a[href*=\"genre=\"]"
+        }
+      },
+      "unportedOverrides": 7,
+      "id": "1000000000000000407"
     },
     {
       "pkgName": "tr.tonizutoon",
@@ -4615,6 +5824,9 @@
       "config": {
         "mangaPath": "manhua",
         "variant": "noajax",
+        "selectors": {
+          "chapterList": "div.wp-manga-chapter"
+        },
         "dateFormat": "MM/dd/yyyy",
         "dateLocale": "en"
       },
@@ -4675,6 +5887,24 @@
       "id": "1000000000000000356"
     },
     {
+      "pkgName": "vi.truyentuoitho",
+      "name": "TruyenTuoiTho",
+      "lang": "vi",
+      "theme": "madara",
+      "baseUrl": "https://truyentuoitho.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "chapterMode": "MangaAjaxPaginated",
+        "filterNonMangaItems": false,
+        "dateFormat": "dd/MM/yyyy",
+        "dateLocale": "en",
+        "minIntervalMs": 20000
+      },
+      "unportedOverrides": 2,
+      "id": "1000000000000000412"
+    },
+    {
       "pkgName": "pt.tsundokutraducoes",
       "name": "Tsundoku Traduções",
       "lang": "pt-BR",
@@ -4683,6 +5913,9 @@
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
       "config": {
+        "selectors": {
+          "searchItem": ".utao .uta .imgu, .listupd .bs .bsx:not(:has(span.novelabel)), .listo .bs .bsx:not(:has(span.novelabel))"
+        },
         "dateFormat": "MMMMM d, yyyy",
         "dateLocale": "pt",
         "minIntervalMs": 2000
@@ -4735,6 +5968,17 @@
       "retired": "site pulled, replaced by a billing notice"
     },
     {
+      "pkgName": "en.vanillascans",
+      "name": "Vanilla Scans",
+      "lang": "en",
+      "theme": "iken",
+      "baseUrl": "https://vanillascans.org",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "id": "1000000000000000408",
+      "retired": "the api. subdomain every Iken site answers on returns a bare 404 from Cloudflare on /api/query and /api/genres alike, so no listing, no series and no chapter can be fetched"
+    },
+    {
       "pkgName": "es.vermanhwas",
       "name": "Ver Manhwas",
       "lang": "es",
@@ -4757,10 +6001,23 @@
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
       "config": {
-        "mangaPath": "comics"
+        "mangaPath": "comics",
+        "selectors": {
+          "chapterList": "#chapterlist li:not(:has(svg))"
+        }
       },
       "unportedOverrides": 2,
       "id": "1000000000000000148"
+    },
+    {
+      "pkgName": "en.arvenscans",
+      "name": "Vortex Scans",
+      "lang": "en",
+      "theme": "iken",
+      "baseUrl": "https://vortexscans.org",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "id": "1000000000000000359"
     },
     {
       "pkgName": "en.vyvymangaorg",
@@ -4848,6 +6105,11 @@
       "baseUrl": "https://witchscans.com",
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
+      "config": {
+        "selectors": {
+          "chapterList": "div.eplister ul li:has(div.chbox):has(div.eph-num):has(a[href])"
+        }
+      },
       "unportedOverrides": 2,
       "id": "1000000000000000153",
       "retired": "moved to witchtoons.net and was rebuilt; the new site runs no theme this build has"
@@ -4862,6 +6124,20 @@
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
       "retired": "rebuilt as a novel site; no longer runs the declared theme"
+    },
+    {
+      "pkgName": "en.writerscans",
+      "name": "Writer Scans",
+      "lang": "en",
+      "theme": "keyoapp",
+      "baseUrl": "https://writerscans.com",
+      "contentWarning": "SAFE",
+      "versionName": "1.0.0",
+      "config": {
+        "popularSelector": "div:contains(Trending) + div .group.overflow-hidden"
+      },
+      "unportedOverrides": 1,
+      "id": "1000000000000000409"
     },
     {
       "pkgName": "en.wuxiaworld",
@@ -5017,7 +6293,10 @@
       "contentWarning": "MIXED",
       "versionName": "1.0.0",
       "config": {
-        "variant": "noajax"
+        "variant": "noajax",
+        "selectors": {
+          "chapterList": "div.wp-manga-chapter"
+        }
       },
       "unportedOverrides": 3,
       "id": "1000000000000000159"

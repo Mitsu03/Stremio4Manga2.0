@@ -207,10 +207,11 @@ loopback host means nothing is in front — print which they chose, and take
 
 Optional, external, and off by default — but it is worth more than that
 description used to suggest. Two of the six hand-written sources (Asura Scans
-and ComicK) sit behind Cloudflare, and so do roughly 63 of the 302 themed ones:
-about a fifth of the whole catalogue is unreachable without a solver. Without
-one they fail with a message naming the source and saying exactly what to
-configure; nothing else is affected.
+and ComicK) sit behind Cloudflare, and so do roughly 69 of the 352 themed ones —
+63 measured across Madara and MangaThemesia, plus six of the fifteen Keyoapp
+installs. About a fifth of the whole catalogue is unreachable without a solver.
+Without one they fail with a message naming the source and saying exactly what
+to configure; nothing else is affected.
 
 Adding browser-like request headers does not substitute for it. That was
 measured across all 63 challenged hosts — the current headers and a full
