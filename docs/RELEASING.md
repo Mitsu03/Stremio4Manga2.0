@@ -425,19 +425,25 @@ To run the published image instead of building it:
 podman pull ghcr.io/mitsu03/stremio4manga:latest
 ```
 
-**A package published to ghcr is private until somebody makes it public**, and
-that is true even when the repository is public — the visibility of a package and
-the visibility of the repository it was built from are separate settings. So the
-first tag publishes an image that an anonymous `podman pull` answers with a 401.
-It is a one-time fix, on the web, and it cannot be done from the workflow: the
-`GITHUB_TOKEN` a job runs with cannot change package visibility.
+That pull needs no credentials. A package the workflow publishes with
+`GITHUB_TOKEN` is linked to the repository it was built from and inherits its
+visibility, so a public repository produces a public package with nothing to
+configure. Checked on v2.0.0: an anonymous pull of
+`ghcr.io/mitsu03/stremio4manga:v2.0.0` succeeds, and the container runs as the
+unprivileged `s4m` user and answers on `/gateway/health`.
+
+Older advice says packages are private by default and have to be made public by
+hand. That was true of packages not linked to a repository, and it is the first
+thing people suggest when a pull returns 401 — but it is not this repository's
+situation, and doing it is not part of cutting a release here.
+
+If a pull ever does return 401, the link is what to check:
 
 > github.com/Mitsu03?tab=packages → **stremio4manga** → Package settings →
-> Danger Zone → **Change visibility** → Public
+> **Manage Actions access**, and the visibility below it
 
-Do it once, immediately after the first release, and check it with a `podman
-pull` from a machine that is not logged in. Every later release reuses the same
-package and stays public.
+The workflow cannot fix that itself: a job's `GITHUB_TOKEN` can push a package
+and cannot change its visibility.
 
 ## The checklist
 
@@ -459,16 +465,13 @@ Each line is one thing, in order:
 10. `sudo s4m update --check` on a server — it should name the new version.
 11. `sudo s4m update --yes --restart` — without `--yes` it only reports.
 12. `s4m version`, `curl -s localhost:8080/gateway/health`, and open the UI.
+13. `podman pull ghcr.io/mitsu03/stremio4manga:vX.Y.Z` from somewhere not logged
+    in, if anyone is running the container path.
 
-**The first release only**, once and never again:
-
-- The first tag must be `v2.0.0`, because that is what `package.json` says and
-  the workflow refuses a tag that disagrees.
-- Steps 10 and 11 have nothing to update from, since no server was installed from
-  a release. Install one instead, with
-  `curl -fsSLO .../releases/latest/download/install.sh` and
-  `sudo bash install.sh --release --origin ...`.
-- Make the ghcr package public, as above.
+`v2.0.0`, the first release, is the worked example: all five assets attached,
+the image pulled anonymously and started as `s4m`, and a server installed from
+the release with the `curl` bootstrap — account created, sign-in 200, 405
+sources loaded, `s4m update --check` correctly answering "already up to date".
 
 ## The payload list lives in four places
 

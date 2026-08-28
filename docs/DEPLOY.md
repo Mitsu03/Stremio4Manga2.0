@@ -129,12 +129,12 @@ podman run -d --name stremio4manga -p 127.0.0.1:8080:8080 \
 podman exec -it stremio4manga node server/bin/s4m.js users add alice
 ```
 
-A 401 on that `pull` means the package is still private. Packages published to
-ghcr stay private until somebody changes it, independently of whether the
-repository is public, and it is a one-time setting — see
-[RELEASING.md](RELEASING.md#containers-update-themselves). Pin a tag rather than
-`:latest` (`ghcr.io/mitsu03/stremio4manga:v2.1.0`) unless you want
-`podman auto-update` moving the deployment for you.
+No credentials needed: the package is linked to this repository and inherits its
+visibility. If a pull ever returns 401 that link is what broke, and
+[RELEASING.md](RELEASING.md#containers-update-themselves) says where to look.
+
+Pin a tag rather than `:latest` (`ghcr.io/mitsu03/stremio4manga:v2.0.0`) unless
+you want `podman auto-update` moving the deployment for you.
 
 Building it locally produces the same image, and is what you want for a change
 that is not released yet:
