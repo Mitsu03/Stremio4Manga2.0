@@ -144,7 +144,8 @@ function sortExtensions(
 ): CatalogExtension[] {
   // GraphQL input coercion means a single object is a valid list of one, and the
   // client sends both forms against this field.
-  const orders = order === null || order === undefined ? [] : Array.isArray(order) ? order : [order];
+  const orders =
+    order === null || order === undefined ? [] : Array.isArray(order) ? order : [order];
   if (orders.length === 0) return extensions;
 
   return [...extensions].sort((left, right) => {
@@ -226,7 +227,7 @@ export const group: ResolverGroup = {
 
     // Two, because there are two: the handful written here, and the ones taken
     // from keiyoushi's catalogue. Listing only "Built-in" credited this server
-    // with 348 sources somebody else catalogued, and left the Sources page
+    // with hundreds of sources somebody else catalogued, and left the Sources page
     // unable to point anyone at where they actually come from.
     extensionStores: () => {
       const nodes = [
@@ -261,7 +262,11 @@ export const group: ResolverGroup = {
       return {
         extension: toExtension(
           extension,
-          patch.uninstall ? false : patch.install ? true : installedPkgNames(context.db, context.userId).has(pkgName),
+          patch.uninstall
+            ? false
+            : patch.install
+              ? true
+              : installedPkgNames(context.db, context.userId).has(pkgName),
         ),
       };
     },

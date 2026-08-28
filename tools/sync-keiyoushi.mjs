@@ -5,10 +5,20 @@
  * Most keiyoushi extensions are not bespoke code. They declare a *theme* — one
  * shared engine — and point it at a domain, which is exactly the shape of
  * `sites/mangadistrict.ts` and `sites/rizzfables.ts` here. So for every theme
- * this build implements, an extension reduces to four values we already accept:
- * name, language, base URL, content warning. Those go in
- * `server/sources.themed.json` and cost a row of data rather than a file of
- * code.
+ * this build implements, an extension reduces to data: it goes in
+ * `server/sources.themed.json` and costs a row rather than a file of code.
+ *
+ * It does *not* reduce to four values. That was the original belief here, and it
+ * was wrong in a way that took a while to see: only 30 of the 315 extensions
+ * this build covers override nothing at all. The rest rename a URL path, move a
+ * selector, write dates in another language or extend a different base class,
+ * and dropping all of that shipped sources that installed and then returned
+ * nothing. So the identity fields come from the build file, and everything else
+ * is read out of the extension's own Kotlin into a `config` object.
+ *
+ * Overridden *functions* are logic, not data, and cannot come across. They are
+ * counted into `unportedOverrides` rather than ignored, so a source that is only
+ * approximately right says so instead of looking exact.
  *
  * Everything needed is in the extension's own `build.gradle.kts`:
  *

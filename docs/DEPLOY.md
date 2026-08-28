@@ -174,8 +174,9 @@ manga.example.com {
 ```
 
 The 5-minute timeouts are not padding. The server is deliberately slow with
-sources (see the rate limits below), so a search across six catalogues or a
-chapter off a shared WordPress host routinely outlives Caddy's defaults. Without
+sources (see the rate limits below), so a search fanned out across hundreds of
+catalogues, or a chapter off a shared WordPress host, routinely outlives Caddy's
+defaults. Without
 them the browser gets a 502 while the server is still perfectly well waiting —
 and the user learns to hammer reload, which is exactly the traffic that gets the
 server's address banned.
@@ -204,10 +205,22 @@ loopback host means nothing is in front — print which they chose, and take
 
 ## FlareSolverr
 
-Optional, external, and off by default. Two of the six sources — Asura Scans and
-ComicK — sit behind Cloudflare. Without a solver they fail with a message
-naming the source and saying exactly what to configure; nothing else is
-affected.
+Optional, external, and off by default — but it is worth more than that
+description used to suggest. Two of the six hand-written sources (Asura Scans
+and ComicK) sit behind Cloudflare, and so do roughly 63 of the 305 themed ones:
+about a fifth of the whole catalogue is unreachable without a solver. Without
+one they fail with a message naming the source and saying exactly what to
+configure; nothing else is affected.
+
+Adding browser-like request headers does not substitute for it. That was
+measured across all 63 challenged hosts — the current headers and a full
+`Sec-Fetch-*` browser set returned identical status codes on every one. These
+are real challenges, not a user-agent check.
+
+A handful are Cloudflare *firewall* denials rather than challenges, and a solver
+does not clear those either; they are marked `retired` in
+`server/sources.overrides.json` with that as the reason, so nobody investigates
+them twice.
 
 ```json
 "flaresolverr": { "url": "http://127.0.0.1:8191", "timeoutMs": 60000 }

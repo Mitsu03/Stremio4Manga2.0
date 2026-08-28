@@ -259,8 +259,13 @@ export function createMadaraSource(config: MadaraConfig, deps: SourceDeps): Sour
 
   /**
    * The theme's own archive endpoint. It returns the same card markup the
-   * archive page does, so the ordinary parse handles the response unchanged,
-   * and — contrary to the note that used to sit below — it needs no nonce.
+   * archive page does, so the ordinary parse handles the response unchanged.
+   *
+   * It needs no nonce. A comment here long claimed it did, and that claim is
+   * the only reason this went unimplemented — worth remembering, because a
+   * sentence about someone else's system has no test that fails when it stops
+   * being true, or when it was never true.
+   *
    * `page` is zero-based here, unlike everywhere else in this theme.
    */
   async function listingViaLoadMore(page: number, metaKey: string): Promise<string> {
