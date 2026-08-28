@@ -230,6 +230,13 @@ deliberate:
   `server/sources.themed.json` are the index. "Installing" a source is one row
   in `source_state`, per account, so two people sharing a server do not have to
   share a taste in scanlation sites.
+- **A new account is seeded with the English half, not all of it.** 166 sources
+  — every `en` and `all` one — are installed the moment the account is created;
+  the other twelve languages are listed on the Sources page and switched on from
+  there. Search fans out across every installed source, so seeding all 405 spent
+  every query on sites the reader cannot read; seeding none opens the app on an
+  empty Sources page, which reads as broken. See `seedDefaults` in
+  `server/src/sources/registry.ts` and the note in `docs/ACCOUNTS.md`.
 - **Adding a bespoke site means adding a file.** Write a module in
   `server/src/sources/sites/` exporting a `SourceDefinition` (see
   `server/src/sources/types.ts`), register it in

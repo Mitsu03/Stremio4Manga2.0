@@ -196,11 +196,16 @@ async function add(positional: string[], options: Options): Promise<void> {
   // An account with no sources has an empty Sources page, an empty Discover and
   // a search that can reach nothing — which reads as a broken install rather
   // than an empty one. Version 1 seeded every new account for the same reason.
+  // English and multi-language only: the rest of the catalogue is on the Sources
+  // page from the first sign-in, one toggle away, rather than in every search.
   const seeded = seedDefaults(db, name);
 
   out('');
   out(`Added "${name}". They can sign in now — no restart needed.`);
-  if (seeded > 0) out(`${seeded} built-in sources are installed and ready to search.`);
+  if (seeded > 0) {
+    out(`${seeded} English and multi-language sources are installed and ready to search.`);
+    out('The other languages are on the Sources page, switched off until they turn them on.');
+  }
 }
 
 async function passwd(positional: string[], options: Options): Promise<void> {

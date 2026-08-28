@@ -324,20 +324,51 @@ async function run() {
   section('Catalogue, categories, settings, tracker');
   const extensions = await gql(
     a,
-    '{extensions(order:[{by:NAME}]){nodes{pkgName name isInstalled source{totalCount}}} extensionStores{nodes{name indexUrl}}}',
+    '{extensions(order:[{by:NAME}]){nodes{pkgName name lang isInstalled source{totalCount}}} extensionStores{nodes{name indexUrl}}}',
   );
   const catalogue = extensions.data?.extensions?.nodes ?? [];
   check('the built-in catalogue lists sources', catalogue.length > 0, `${catalogue.length} entries`);
-  // The opposite of what this asserted before the catalogue was seeded: an
+  // Two halves of one rule, so a regression in either direction is caught. An
   // account that can reach nothing looks, on screen, exactly like an account
-  // whose server is broken.
+  // whose server is broken — but seeding all thirteen languages made every
+  // search fan out across sources the reader cannot read.
+  const seedable = (entry) => entry.lang === 'en' || entry.lang === 'all';
+  const seeded = catalogue.filter(seedable);
   check(
-    'the whole catalogue is installed on a new account',
-    catalogue.length > 0 && catalogue.every((entry) => entry.isInstalled),
-    catalogue
+    'every English and multi-language source is installed on a new account',
+    seeded.length > 0 && seeded.every((entry) => entry.isInstalled),
+    seeded
       .filter((entry) => !entry.isInstalled)
       .map((entry) => entry.pkgName)
-      .join(', ') || `${catalogue.length} installed`,
+      .join(', ') || `${seeded.length} installed`,
+  );
+  const others = catalogue.filter((entry) => !seedable(entry));
+  check(
+    'the other languages are listed but not installed',
+    others.length > 0 && others.every((entry) => !entry.isInstalled),
+    others
+      .filter((entry) => entry.isInstalled)
+      .map((entry) => `${entry.pkgName} (${entry.lang})`)
+      .join(', ') || `${others.length} available, none installed`,
+  );
+
+  // Installing is per account, and only a source neither account starts with can
+  // prove it: both are seeded with every English one, so mangadex would pass this
+  // no matter how badly `source_state` leaked between accounts.
+  const offLanguage = others[0];
+  await gql(
+    a,
+    'mutation($p:String!){updateExtension(input:{id:$p,patch:{install:true}}){extension{pkgName}}}',
+    { p: offLanguage.pkgName },
+  );
+  const aLangs = await gql(a, '{sources{nodes{id lang}}}');
+  const bLangs = await gql(b, '{sources{nodes{id lang}}}');
+  const carries = (result) =>
+    (result.data?.sources?.nodes ?? []).some((source) => source.lang === offLanguage.lang);
+  check(
+    'installing a source is per account, not per server',
+    carries(aLangs) && !carries(bLangs),
+    `${offLanguage.pkgName} (${offLanguage.lang})`,
   );
   // Two stores, and which two matters: the sources are largely catalogued by
   // keiyoushi, and a page that credits only "Built-in" cannot tell anyone where
@@ -467,12 +498,6 @@ async function liveChecks(a, b) {
   const ids = (sources.data?.sources?.nodes ?? []).map((source) => source.id);
   check('the installed source is listed', ids.includes(MANGADEX_ID), ids.join(','));
   check('the AniList pseudo-source is listed', ids.includes('1'));
-
-  const bSources = await gql(b, '{sources{nodes{id name}}}');
-  check(
-    'the other account did not get the source',
-    !(bSources.data?.sources?.nodes ?? []).map((source) => source.id).includes(MANGADEX_ID),
-  );
 
   const search = await gql(
     a,
