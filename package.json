@@ -17,6 +17,7 @@
     "s4m": "node server/bin/s4m.js",
     "test": "node test/smoke.mjs",
     "test:offline": "node test/smoke.mjs --offline",
-    "test:podman": "bash test/podman-validate.sh"
+    "test:podman": "bash test/podman-validate.sh",
+    "test:release": "bash test/release-install.sh"
   }
 }

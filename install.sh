@@ -7,13 +7,24 @@
 # whole deployment is `node server/dist/main.js` plus whatever terminates TLS in
 # front of it.
 #
-# Safe to re-run. Every step checks for its own result first, so running this
-# again after a `git pull` rebuilds and restarts without touching the config,
-# the data or the accounts.
+# Two ways in, and the difference is where the built output comes from:
+#
+#   sudo bash install.sh --release --origin https://manga.example.com
+#     Downloads a published release, verifies both archives against their
+#     checksums, extracts. Nothing is built here. This is how a server should be
+#     installed, and this file is attached to every release on its own so the
+#     first command on a new machine can be a curl.
 #
 #   sudo ./install.sh --origin https://manga.example.com
+#     Builds this checkout. Needs npm and ~200 MB of devDependencies, and
+#     installs whatever the checkout is on -- `main`, on a fresh clone, rather
+#     than the last tag. For developing, and for running something unreleased.
 #
-# `--help` lists the rest.
+# Safe to re-run either way. Every step checks for its own result first, so
+# running this again after a `git pull`, or against a newer release, replaces the
+# build without touching the config, the data or the accounts.
+#
+# `--help` lists the rest. docs/RELEASING.md has the whole picture.
 
 set -euo pipefail
 
@@ -33,6 +44,16 @@ TRUST_PROXY=auto
 ADMIN_USER=""
 INTERACTIVE=auto
 INSTALL_SERVICE=yes
+# Empty means "build this checkout". Set by --release to a tag, or to the
+# literal "latest", and then the tree comes from a published release instead
+# and nothing is built here at all.
+RELEASE=""
+RELEASE_REPO=${S4M_RELEASE_REPO:-Mitsu03/Stremio4Manga2.0}
+# Overridable so the release path can be exercised without publishing a release:
+# test/release-install.sh points it at a directory served over file://, which is
+# the only way to prove this branch works before the first tag exists. `s4m
+# update` carries the same seam for the same reason (S4M_UPDATE_REPO).
+RELEASE_API_BASE=${S4M_RELEASE_API:-https://api.github.com}
 
 # Where this script is being run from — the tree that gets copied to PREFIX.
 SOURCE_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
@@ -67,13 +88,29 @@ usage() {
   cat <<'EOF'
 Stremio4Manga installer (Linux, systemd)
 
-  sudo ./install.sh --origin https://manga.example.com
+  From a published release. No toolchain, nothing built on the server:
+
+    curl -fsSLO https://github.com/Mitsu03/Stremio4Manga2.0/releases/latest/download/install.sh
+    sudo bash install.sh --release --origin https://manga.example.com
+
+  From a checkout. Builds on the machine, and installs whatever the checkout
+  is on -- which is main, not the last release, unless you checked out a tag:
+
+    sudo ./install.sh --origin https://manga.example.com
 
 Options
   --origin URL          Public URL people will type. Required, and asked for
                         interactively if omitted. Every CSRF check compares
                         against it, and its scheme decides whether the session
                         cookie is Secure.
+  --release[=TAG]       Install a published release instead of building this
+                        checkout. Bare it takes the latest; --release=v2.1.0
+                        pins one. Downloads the runtime and install archives
+                        with their checksums, verifies both before writing
+                        anything, and needs neither npm nor the ~200 MB of
+                        build dependencies. This is how a server should be
+                        installed; building from a checkout is for developing,
+                        and for testing something that is not released yet.
   --prefix DIR          Where to install the tree.        (/opt/stremio4manga)
   --data-dir DIR        Database, downloads, backups,
                         page cache, log.               (/var/lib/stremio4manga)
@@ -140,6 +177,8 @@ while [ $# -gt 0 ]; do
     --admin=*)       ADMIN_USER=${1#*=}; shift ;;
     --no-proxy)      TRUST_PROXY=false; shift ;;
     --proxy)         TRUST_PROXY=true; shift ;;
+    --release)       RELEASE=latest; shift ;;
+    --release=*)     RELEASE=${1#*=}; [ -n "$RELEASE" ] || RELEASE=latest; shift ;;
     --no-service)    INSTALL_SERVICE=no; shift ;;
     --non-interactive|--yes) INTERACTIVE=no; shift ;;
     -h|--help)       usage; exit 0 ;;
@@ -204,17 +243,41 @@ esac
 # discovering at 3am that /usr/local/bin/node was a symlink into a deleted nvm.
 NODE_BIN=$(readlink -f "$NODE_BIN")
 
-NPM_BIN=$(command -v npm || true)
-[ -n "$NPM_BIN" ] || die \
-  "npm is not installed." \
-  "Most Node packages ship it; on Debian and Fedora it is a separate 'npm' package."
+# npm and a checkout are needed to build, and a release install builds nothing.
+# Demanding them there would refuse a machine that is perfectly able to run the
+# server, which is the entire point of installing from a release.
+if [ -z "$RELEASE" ]; then
+  NPM_BIN=$(command -v npm || true)
+  [ -n "$NPM_BIN" ] || die \
+    "npm is not installed." \
+    "Most Node packages ship it; on Debian and Fedora it is a separate 'npm' package." \
+    "" \
+    "Or skip the build entirely and install a published release instead:" \
+    "  sudo ./install.sh --release --origin ..."
 
-info "node $NODE_VERSION at $NODE_BIN"
-info "npm  $("$NPM_BIN" -v 2>/dev/null || echo '?') at $NPM_BIN"
+  info "node $NODE_VERSION at $NODE_BIN"
+  info "npm  $("$NPM_BIN" -v 2>/dev/null || echo '?') at $NPM_BIN"
 
-[ -f "$SOURCE_DIR/package.json" ] || die \
-  "No package.json next to this script." \
-  "Run install.sh from the root of the checkout, not from a copy of the file."
+  [ -f "$SOURCE_DIR/package.json" ] || die \
+    "No package.json next to this script." \
+    "Run install.sh from the root of the checkout, not from a copy of the file." \
+    "" \
+    "A single copy of install.sh is enough on its own with --release:" \
+    "  sudo bash install.sh --release --origin ..."
+else
+  info "node $NODE_VERSION at $NODE_BIN"
+
+  # What the release path needs instead. All three are on any machine that can
+  # already be administered, but naming the missing one beats a failure three
+  # steps further down inside a pipeline.
+  for tool in curl tar sha256sum; do
+    command -v "$tool" >/dev/null 2>&1 || die \
+      "$tool is not installed, and --release needs it." \
+      "Debian/Ubuntu:  sudo apt install curl tar coreutils" \
+      "Fedora/RHEL:    sudo dnf install curl tar coreutils"
+  done
+  info "installing release: $RELEASE (from $RELEASE_REPO)"
+fi
 
 # ----------------------------------------------------------------- 1. user --
 
@@ -238,6 +301,175 @@ else
     || die "useradd failed for $SERVICE_USER." "Create it by hand and re-run with --user $SERVICE_USER."
   info "created (system account, shell $NOLOGIN, home $DATA_DIR, not created)"
 fi
+
+# ---------------------------------------------------------------- 2. tree --
+
+# Owned by root, readable by everyone, writable by nobody. Nothing in the tree
+# is written at runtime -- the config is read at boot and all state lives in the
+# data directory -- so a source parser that goes wrong cannot rewrite the server
+# it is running inside.
+#
+# A function because both paths below end with it and neither may skip it.
+harden_prefix() {
+  chown -R root:root "$PREFIX"
+  chmod -R u=rwX,go=rX "$PREFIX"
+}
+
+if [ -n "$RELEASE" ]; then
+
+# A release install writes the same tree the source path builds, minus the
+# building. Two archives, because they answer to two different owners: the
+# runtime payload is what `s4m update` replaces on every future update, and the
+# install assets -- this script, the unit template, the example Caddyfile, the
+# docs -- are read once, here, and never touched again. Keeping them apart is
+# what lets the updater swap a server without ever rewriting an installer.
+#
+# Everything that can fail happens before $PREFIX is touched: the API call, both
+# downloads, both checksums, and the check that the archives actually contain a
+# server. That is the ordering `s4m update` uses, for the same reason.
+
+step "Fetching $RELEASE from $RELEASE_REPO"
+
+TMP_DIR=$(mktemp -d) || die "Could not create a temporary directory."
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+if [ "$RELEASE" = latest ]; then
+  RELEASE_API="$RELEASE_API_BASE/repos/$RELEASE_REPO/releases/latest"
+else
+  RELEASE_API="$RELEASE_API_BASE/repos/$RELEASE_REPO/releases/tags/$RELEASE"
+fi
+
+# --fail (the f in -fsSL) so a 404 is an error rather than a JSON body that
+# fails to parse two steps later. GitHub rejects an API request with no
+# User-Agent outright, hence -A.
+curl -fsSL \
+  -H 'Accept: application/vnd.github+json' \
+  -H 'X-GitHub-Api-Version: 2022-11-28' \
+  -A 'stremio4manga-install.sh' \
+  -o "$TMP_DIR/release.json" \
+  "$RELEASE_API" \
+  || die "Could not read $RELEASE_API." \
+         "A 404 means that tag has no release -- check the spelling, or drop the" \
+         "tag to take the latest. Otherwise it is the network, or GitHub's" \
+         "unauthenticated rate limit, which is 60 an hour per address and resets" \
+         "on its own." \
+         "" \
+         "If this repository has no releases yet, build from the checkout instead:" \
+         "  sudo ./install.sh --origin $ORIGIN"
+
+# node rather than jq: jq is not installed everywhere and node already is -- it
+# is the thing being installed. Emitting shell assignments keeps the parsing in
+# one place, and the quote check below is what makes sourcing them safe.
+"$NODE_BIN" - "$TMP_DIR/release.json" > "$TMP_DIR/release.env" <<'JS' \
+  || die "The GitHub API answered with something this cannot read."
+const release = JSON.parse(require('fs').readFileSync(process.argv[2], 'utf8'));
+const assets = release.assets || [];
+const url = (name) => (assets.find((a) => a.name === name) || {}).browser_download_url || '';
+
+const tag = release.tag_name || '';
+const version = tag.replace(/^v/, '');
+if (!version) {
+  console.error('That release has no tag name, so there is nothing to install.');
+  process.exit(1);
+}
+
+const runtime = `stremio4manga-${version}.tar.gz`;
+const installer = `stremio4manga-${version}-install.tar.gz`;
+const fields = {
+  RELEASE_TAG: tag,
+  RELEASE_VERSION: version,
+  RUNTIME_TAR: runtime,
+  RUNTIME_URL: url(runtime),
+  RUNTIME_SHA_URL: url(`${runtime}.sha256`),
+  INSTALL_TAR: installer,
+  INSTALL_URL: url(installer),
+  INSTALL_SHA_URL: url(`${installer}.sha256`),
+};
+
+for (const [key, value] of Object.entries(fields)) {
+  // Single-quoted below, so a value carrying a quote would end the string and
+  // let the rest of it run as shell. Nothing the release workflow produces
+  // contains one; a value that does is not a release this should install.
+  if (value.includes("'")) {
+    console.error(`Refusing an asset name containing a quote: ${value}`);
+    process.exit(1);
+  }
+  console.log(`${key}='${value}'`);
+}
+JS
+
+# shellcheck source=/dev/null
+. "$TMP_DIR/release.env"
+
+info "release $RELEASE_TAG"
+
+[ -n "$RUNTIME_URL" ] && [ -n "$RUNTIME_SHA_URL" ] || die \
+  "Release $RELEASE_TAG has no $RUNTIME_TAR and .sha256 pair." \
+  "That is either a release built by hand, or one whose workflow failed after" \
+  "creating the release but before uploading the assets. Check the release page" \
+  "before installing anything from it."
+
+[ -n "$INSTALL_URL" ] && [ -n "$INSTALL_SHA_URL" ] || die \
+  "Release $RELEASE_TAG has no $INSTALL_TAR, so it predates --release." \
+  "Releases before that one carry the runtime payload only, and the systemd unit" \
+  "template this installer needs is not in it." \
+  "" \
+  "Install a newer release, or build this checkout:" \
+  "  sudo ./install.sh --origin $ORIGIN"
+
+step "Downloading and verifying"
+
+# $1 archive name, $2 archive URL, $3 checksum URL.
+fetch_and_verify() {
+  curl -fsSL -A 'stremio4manga-install.sh' -o "$TMP_DIR/$1" "$2" \
+    || die "Downloading $1 failed." "Check the network and run this again; nothing has been changed."
+  curl -fsSL -A 'stremio4manga-install.sh' -o "$TMP_DIR/$1.sha256" "$3" \
+    || die "Downloading $1.sha256 failed." "Nothing has been changed."
+
+  # The published .sha256 is `sha256sum` output -- hash, two spaces, filename --
+  # and the file was saved under that same name, so -c checks it directly.
+  ( cd "$TMP_DIR" && sha256sum -c "$1.sha256" >/dev/null 2>&1 ) \
+    || die "$1 does not match its published checksum." \
+           "Nothing has been changed. A truncated download is the ordinary" \
+           "explanation, so run this again; if it repeats, do not install it."
+  info "$1  $(du -h "$TMP_DIR/$1" | cut -f1), checksum verified"
+}
+
+fetch_and_verify "$RUNTIME_TAR" "$RUNTIME_URL" "$RUNTIME_SHA_URL"
+fetch_and_verify "$INSTALL_TAR" "$INSTALL_URL" "$INSTALL_SHA_URL"
+
+step "Installing the tree into $PREFIX"
+
+mkdir -p "$PREFIX"
+
+# Neither archive contains server/config.json -- a server's configuration is its
+# own, and an install that overwrote it would replace a working publicOrigin
+# with an example one. Re-running this on an existing install is therefore safe:
+# it replaces the build and the docs and leaves the config, the database and the
+# downloads alone.
+tar -xzf "$TMP_DIR/$RUNTIME_TAR" -C "$PREFIX" \
+  || die "Extracting $RUNTIME_TAR into $PREFIX failed." "Check free space and permissions on $PREFIX."
+tar -xzf "$TMP_DIR/$INSTALL_TAR" -C "$PREFIX" \
+  || die "Extracting $INSTALL_TAR into $PREFIX failed." "Check free space and permissions on $PREFIX."
+
+# Proof that the extraction produced a server and not an empty directory tree.
+# The first three are what `s4m update` checks, for the same reason; the unit
+# template is the one thing this installer additionally cannot do without.
+for required in \
+  server/dist/main.js \
+  server/dist/cli.js \
+  web/dist/index.html \
+  deploy/stremio4manga.service
+do
+  [ -f "$PREFIX/$required" ] || die \
+    "$RELEASE_TAG extracted without $required, so it is not a complete release." \
+    "Check the release page before installing anything from it."
+done
+
+harden_prefix
+info "installed $RELEASE_TAG -- nothing was built here, and nothing needed to be"
+
+else
 
 # ---------------------------------------------------------------- 2. files --
 
@@ -267,12 +499,8 @@ else
   info "copied from $SOURCE_DIR (without .git, node_modules, dist, config.json)"
 fi
 
-# Owned by root, readable by everyone, writable by nobody. Nothing in the tree
-# is written at runtime — the config is read at boot and all state lives in the
-# data directory — so a source parser that goes wrong cannot rewrite the server
-# it is running inside.
-chown -R root:root "$PREFIX"
-chmod -R u=rwX,go=rX "$PREFIX"
+harden_prefix
+
 
 # --------------------------------------------------------------- 3. build --
 
@@ -316,6 +544,9 @@ export npm_config_audit=false
   || warn "npm prune --omit=dev failed; node_modules keeps its build tools. Harmless."
 
 info "server/dist and web/dist built"
+
+fi
+
 
 # --------------------------------------------------------------- 3b. s4m --
 
