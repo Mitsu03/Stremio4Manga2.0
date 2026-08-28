@@ -370,6 +370,34 @@ async function run() {
     carries(aLangs) && !carries(bLangs),
     `${offLanguage.pkgName} (${offLanguage.lang})`,
   );
+
+  // `users reseed` puts an account back on the default a new one gets, which is
+  // the only way somebody seeded under an older default reaches this one — the
+  // seeding itself is one-shot on purpose. The account is off the default by
+  // exactly one source right now, which is what makes this measurable.
+  const dryReseed = cli(['users', 'reseed', 'smoke-a']);
+  check(
+    'reseed explains and changes nothing without --yes',
+    dryReseed.status === 0 && /Nothing has changed/.test(dryReseed.stdout),
+    dryReseed.stdout.trim() || dryReseed.stderr,
+  );
+  check(
+    'the source is still installed after the dry run',
+    carries(await gql(a, '{sources{nodes{id lang}}}')),
+  );
+
+  const doneReseed = cli(['users', 'reseed', 'smoke-a', '--yes']);
+  check('reseed runs with --yes', doneReseed.status === 0, doneReseed.stderr);
+  const afterReseed = await gql(a, '{sources{nodes{id lang}}}');
+  check(
+    'reseed switches the off-language source back off',
+    !carries(afterReseed),
+    doneReseed.stdout.trim(),
+  );
+  check(
+    'reseed leaves the English sources installed',
+    (afterReseed.data?.sources?.nodes ?? []).some((source) => source.lang === 'en'),
+  );
   // Two stores, and which two matters: the sources are largely catalogued by
   // keiyoushi, and a page that credits only "Built-in" cannot tell anyone where
   // they came from.

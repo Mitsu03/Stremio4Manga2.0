@@ -16,7 +16,12 @@ import { ConfigError, dataPaths, defaultConfigPath, loadConfig, type Config } fr
 import { openDb, type Db } from './db/open.js';
 import { hashPassword } from './http/crypto.js';
 import { importTachibk } from './backup/tachibk.js';
-import { seedDefaults } from './sources/registry.js';
+import {
+  applySeedDiff,
+  definitionByPkg,
+  diffAgainstSeed,
+  seedDefaults,
+} from './sources/registry.js';
 import { VERSION } from './version.js';
 import {
   assertComparable,
@@ -259,6 +264,92 @@ function remove(positional: string[], options: Options): void {
   out(`Removed "${name}".`);
 }
 
+/**
+ * How many titles somebody actually reads from the sources about to be switched
+ * off. Nothing breaks — an uninstalled source keeps its library rows and the app
+ * draws them — but "239 sources" and "the 12 titles you are reading" are
+ * different sentences, and only the second one is about this person.
+ */
+function titlesFromSources(db: Db, name: string, pkgNames: string[]): number {
+  if (pkgNames.length === 0) return 0;
+  const sourceIds = new Set(
+    pkgNames.map((pkgName) => definitionByPkg(pkgName)?.id).filter((id) => id !== undefined),
+  );
+  const rows = db.all<{ source_id: string; titles: number }>(
+    'SELECT source_id, COUNT(*) AS titles FROM manga WHERE user_id = ? AND in_library = 1' +
+      ' GROUP BY source_id',
+    name,
+  );
+  return rows
+    .filter((row) => sourceIds.has(row.source_id))
+    .reduce((total, row) => total + row.titles, 0);
+}
+
+/**
+ * `s4m users reseed` — move an existing account to the sources a new one gets.
+ *
+ * Seeding happens once, guarded on "this account has no source rows at all", so
+ * that the server can never override a choice somebody made. The cost of that
+ * guarantee is that changing the default leaves everyone who came before on the
+ * old one, with no way back that is not 239 toggles in a browser. This is the
+ * way back, and it is opt-in per account rather than a migration, because the
+ * old default was not wrong — it was just noisier than it needed to be.
+ *
+ * Like `remove`, it explains and stops without `--yes`: switching sources off is
+ * not something to discover having done.
+ */
+function reseed(positional: string[], options: Options): void {
+  const given = positional[0];
+  if (!given) fail('Usage: s4m users reseed <username> [--yes]');
+  const name = given.toLowerCase();
+
+  const db = open();
+  requireUser(db, name);
+
+  const diff = diffAgainstSeed(db, name);
+  if (diff.install.length === 0 && diff.uninstall.length === 0) {
+    out(`"${name}" already has exactly the sources a new account starts with.`);
+    return;
+  }
+
+  const langs = [
+    ...new Set(
+      diff.uninstall.map((pkgName) => definitionByPkg(pkgName)?.lang).filter((lang) => lang),
+    ),
+  ].sort();
+
+  if (!options.yes) {
+    out(`Reseeding "${name}" would:`);
+    if (diff.install.length > 0) {
+      out(`  install    ${diff.install.length} English and multi-language sources`);
+    }
+    if (diff.uninstall.length > 0) {
+      out(`  uninstall  ${diff.uninstall.length} sources  (${langs.join(', ')})`);
+    }
+
+    const titles = titlesFromSources(db, name, diff.uninstall);
+    if (titles > 0) {
+      out('');
+      out(`${titles} titles in their library come from a source this would switch off.`);
+      out('The titles stay, and so does their progress — an uninstalled source keeps its');
+      out('rows. New chapters stop being fetched until it is switched back on.');
+    }
+
+    out('');
+    out('Re-run with --yes to confirm. Nothing has changed.');
+    return;
+  }
+
+  applySeedDiff(db, name, diff);
+
+  out('');
+  out(`Reseeded "${name}".`);
+  if (diff.install.length > 0) out(`${diff.install.length} sources installed.`);
+  if (diff.uninstall.length > 0) {
+    out(`${diff.uninstall.length} uninstalled — they are still on the Sources page to turn back on.`);
+  }
+}
+
 function list(): void {
   const db = open();
   const users = db.all<UserRow>(
@@ -416,6 +507,7 @@ const USER_COMMANDS: Record<string, Command> = {
   add: { usage: 's4m users add <username> [--password-stdin]', run: add },
   passwd: { usage: 's4m users passwd <username> [--password-stdin]', run: passwd },
   remove: { usage: 's4m users remove <username> [--yes]', run: remove },
+  reseed: { usage: 's4m users reseed <username> [--yes]', run: reseed },
   list: { usage: 's4m users list', run: list },
 };
 
@@ -503,7 +595,7 @@ const COMMANDS: Record<string, Command> = {
     run: rollbackCommand,
   },
   users: {
-    usage: 's4m users add|passwd|remove|list',
+    usage: 's4m users add|passwd|remove|reseed|list',
     run: (positional, options) => {
       const sub = positional[0];
       const command = sub ? USER_COMMANDS[sub] : undefined;

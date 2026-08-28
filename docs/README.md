@@ -130,6 +130,7 @@ node server/dist/cli.js users add    <username>
 node server/dist/cli.js users passwd <username>
 node server/dist/cli.js users list
 node server/dist/cli.js users remove <username> --yes
+node server/dist/cli.js users reseed <username> --yes
 ```
 
 `server/bin/s4m.js` is a shim over the same commands, for an npm bin link.
@@ -235,8 +236,10 @@ deliberate:
   the other twelve languages are listed on the Sources page and switched on from
   there. Search fans out across every installed source, so seeding all 405 spent
   every query on sites the reader cannot read; seeding none opens the app on an
-  empty Sources page, which reads as broken. See `seedDefaults` in
-  `server/src/sources/registry.ts` and the note in `docs/ACCOUNTS.md`.
+  empty Sources page, which reads as broken. Seeding is one-shot, so an account
+  made under an older default keeps it until `s4m users reseed` moves it. See
+  `seedDefaults` in `server/src/sources/registry.ts` and the note in
+  `docs/ACCOUNTS.md`.
 - **Adding a bespoke site means adding a file.** Write a module in
   `server/src/sources/sites/` exporting a `SourceDefinition` (see
   `server/src/sources/types.ts`), register it in
