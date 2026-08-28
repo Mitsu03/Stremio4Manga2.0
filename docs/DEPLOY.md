@@ -278,6 +278,26 @@ The archive is around 230 MB because it carries its own Chromium. That is the
 whole reason this works without a container, and also the reason it wants
 somewhere near a gigabyte of memory while a challenge is being solved.
 
+**It carries the browser, not the browser's dependencies.** On a minimal server
+the binary starts, finds its Chromium, and dies — first on
+`libxcb.so.1: cannot open shared object file`, and then, once the libraries are
+there, on `Could not find Xvfb`. Neither failure is in the release notes and
+both happen at *start*, which is the good case; the list below is what a
+`debian:bookworm-slim` needed before a challenge actually solved:
+
+```bash
+sudo apt install -y xvfb fonts-liberation \
+  libnss3 libnspr4 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 \
+  libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 \
+  libpango-1.0-0 libcairo2 libasound2 libxcb1 libx11-6 libxext6
+```
+
+Xvfb is the surprising one and it is not optional: FlareSolverr drives a real,
+headed browser inside a virtual display rather than a headless one, because
+headless is itself a signal Cloudflare reads. A desktop distribution has all of
+this already, which is why the failure only shows up on the machine you actually
+wanted to run it on.
+
 `/etc/systemd/system/flaresolverr.service`:
 
 ```ini
@@ -306,7 +326,18 @@ curl -sX POST http://127.0.0.1:8191/v1 \
      -H 'Content-Type: application/json' -d '{"cmd":"sessions.list"}'
 ```
 
-That last command answering `{"status": "ok", …}` is the whole test.
+That last command answering `{"status": "ok", …}` is the whole test — and it is
+worth going one step further, because "the service started" and "it can solve a
+challenge" are different claims:
+
+```bash
+curl -sX POST http://127.0.0.1:8191/v1 -H 'Content-Type: application/json' \
+     -d '{"cmd":"request.get","url":"https://example.org/","maxTimeout":90000}' | head -c 120
+```
+
+`"message": "Challenge solved!"` — or `"Challenge not detected!"` on a host that
+was not defending itself — means the browser really launched. A missing Xvfb
+fails the first call, not this one, so run both.
 
 `HOST=127.0.0.1` is the line that matters: the default binds every interface,
 and this is a service that fetches any URL it is handed.
@@ -435,8 +466,17 @@ v1's library is usually the larger half. `install.ps1 -DataDir D:\S4M` keeps
 them apart; `--data-dir` is the same flag on Linux, where the installer's own
 `/var/lib/stremio4manga` never overlapped anything.
 
-Export a backup from the old server, then, **signed in as the account it should
-land in**:
+On the old server, signed in as the account whose library you are moving:
+
+> **Settings → Backup & restore → Export a backup**
+> *(a Portuguese interface says **Definições → Cópias e reposição → Exportar uma
+> cópia de segurança**)*
+
+That writes the `.tachibk`. Do it per account: a v1 backup carries one library,
+not the server's, so a machine with three accounts is three exports and three
+imports.
+
+Then, on this server, **signed in as the account it should land in**:
 
 > **Settings → Backup & restore → Restore → Choose a backup file**
 
