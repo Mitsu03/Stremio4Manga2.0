@@ -3,11 +3,7 @@
   "sources": {
     "en.vyvymangaorg": {
       "checked": "2026-08-28",
-      "note": "301 to mangaowl.io, where the old /manga/ path answers 410 Gone.",
-      "baseUrl": "https://mangaowl.io",
-      "config": {
-        "mangaPath": "manga-list"
-      }
+      "retired": "vyvymanga.org answers 410 Gone; it now redirects to mangaowl.io, which en.mangaowlio already covers"
     },
     "en.madaradex": {
       "checked": "2026-08-28",
@@ -389,6 +385,14 @@
     "tr.raindropfansub": {
       "checked": "2026-08-28",
       "retired": "reCAPTCHA bot wall on every path; needs a solver, not a config"
+    },
+    "en.mangadistrict": {
+      "checked": "2026-08-28",
+      "retired": "same site as the hand-written `mangadistrict` source, which is the better implementation and carries its own rate-limit floor"
+    },
+    "en.rizzcomic": {
+      "checked": "2026-08-28",
+      "retired": "same site as the hand-written `rizzfables` source, which is the better implementation and carries its own rate-limit floor"
     }
   }
 }
