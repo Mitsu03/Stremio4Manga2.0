@@ -36,7 +36,7 @@ so no build tools.
 |---|---|
 | `server/` | The server and the `s4m` CLI. TypeScript, bundled by esbuild to `server/dist/`. |
 | `server/src/sources/sites/` | The six hand-written sites. One file each. |
-| `server/src/sources/themes/` | The six engines behind the other 410 sites, which are rows in `server/sources.themed.json` rather than code. |
+| `server/src/sources/themes/` | The six engines behind the other 399 sites, which are rows in `server/sources.themed.json` rather than code. |
 | `web/` | The React UI, built by vite to `web/dist/`. |
 | `deploy/` | The systemd unit, an example Caddyfile, and the Windows launchers and tray. |
 | `install.sh`, `install.ps1` | The installers. Both take `--help`. |

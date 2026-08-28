@@ -445,6 +445,50 @@
     "en.mangadrama": {
       "checked": "2026-08-28",
       "retired": "browses 458 titles and then exposes no chapter list by any of the three routes, and its series pages carry no title either"
+    },
+    "en.mangahubio": {
+      "checked": "2026-08-28",
+      "retired": "the shared GraphQL API is gone: api.mghcdn.com answers 404 to a POST on /graphql even with a valid mhub_access key obtained through a solver, and the site's own pages reference no other endpoint - the eleven front ends share that one API, so none of them can be read"
+    },
+    "en.mangafoxfun": {
+      "checked": "2026-08-28",
+      "retired": "the shared GraphQL API is gone: api.mghcdn.com answers 404 to a POST on /graphql even with a valid mhub_access key obtained through a solver, and the site's own pages reference no other endpoint - the eleven front ends share that one API, so none of them can be read"
+    },
+    "en.mangahereonl": {
+      "checked": "2026-08-28",
+      "retired": "the shared GraphQL API is gone: api.mghcdn.com answers 404 to a POST on /graphql even with a valid mhub_access key obtained through a solver, and the site's own pages reference no other endpoint - the eleven front ends share that one API, so none of them can be read"
+    },
+    "en.mangakakalotfun": {
+      "checked": "2026-08-28",
+      "retired": "the shared GraphQL API is gone: api.mghcdn.com answers 404 to a POST on /graphql even with a valid mhub_access key obtained through a solver, and the site's own pages reference no other endpoint - the eleven front ends share that one API, so none of them can be read"
+    },
+    "en.manganel": {
+      "checked": "2026-08-28",
+      "retired": "the shared GraphQL API is gone: api.mghcdn.com answers 404 to a POST on /graphql even with a valid mhub_access key obtained through a solver, and the site's own pages reference no other endpoint - the eleven front ends share that one API, so none of them can be read"
+    },
+    "en.mangaonlinefun": {
+      "checked": "2026-08-28",
+      "retired": "the shared GraphQL API is gone: api.mghcdn.com answers 404 to a POST on /graphql even with a valid mhub_access key obtained through a solver, and the site's own pages reference no other endpoint - the eleven front ends share that one API, so none of them can be read"
+    },
+    "en.mangapandaonl": {
+      "checked": "2026-08-28",
+      "retired": "the shared GraphQL API is gone: api.mghcdn.com answers 404 to a POST on /graphql even with a valid mhub_access key obtained through a solver, and the site's own pages reference no other endpoint - the eleven front ends share that one API, so none of them can be read"
+    },
+    "en.mangareadersite": {
+      "checked": "2026-08-28",
+      "retired": "the shared GraphQL API is gone: api.mghcdn.com answers 404 to a POST on /graphql even with a valid mhub_access key obtained through a solver, and the site's own pages reference no other endpoint - the eleven front ends share that one API, so none of them can be read"
+    },
+    "en.mangatoday": {
+      "checked": "2026-08-28",
+      "retired": "the shared GraphQL API is gone: api.mghcdn.com answers 404 to a POST on /graphql even with a valid mhub_access key obtained through a solver, and the site's own pages reference no other endpoint - the eleven front ends share that one API, so none of them can be read"
+    },
+    "en.onemangaco": {
+      "checked": "2026-08-28",
+      "retired": "the shared GraphQL API is gone: api.mghcdn.com answers 404 to a POST on /graphql even with a valid mhub_access key obtained through a solver, and the site's own pages reference no other endpoint - the eleven front ends share that one API, so none of them can be read"
+    },
+    "en.onemangainfo": {
+      "checked": "2026-08-28",
+      "retired": "the shared GraphQL API is gone: api.mghcdn.com answers 404 to a POST on /graphql even with a valid mhub_access key obtained through a solver, and the site's own pages reference no other endpoint - the eleven front ends share that one API, so none of them can be read"
     }
   }
 }

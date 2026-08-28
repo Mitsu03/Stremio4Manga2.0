@@ -155,7 +155,7 @@ cannot be connected yet, rather than failing the whole query.
 
 ## Sources
 
-416 sites ship built in, across 13 languages. They come in two kinds.
+405 sites ship built in, across 13 languages. They come in two kinds.
 
 **Six are written out by hand**, because each is its own thing:
 
@@ -168,7 +168,7 @@ cannot be connected yet, rather than failing the whole query.
 | Asura Scans | `asurascans` | needs FlareSolverr |
 | Rizz Fables | `rizzfables` | |
 
-**The other 410 are data.** Most of the scanlation web is a handful of site
+**The other 399 are data.** Most of the scanlation web is a handful of site
 engines wearing different skins, so a site on a theme this build implements does
 not need code — it needs a row. `server/sources.themed.json` holds them, and
 `server/src/sources/themes/` holds the six engines they run on:
@@ -179,14 +179,14 @@ not need code — it needs a row. `server/sources.themed.json` holds them, and
 | MangaThemesia | 118 | WordPress, still widely called WPMangaStream. |
 | Keyoapp | 15 | Tailwind front end; covers are CSS, pages are ids resolved against a CDN host printed in a script. |
 | Iken | 12 | Not a scraper: a Next.js site over a JSON API on an `api.` sibling host. |
-| MangaHub | 11 | Eleven front ends over one GraphQL API, keyed by an access cookie the site issues. |
+| MangaHub | 0 | Eleven front ends over one GraphQL API, keyed by an access cookie the site issues. The engine is here and every row is retired: `api.mghcdn.com` answers 404 to a POST on `/graphql` even with a valid key obtained through a solver, and the sites reference no other endpoint. One line un-retires them if it comes back. |
 | MangaCatalog | 11 | One franchise per host. The catalogue is a list the extension names, so browsing costs no request at all. |
 
 A row is not just the site's address. Almost every install differs from its
 theme somewhere — a renamed archive path, a moved status row, dates written in
 Turkish — so each row also carries a `config` describing those differences,
 read out of the upstream extension's own source by `tools/sync-keiyoushi.mjs`.
-356 of the 410 need one. Leaving them out is what once made two thirds of these
+345 of the 399 need one. Leaving them out is what once made two thirds of these
 sources return nothing at all; see the note on defaults below.
 
 What a `config` carries depends on the engine, and the difference is
@@ -226,8 +226,30 @@ deliberate:
   18 were. Count what the catalogue will actually offer, not what upstream ships.
 - **Source ids are permanent.** Decimal strings, stored on every manga row and
   in saved searches. Never reuse or renumber one. A site that dies keeps its row
-  and its id, marked `retired` with the reason, and is simply not built — 59 are
+  and its id, marked `retired` with the reason, and is simply not built — 70 are
   in that state, and they cost nothing per search.
+
+### Two things the Madara engine does that are not selectors
+
+Worth naming here, because both look like a broken selector from the outside and
+neither is.
+
+**`chapterSource` orders the attempts; it does not choose one.** The value is
+what the upstream extension declared, and declarations go stale — three sites
+declare the slug endpoint, answer 404 on it, and render the chapter list into the
+page anyway. So a 404 or a 400 from one route is a reason to try the next, not to
+fail the source. The exception is `page`, which is the one value meaning "this
+install has no endpoint at all".
+
+**The chapter protector is decrypted.** Some installs stop printing `<img>` into
+the reader and ship the image URLs as an AES blob with the key sitting in the
+same script. The document then parses cleanly to zero pages, which is
+indistinguishable from a selector that stopped matching. Undoing it is CryptoJS's
+OpenSSL passphrase derivation and AES-256-CBC, both already in `node:crypto`. The
+site that led to implementing it does not declare the feature upstream, so the
+four extensions that do declare it are a lower bound rather than the list — if a
+Madara source browses and lists chapters and then opens none of them, look for
+`#chapter-protector-data` before suspecting the page selector.
 
 ### Corrections, and why defaults are dangerous here
 
@@ -235,7 +257,7 @@ deliberate:
 merged over whatever upstream says. It exists because upstream is not always
 current: a site moves its archive or its domain and its extension is not updated
 for months, and a source that 404s on every request is worse than one nobody
-offered. Twenty-one sites are corrected there, each carrying the date it was
+offered. Twenty sites are corrected there, each carrying the date it was
 checked — re-check before trusting an old entry.
 
 One trap is worth naming, because it once cost this build two thirds of its

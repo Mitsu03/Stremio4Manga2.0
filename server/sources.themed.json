@@ -16,7 +16,8 @@
       "config": {
         "mangaSource": "mn03"
       },
-      "id": "1000000000000000385"
+      "id": "1000000000000000385",
+      "retired": "the shared GraphQL API is gone: api.mghcdn.com answers 404 to a POST on /graphql even with a valid mhub_access key obtained through a solver, and the site's own pages reference no other endpoint - the eleven front ends share that one API, so none of them can be read"
     },
     {
       "pkgName": "en.novel24h",
@@ -3485,7 +3486,8 @@
       "config": {
         "mangaSource": "mf01"
       },
-      "id": "1000000000000000371"
+      "id": "1000000000000000371",
+      "retired": "the shared GraphQL API is gone: api.mghcdn.com answers 404 to a POST on /graphql even with a valid mhub_access key obtained through a solver, and the site's own pages reference no other endpoint - the eleven front ends share that one API, so none of them can be read"
     },
     {
       "pkgName": "en.mangafree",
@@ -3552,7 +3554,8 @@
       "config": {
         "mangaSource": "mh01"
       },
-      "id": "1000000000000000372"
+      "id": "1000000000000000372",
+      "retired": "the shared GraphQL API is gone: api.mghcdn.com answers 404 to a POST on /graphql even with a valid mhub_access key obtained through a solver, and the site's own pages reference no other endpoint - the eleven front ends share that one API, so none of them can be read"
     },
     {
       "pkgName": "en.mangahubio",
@@ -3565,7 +3568,8 @@
       "config": {
         "mangaSource": "m01"
       },
-      "id": "1000000000000000373"
+      "id": "1000000000000000373",
+      "retired": "the shared GraphQL API is gone: api.mghcdn.com answers 404 to a POST on /graphql even with a valid mhub_access key obtained through a solver, and the site's own pages reference no other endpoint - the eleven front ends share that one API, so none of them can be read"
     },
     {
       "pkgName": "fr.mangahubfr",
@@ -3631,7 +3635,8 @@
       "config": {
         "mangaSource": "mn01"
       },
-      "id": "1000000000000000374"
+      "id": "1000000000000000374",
+      "retired": "the shared GraphQL API is gone: api.mghcdn.com answers 404 to a POST on /graphql even with a valid mhub_access key obtained through a solver, and the site's own pages reference no other endpoint - the eleven front ends share that one API, so none of them can be read"
     },
     {
       "pkgName": "th.mangakimi",
@@ -3686,7 +3691,8 @@
       "config": {
         "mangaSource": "mn05"
       },
-      "id": "1000000000000000375"
+      "id": "1000000000000000375",
+      "retired": "the shared GraphQL API is gone: api.mghcdn.com answers 404 to a POST on /graphql even with a valid mhub_access key obtained through a solver, and the site's own pages reference no other endpoint - the eleven front ends share that one API, so none of them can be read"
     },
     {
       "pkgName": "en.mangaonlinefun",
@@ -3699,7 +3705,8 @@
       "config": {
         "mangaSource": "m02"
       },
-      "id": "1000000000000000376"
+      "id": "1000000000000000376",
+      "retired": "the shared GraphQL API is gone: api.mghcdn.com answers 404 to a POST on /graphql even with a valid mhub_access key obtained through a solver, and the site's own pages reference no other endpoint - the eleven front ends share that one API, so none of them can be read"
     },
     {
       "pkgName": "en.mangaowlio",
@@ -3726,7 +3733,8 @@
       "config": {
         "mangaSource": "mr02"
       },
-      "id": "1000000000000000377"
+      "id": "1000000000000000377",
+      "retired": "the shared GraphQL API is gone: api.mghcdn.com answers 404 to a POST on /graphql even with a valid mhub_access key obtained through a solver, and the site's own pages reference no other endpoint - the eleven front ends share that one API, so none of them can be read"
     },
     {
       "pkgName": "en.mangareadorg",
@@ -3753,7 +3761,8 @@
       "config": {
         "mangaSource": "mr01"
       },
-      "id": "1000000000000000378"
+      "id": "1000000000000000378",
+      "retired": "the shared GraphQL API is gone: api.mghcdn.com answers 404 to a POST on /graphql even with a valid mhub_access key obtained through a solver, and the site's own pages reference no other endpoint - the eleven front ends share that one API, so none of them can be read"
     },
     {
       "pkgName": "es.mangasnosekai",
@@ -3884,7 +3893,8 @@
       "config": {
         "mangaSource": "m03"
       },
-      "id": "1000000000000000379"
+      "id": "1000000000000000379",
+      "retired": "the shared GraphQL API is gone: api.mghcdn.com answers 404 to a POST on /graphql even with a valid mhub_access key obtained through a solver, and the site's own pages reference no other endpoint - the eleven front ends share that one API, so none of them can be read"
     },
     {
       "pkgName": "ar.mangatuk",
@@ -5085,7 +5095,8 @@
       "config": {
         "mangaSource": "mh01"
       },
-      "id": "1000000000000000386"
+      "id": "1000000000000000386",
+      "retired": "the shared GraphQL API is gone: api.mghcdn.com answers 404 to a POST on /graphql even with a valid mhub_access key obtained through a solver, and the site's own pages reference no other endpoint - the eleven front ends share that one API, so none of them can be read"
     },
     {
       "pkgName": "tr.opiatoon",
