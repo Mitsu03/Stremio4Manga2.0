@@ -146,6 +146,15 @@ export interface SourceHttp {
   json<T>(url: string, init?: SourceRequestInit): Promise<T>;
   /** The raw response, for image bytes. */
   raw(url: string, init?: SourceRequestInit): Promise<Response>;
+  /**
+   * A cookie the shared jar holds for `url`'s host, by name.
+   *
+   * Reading a cookie is not something a scraper normally needs — the jar sends
+   * them back on its own. It is here for the one source whose API lives on a
+   * different host from the site that authenticates it, and therefore has to
+   * move the value across by hand.
+   */
+  cookie(url: string, name: string): string | undefined;
 }
 
 export interface SourceDeps {
