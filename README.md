@@ -8,17 +8,24 @@ One process, one port, one SQLite file. No JVM, no port per person, no data
 directory per person — version 1 had all three and none of them survived.
 
 ```bash
-git clone https://github.com/Mitsu03/Stremio4Manga2.0
-cd Stremio4Manga2.0
-sudo ./install.sh --origin https://manga.example.com     # Linux, systemd
+# Linux, systemd. Installs a published release; nothing is built on the server.
+curl -fsSLO https://github.com/Mitsu03/Stremio4Manga2.0/releases/latest/download/install.sh
+sudo bash install.sh --release --origin https://manga.example.com
 ```
 
 ```powershell
+git clone https://github.com/Mitsu03/Stremio4Manga2.0
+cd Stremio4Manga2.0
 .\install.ps1                                            # Windows, tray icon
 ```
 
 Needs **Node 22 or newer** — the database is `node:sqlite`. No native modules,
 so no build tools.
+
+Building on the machine instead — for developing, or for something not released
+yet — is `git clone`, then `sudo ./install.sh --origin ...` without `--release`.
+That installs whatever the checkout is on, which is `main` rather than the last
+tag. [docs/RELEASING.md](docs/RELEASING.md) has both paths and why they differ.
 
 ## Documentation
 

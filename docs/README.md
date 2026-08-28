@@ -30,7 +30,9 @@ range to reserve and no per-account directory to move.
 
 - **Node 22 or newer.** The database is `node:sqlite`, which does not exist
   before 22. Tested on 24.
-- **No build tools.** There are no native modules; `npm ci` is a download.
+- **No build tools.** There are no native modules; `npm ci` is a download. And a
+  server installed with `--release` never runs it at all — it needs `curl`,
+  `tar` and `sha256sum`, which it already has.
 - **A reverse proxy**, if this faces the internet. The server never terminates
   TLS. See [DEPLOY.md](DEPLOY.md).
 - **FlareSolverr — optional**, external, and worth more than "optional" makes it
@@ -43,14 +45,32 @@ range to reserve and no per-account directory to move.
 ## Installing on Linux
 
 This is the primary target. `install.sh` creates a system account, installs into
-`/opt/stremio4manga`, builds, writes the config, installs a systemd unit and
-offers to create the first account.
+`/opt/stremio4manga`, writes the config, installs a systemd unit and offers to
+create the first account.
+
+```bash
+curl -fsSLO https://github.com/Mitsu03/Stremio4Manga2.0/releases/latest/download/install.sh
+sudo bash install.sh --release --origin https://manga.example.com
+```
+
+`--release` installs a published release: it downloads the two archives and
+their checksums, verifies them, and extracts. Nothing is built on the server, so
+npm is not needed and neither are the ~200 MB of build dependencies. Add a tag —
+`--release=v2.1.0` — to pin one instead of taking the latest.
+
+The other way builds the checkout on the machine, which is what you want when
+developing, or when running something that is not released yet:
 
 ```bash
 git clone https://github.com/Mitsu03/Stremio4Manga2.0
 cd Stremio4Manga2.0
 sudo ./install.sh --origin https://manga.example.com
 ```
+
+A fresh clone is on `main`, so that installs unreleased code while reporting the
+version in `package.json` — usually the last release. `git checkout vX.Y.Z`
+first if that is not what you meant. [RELEASING.md](RELEASING.md) has the whole
+picture.
 
 `./install.sh --help` lists the flags — a different prefix, a different data
 directory, a different service account, FlareSolverr, and a fully

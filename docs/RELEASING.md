@@ -18,25 +18,100 @@ git tag v2.1.0
 git push origin v2.1.0
 ```
 
-The workflow attaches two assets to the release: `stremio4manga-X.Y.Z.tar.gz`
-and `stremio4manga-X.Y.Z.tar.gz.sha256`. The tarball is the runtime payload and
-only the runtime payload — `server/dist`, `server/bin`, `server/catalog.json`,
-`server/config.example.json`, `web/dist`. That is the same set the
-`Containerfile`'s runtime stage copies, for the same reason: it is everything
-the server opens once it is running and nothing else.
+The workflow attaches five assets:
 
-What it deliberately does not carry matters as much. No `node_modules` — the
-esbuild bundle already carries its dependencies, which is why the archive is a
-few megabytes rather than a few hundred. No source and no toolchain: the build
-needs npm, esbuild, vite and roughly 200 MB of devDependencies, and it runs once,
-here, so it never has to run on the machine that serves manga. And no
-`config.json`, because a server's configuration is its own and an update that
-overwrote it would replace a working `publicOrigin` with an example one.
+| | |
+|---|---|
+| `stremio4manga-X.Y.Z.tar.gz` | The runtime payload. `server/dist`, `server/bin`, `server/catalog.json`, `server/config.example.json`, `web/dist` — the same set the `Containerfile`'s runtime stage copies, for the same reason: it is everything the server opens once it is running and nothing else. |
+| `stremio4manga-X.Y.Z.tar.gz.sha256` | Its checksum. `s4m update` verifies against this before it extracts anything. |
+| `stremio4manga-X.Y.Z-install.tar.gz` | The install-time assets: `install.sh`, `deploy/`, `docs/`, `README.md`. No build output, so it is tens of kilobytes. |
+| `stremio4manga-X.Y.Z-install.tar.gz.sha256` | Its checksum. |
+| `install.sh` | The same file again, loose. This is the bootstrap: `/releases/latest/download/install.sh` is a stable URL, so the first command on a new machine can be a `curl` rather than a `git clone`. |
+
+**Why two archives rather than one.** They answer to different owners. The
+runtime payload is what `s4m update` replaces on a running server, over and over,
+for the rest of that deployment's life. The install assets are read once, by the
+installer, and never touched again. Keeping them apart is what lets the updater
+swap a server without ever rewriting the installer that put it there — and it
+keeps `PAYLOAD` in `server/src/update.ts` exactly equal to the runtime list,
+which is the invariant [the payload list](#the-payload-list-lives-in-four-places)
+depends on.
+
+What the runtime payload deliberately does not carry matters as much. No
+`node_modules` — the esbuild bundle already carries its dependencies, which is
+why the archive is a few megabytes rather than a few hundred. No source and no
+toolchain: the build needs npm, esbuild, vite and roughly 200 MB of
+devDependencies, and it runs once, here, so it never has to run on the machine
+that serves manga. And no `config.json`, because a server's configuration is its
+own and an update that overwrote it would replace a working `publicOrigin` with
+an example one.
 
 The same push also builds and publishes a container image to
 `ghcr.io/mitsu03/stremio4manga:vX.Y.Z` and `:latest`, from the `Containerfile`'s
 runtime target. That is a separate job for a separate kind of deployment; see
 [Containers update themselves](#containers-update-themselves).
+
+The image job carries `needs: release`, so it does not start until the lint, the
+build and the tests above have passed. Without that they run in parallel, and a
+tag whose tests failed still publishes `:latest` — which every machine with
+`podman auto-update` enabled then pulls, unattended, in the middle of the night.
+Podman's rollback catches an image that fails to start; it cannot catch one that
+starts and behaves badly.
+
+## Installing a server from a release
+
+This is the point of the archives above, and it is how a Linux server should be
+installed. Nothing is built on the machine:
+
+```bash
+curl -fsSLO https://github.com/Mitsu03/Stremio4Manga2.0/releases/latest/download/install.sh
+sudo bash install.sh --release --origin https://manga.example.com
+```
+
+`--release` takes the latest; `--release=v2.1.0` pins one. The installer asks the
+GitHub API for the release, downloads both archives with their `.sha256` files,
+verifies both, checks the extracted tree actually contains
+`server/dist/main.js`, `server/dist/cli.js`, `web/dist/index.html` and
+`deploy/stremio4manga.service`, and only then writes anything into `PREFIX`. The
+ordering is `s4m update`'s, for the same reason: everything that can fail happens
+before the live tree is touched.
+
+The alternative is still there and is still the right thing while developing:
+
+```bash
+git clone https://github.com/Mitsu03/Stremio4Manga2.0
+cd Stremio4Manga2.0
+sudo ./install.sh --origin https://manga.example.com
+```
+
+Be clear about what that second form installs. It builds the checkout, and a
+fresh clone is on `main` — not on the last tag. So it installs unreleased code
+while `VERSION` reports whatever `package.json` says, which is usually the last
+release. `s4m update --check` then compares that number against the published one
+and can honestly answer "up to date" about a build that is nothing of the sort.
+If you want a specific release from a checkout, `git checkout vX.Y.Z` first; if
+you want a server, use `--release`.
+
+`--release` needs `curl`, `tar` and `sha256sum`, and no npm at all. The source
+path needs npm and roughly 200 MB of devDependencies, which it prunes afterwards.
+
+### Proving it without publishing anything
+
+```bash
+npm run test:release
+```
+
+`test/release-install.sh` builds both archives exactly as the workflow does,
+serves them and a synthetic release document over `file://`, and runs the real
+`install.sh --release` against them inside a throwaway container: extraction,
+checksums, ownership, the `s4m` wrapper, the server starting as the service user
+and answering on `/gateway/health`, and a second run to prove the installer is
+re-runnable. It needs podman and takes about a minute.
+
+That exists because the release path is the one branch that cannot be tried on
+the machine that wrote it — trying it for real means publishing a tag, and a tag
+is awkward to take back. The seam that makes it testable is `S4M_RELEASE_API`,
+which the test points at a local directory and nothing else ever sets.
 
 ## The version number, and the one place it lives
 
@@ -344,37 +419,79 @@ systemd starts, so the container has to be run from a unit (a Quadlet file, or
 This is the container path only. The systemd install that `install.sh` produces
 is the documented default, and it uses `s4m update`.
 
+To run the published image instead of building it:
+
+```bash
+podman pull ghcr.io/mitsu03/stremio4manga:latest
+```
+
+**A package published to ghcr is private until somebody makes it public**, and
+that is true even when the repository is public — the visibility of a package and
+the visibility of the repository it was built from are separate settings. So the
+first tag publishes an image that an anonymous `podman pull` answers with a 401.
+It is a one-time fix, on the web, and it cannot be done from the workflow: the
+`GITHUB_TOKEN` a job runs with cannot change package visibility.
+
+> github.com/Mitsu03?tab=packages → **stremio4manga** → Package settings →
+> Danger Zone → **Change visibility** → Public
+
+Do it once, immediately after the first release, and check it with a `podman
+pull` from a machine that is not logged in. Every later release reuses the same
+package and stays public.
+
 ## The checklist
 
 Each line is one thing, in order:
 
 1. Every schema change in this release also has a `MIGRATIONS` entry.
 2. Bump `version` in the root `package.json`.
-3. `npm run lint && npm run build && npm run test:offline` locally.
-4. Commit.
-5. `git tag vX.Y.Z` — the same X.Y.Z as `package.json`.
-6. `git push origin vX.Y.Z`.
-7. Watch the workflow; the tag/`package.json` check fails first if it is going to.
-8. Confirm both `stremio4manga-X.Y.Z.tar.gz` and its `.sha256` are attached to
-   the release.
-9. `sudo s4m update --check` on a server — it should name the new version.
-10. `sudo s4m update --yes --restart` — without `--yes` it only reports.
-11. `s4m version`, `curl -s localhost:8080/gateway/health`, and open the UI.
+3. `npm run lint && npm run build && npm run test:offline` locally — or read the
+   CI run on the pull request, which is the same three commands in the same
+   order.
+4. `npm run test:release`, if this release changes `install.sh`, the payload
+   list, or the workflow that packs it.
+5. Commit, and land it through a pull request so CI has actually seen it.
+6. `git tag vX.Y.Z` — the same X.Y.Z as `package.json`.
+7. `git push origin vX.Y.Z`.
+8. Watch the workflow; the tag/`package.json` check fails first if it is going to.
+9. Confirm all five assets are attached: both `.tar.gz` files, both `.sha256`
+   files, and the loose `install.sh`.
+10. `sudo s4m update --check` on a server — it should name the new version.
+11. `sudo s4m update --yes --restart` — without `--yes` it only reports.
+12. `s4m version`, `curl -s localhost:8080/gateway/health`, and open the UI.
 
-## The payload list lives in three places
+**The first release only**, once and never again:
+
+- The first tag must be `v2.0.0`, because that is what `package.json` says and
+  the workflow refuses a tag that disagrees.
+- Steps 10 and 11 have nothing to update from, since no server was installed from
+  a release. Install one instead, with
+  `curl -fsSLO .../releases/latest/download/install.sh` and
+  `sudo bash install.sh --release --origin ...`.
+- Make the ghcr package public, as above.
+
+## The payload list lives in four places
 
 `.github/workflows/release.yml` packs it, `server/src/update.ts` has it as
-`PAYLOAD` and swaps each entry, and the `Containerfile`'s runtime stage copies
-it. Three copies of one list, in three languages, none of which can see the other
-two.
+`PAYLOAD` and swaps each entry, the `Containerfile`'s runtime stage copies it,
+and `test/release-install.sh` packs it again to build the archive it tests
+against. Four copies of one list, in three languages, none of which can see the
+other three.
 
 They have to be changed together. Adding a runtime file to the Containerfile and
 not to the workflow ships a tarball that is missing it; adding it to the workflow
 and not to `PAYLOAD` extracts it into staging and never swaps it in.
 
-What keeps a disagreement from becoming a broken install is `update.ts`'s
-`MUST_EXIST` check: a staged tree without `server/dist/main.js`,
-`server/dist/cli.js` and `web/dist/index.html` is refused before the swap, so the
-update stops rather than completing and leaving a server unable to start. That is
-the most a check on this side can do — it turns a silent breakage into a refusal,
-but it cannot know about a file nobody added to any of the three.
+Two checks stand between a disagreement and a broken install, and neither is
+complete on its own:
+
+`update.ts`'s `MUST_EXIST` refuses a staged tree without `server/dist/main.js`,
+`server/dist/cli.js` and `web/dist/index.html` before the swap, so an update
+stops rather than completing and leaving a server unable to start. It turns a
+silent breakage into a refusal, but it cannot know about a file nobody added to
+any of the four.
+
+`npm run test:release` installs from an archive it packed itself and then starts
+the server, so a runtime file that is missing everywhere fails there — as a
+server that will not boot, on a laptop, rather than on somebody's machine after a
+tag. That is the check worth running when this list changes.

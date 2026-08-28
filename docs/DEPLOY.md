@@ -18,8 +18,8 @@ back.
 
 ### Linux, with systemd
 
-`sudo ./install.sh --origin https://manga.example.com` does all of this. What
-follows is what it did, so that editing it later is not archaeology.
+`sudo bash install.sh --release --origin https://manga.example.com` does all of
+this. What follows is what it did, so that editing it later is not archaeology.
 
 ```bash
 useradd --system --home-dir /var/lib/stremio4manga --no-create-home \
@@ -117,6 +117,27 @@ to the same problem.
 The `Containerfile` is a two-stage build: Node and the built output, no JVM, no
 Chromium, no native module to compile. The runtime stage runs as an unprivileged
 `s4m` user and keeps everything under `/data`.
+
+Every tag publishes that image, so there is usually nothing to build:
+
+```bash
+podman pull ghcr.io/mitsu03/stremio4manga:latest
+podman volume create s4m-data
+podman run -d --name stremio4manga -p 127.0.0.1:8080:8080 \
+  -v s4m-data:/data -v ./config.json:/app/server/config.json:ro \
+  ghcr.io/mitsu03/stremio4manga:latest
+podman exec -it stremio4manga node server/bin/s4m.js users add alice
+```
+
+A 401 on that `pull` means the package is still private. Packages published to
+ghcr stay private until somebody changes it, independently of whether the
+repository is public, and it is a one-time setting — see
+[RELEASING.md](RELEASING.md#containers-update-themselves). Pin a tag rather than
+`:latest` (`ghcr.io/mitsu03/stremio4manga:v2.1.0`) unless you want
+`podman auto-update` moving the deployment for you.
+
+Building it locally produces the same image, and is what you want for a change
+that is not released yet:
 
 ```bash
 podman build -t stremio4manga .
