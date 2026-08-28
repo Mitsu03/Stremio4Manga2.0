@@ -207,7 +207,7 @@ loopback host means nothing is in front — print which they chose, and take
 
 Optional, external, and off by default — but it is worth more than that
 description used to suggest. Two of the six hand-written sources (Asura Scans
-and ComicK) sit behind Cloudflare, and so do roughly 63 of the 305 themed ones:
+and ComicK) sit behind Cloudflare, and so do roughly 63 of the 302 themed ones:
 about a fifth of the whole catalogue is unreachable without a solver. Without
 one they fail with a message naming the source and saying exactly what to
 configure; nothing else is affected.

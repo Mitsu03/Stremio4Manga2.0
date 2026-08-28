@@ -155,7 +155,7 @@ cannot be connected yet, rather than failing the whole query.
 
 ## Sources
 
-311 sites ship built in, across 13 languages. They come in two kinds.
+308 sites ship built in, across 13 languages. They come in two kinds.
 
 **Six are written out by hand**, because each is its own thing:
 
@@ -168,17 +168,17 @@ cannot be connected yet, rather than failing the whole query.
 | Asura Scans | `asurascans` | needs FlareSolverr |
 | Rizz Fables | `rizzfables` | |
 
-**The other 305 are data.** Most of the scanlation web is a handful of
+**The other 302 are data.** Most of the scanlation web is a handful of
 WordPress themes wearing different skins, so a site on a theme this build
 implements does not need code — it needs a row. `server/sources.themed.json`
-holds them: 186 on Madara and 119 on MangaThemesia, the two engines under
+holds them: 184 on Madara and 118 on MangaThemesia, the two engines under
 `server/src/sources/themes/`.
 
 A row is not just the site's address. Almost every install differs from its
 theme somewhere — a renamed archive path, a moved status row, dates written in
 Turkish — so each row also carries a `config` describing those differences,
 read out of the upstream extension's own source by `tools/sync-keiyoushi.mjs`.
-248 of the 305 need one. Leaving them out is what once made two thirds of these
+246 of the 302 need one. Leaving them out is what once made two thirds of these
 sources return nothing at all; see the note on defaults below.
 
 Several things here are different from version 1, and all of them are
@@ -203,7 +203,7 @@ deliberate:
   two, so this is where the remaining coverage is.
 - **Source ids are permanent.** Decimal strings, stored on every manga row and
   in saved searches. Never reuse or renumber one. A site that dies keeps its row
-  and its id, marked `retired` with the reason, and is simply not built — 43 are
+  and its id, marked `retired` with the reason, and is simply not built — 46 are
   in that state, and they cost nothing per search.
 
 ### Corrections, and why defaults are dangerous here
@@ -212,7 +212,7 @@ deliberate:
 merged over whatever upstream says. It exists because upstream is not always
 current: a site moves its archive or its domain and its extension is not updated
 for months, and a source that 404s on every request is worse than one nobody
-offered. Twenty-two sites are corrected there, each carrying the date it was
+offered. Twenty-one sites are corrected there, each carrying the date it was
 checked — re-check before trusting an old entry.
 
 One trap is worth naming, because it once cost this build two thirds of its
