@@ -9,7 +9,7 @@
  * `server/sources.themed.json` and costs a row rather than a file of code.
  *
  * It does *not* reduce to four values. That was the original belief here, and it
- * was wrong in a way that took a while to see: only 30 of the 315 extensions
+ * was wrong in a way that took a while to see: only 56 of the 302 extensions
  * this build covers override nothing at all. The rest rename a URL path, move a
  * selector, write dates in another language or extend a different base class,
  * and dropping all of that shipped sources that installed and then returned
@@ -85,7 +85,7 @@ function download() {
   say(`downloading ${TARBALL}`);
   execFileSync('curl', ['-sL', '--fail', '-m', '900', TARBALL, '-o', tar], { stdio: 'inherit' });
   // The build file says which theme a source is on; the Kotlin beside it says
-  // how that source differs from the theme's defaults, and only 30 of 315 differ
+  // how that source differs from the theme's defaults, and only 56 of 302 differ
   // in nothing at all. Both are needed. Icons and the rest of the ~200 MB are
   // not, so the extraction stays narrow.
   execFileSync(
