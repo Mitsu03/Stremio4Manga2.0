@@ -68,7 +68,14 @@ const OVERRIDES = join(root, 'server', 'sources.overrides.json');
  * name, and assuming our Madara covers it is how 106 broken sources ship at
  * once.
  */
-const SUPPORTED = new Set(['madara', 'mangathemesia']);
+const SUPPORTED = new Set([
+  'madara',
+  'mangathemesia',
+  'iken',
+  'keyoapp',
+  'mangacatalog',
+  'mangahub',
+]);
 
 const TARBALL = 'https://codeload.github.com/keiyoushi/extensions-source/tar.gz/refs/heads/main';
 
@@ -128,12 +135,74 @@ function kotlinOf(dir) {
   return out.join('\n');
 }
 
-const str = (text, member) =>
-  text.match(new RegExp(`override\\s+val\\s+${member}\\s*=\\s*"([^"]*)"`))?.[1];
+/**
+ * `override val x = "…"`, with Kotlin's own escaping undone.
+ *
+ * `[^"]*` is the obvious pattern and the wrong one: a CSS selector matching on
+ * an attribute value contains escaped quotes — `a[href*=\"?genre=\"]` — and
+ * stopping at the first of them yields a *truncated* selector, which is worse
+ * than none. Cheerio throws on it, and the throw takes the whole source down
+ * rather than one field. One site shipped that way before this was noticed.
+ */
+const str = (text, member) => {
+  const raw = text.match(
+    new RegExp(`override\\s+val\\s+${member}\\s*=\\s*"((?:[^"\\\\]|\\\\.)*)"`),
+  )?.[1];
+  return raw === undefined ? undefined : raw.replace(/\\(.)/g, '$1');
+};
 const bool = (text, member) => {
   const hit = text.match(new RegExp(`override\\s+val\\s+${member}\\s*=\\s*(true|false)\\b`))?.[1];
   return hit === undefined ? undefined : hit === 'true';
 };
+const int = (text, member) => {
+  const hit = text.match(new RegExp(`override\\s+val\\s+${member}\\s*=\\s*(\\d+)\\b`))?.[1];
+  return hit === undefined ? undefined : Number(hit);
+};
+
+/**
+ * A selector an extension expresses as a one-line function rather than a value.
+ *
+ * Some themes declare `open fun popularMangaSelector(): String = "…"` where
+ * others declare a `val`, and an override of the first kind is exactly as much
+ * data as one of the second. Only a bare string literal is taken: a body that
+ * calls something is code, and is counted as code below.
+ */
+const fnStr = (text, member) => {
+  const raw = text.match(
+    new RegExp(
+      `override\\s+fun\\s+${member}\\s*\\([^)]*\\)\\s*(?::\\s*String\\s*)?=\\s*"((?:[^"\\\\]|\\\\.)*)"`,
+    ),
+  )?.[1];
+  return raw === undefined ? undefined : raw.replace(/\\(.)/g, '$1');
+};
+
+/**
+ * `listOf(Pair("Berserk", "$baseUrl/manga/berserk/"), …)` → the pairs.
+ *
+ * MangaCatalog sites are one franchise each, so this list *is* the catalogue.
+ * Without it a site carrying side stories offers only its main title, and the
+ * theme's own default — the site's name pointed at its root — is a series page
+ * that does not exist.
+ *
+ * The `$baseUrl` prefix is dropped rather than resolved, because the engine
+ * resolves a relative URL against whatever the row's `baseUrl` says: a domain
+ * move then stays a one-line correction instead of a re-scrape.
+ */
+function sourceList(text) {
+  const block = text.match(/override\s+val\s+sourceList\s*=\s*listOf\(([\s\S]*?)\n\s*\)/)?.[1];
+  if (!block) return undefined;
+  const series = [];
+  for (const line of block.split('\n')) {
+    // A commented-out entry is one upstream deliberately withdrew — Berserk's
+    // motion comic, which is video and has no pages.
+    if (/^\s*\/\//.test(line)) continue;
+    const pair = line.match(/Pair\(\s*"([^"]*)"\s*,\s*"([^"]*)"/);
+    if (!pair) continue;
+    const url = pair[2].replace(/^\$baseUrl/, '');
+    if (pair[1] !== '' && url !== '') series.push({ name: pair[1], url });
+  }
+  return series.length > 0 ? series : undefined;
+}
 
 /**
  * `rateLimit(3, 2.seconds)` and friends, reduced to the one number this server
@@ -180,12 +249,45 @@ function overrides(theme, dir) {
   // Madara's archive path segment and MangaThemesia's series-URL prefix are
   // different members with different shapes — one bare, one slash-led — so they
   // are read separately and normalised here, not shared.
-  const madaraPath = str(text, 'mangaSubString');
-  const themesiaPath = str(text, 'mangaUrlDirectory');
-  const path = theme === 'madara' ? madaraPath : themesiaPath;
-  if (path) config.mangaPath = path.replace(/^\/+|\/+$/g, '');
+  // Madara's archive path segment and MangaThemesia's series-URL prefix are
+  // different members with different shapes — one bare, one slash-led — so they
+  // are read separately and normalised here, not shared. The other four themes
+  // have no such member: their URLs are fixed by the engine.
+  const path = theme === 'madara' ? str(text, 'mangaSubString') : str(text, 'mangaUrlDirectory');
+  if ((theme === 'madara' || theme === 'mangathemesia') && path) {
+    config.mangaPath = path.replace(/^\/+|\/+$/g, '');
+  }
 
-  if (theme === 'madara') {
+  if (theme === 'mangathemesia') {
+    if (base === 'MangaThemesiaAlt') config.variant = 'alt';
+    if (bool(text, 'hasProjectPage') === true) config.hasProjectPage = true;
+    const page = str(text, 'pageSelector');
+    if (page) config.pageSelector = page;
+  } else if (theme === 'iken') {
+    // Everything Iken varies is a number or a flag; there is no markup to move.
+    const perPage = int(text, 'perPage');
+    if (perPage) config.perPage = perPage;
+    if (bool(text, 'sortPagesByFilename') === true) config.sortPagesByFilename = true;
+    const api = str(text, 'apiUrl');
+    if (api) config.apiUrl = api;
+  } else if (theme === 'keyoapp') {
+    // The featured row is what installs disagree about most, and half of them
+    // express it as a function rather than as a value.
+    const popular = str(text, 'popularMangaSelector') ?? fnStr(text, 'popularMangaSelector');
+    if (popular) config.popularSelector = popular;
+    const type = str(text, 'typeSelector');
+    if (type) config.typeSelector = type;
+    const altName = str(text, 'altNameSelector');
+    if (altName) config.altNameSelector = altName;
+  } else if (theme === 'mangahub') {
+    // Not an override so much as the site's identity: the API is one catalogue
+    // per front end, named by this enum, and the query is malformed without it.
+    const catalogue = str(text, 'mangaSource');
+    if (catalogue) config.mangaSource = catalogue;
+  } else if (theme === 'mangacatalog') {
+    const series = sourceList(text);
+    if (series) config.series = series;
+  } else if (theme === 'madara') {
     // The chapter list arrives one of five ways upstream; this build knows two
     // of them, and `page` is what `MadaraNoAjax`-style installs need.
     const mode = text.match(/chapterMode\s*=\s*ChapterMode\.(\w+)/)?.[1];
@@ -199,11 +301,6 @@ function overrides(theme, dir) {
 
     const filter = bool(text, 'filterNonMangaItems');
     if (filter === false) config.filterNonMangaItems = false;
-  } else {
-    if (base === 'MangaThemesiaAlt') config.variant = 'alt';
-    if (bool(text, 'hasProjectPage') === true) config.hasProjectPage = true;
-    const page = str(text, 'pageSelector');
-    if (page) config.pageSelector = page;
   }
 
   const selectors = {};
@@ -232,9 +329,28 @@ function overrides(theme, dir) {
       chapterList: 'chapterListSelector',
       searchItem: 'searchMangaSelector',
     },
+    // Keyoapp names its members after the field rather than after the page, and
+    // several installs replace the theme's label scan with a plain `div[alt=X]`.
+    keyoapp: {
+      status: 'statusSelector',
+      author: 'authorSelector',
+      artist: 'artistSelector',
+      genre: 'genreSelector',
+      description: 'descriptionSelector',
+      chapterDate: 'dateSelector',
+    },
+    // The one MangaCatalog member that is a value; the rest of what these sites
+    // change is written as functions, and is counted rather than carried.
+    mangacatalog: { chapterList: 'chapterListSelector' },
+    // Nothing to move: Iken parses JSON and MangaHub GraphQL, so neither has a
+    // selector to override. Present so the loop below needs no special case.
+    iken: {},
+    mangahub: {},
   };
-  for (const [field, member] of Object.entries(SELECTORS[theme])) {
-    const found = str(text, member);
+  for (const [field, member] of Object.entries(SELECTORS[theme] ?? {})) {
+    // A theme that writes a selector as a one-line function is as much data as
+    // one that writes it as a value; MangaCatalog does the former throughout.
+    const found = str(text, member) ?? fnStr(text, member);
     if (found) selectors[field] = found;
   }
   if (Object.keys(selectors).length > 0) config.selectors = selectors;
