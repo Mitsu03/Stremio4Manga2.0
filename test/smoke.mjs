@@ -351,6 +351,25 @@ async function run() {
       .map((entry) => `${entry.pkgName} (${entry.lang})`)
       .join(', ') || `${others.length} available, none installed`,
   );
+
+  // Installing is per account, and only a source neither account starts with can
+  // prove it: both are seeded with every English one, so mangadex would pass this
+  // no matter how badly `source_state` leaked between accounts.
+  const offLanguage = others[0];
+  await gql(
+    a,
+    'mutation($p:String!){updateExtension(input:{id:$p,patch:{install:true}}){extension{pkgName}}}',
+    { p: offLanguage.pkgName },
+  );
+  const aLangs = await gql(a, '{sources{nodes{id lang}}}');
+  const bLangs = await gql(b, '{sources{nodes{id lang}}}');
+  const carries = (result) =>
+    (result.data?.sources?.nodes ?? []).some((source) => source.lang === offLanguage.lang);
+  check(
+    'installing a source is per account, not per server',
+    carries(aLangs) && !carries(bLangs),
+    `${offLanguage.pkgName} (${offLanguage.lang})`,
+  );
   // Two stores, and which two matters: the sources are largely catalogued by
   // keiyoushi, and a page that credits only "Built-in" cannot tell anyone where
   // they came from.
@@ -479,12 +498,6 @@ async function liveChecks(a, b) {
   const ids = (sources.data?.sources?.nodes ?? []).map((source) => source.id);
   check('the installed source is listed', ids.includes(MANGADEX_ID), ids.join(','));
   check('the AniList pseudo-source is listed', ids.includes('1'));
-
-  const bSources = await gql(b, '{sources{nodes{id name}}}');
-  check(
-    'the other account did not get the source',
-    !(bSources.data?.sources?.nodes ?? []).map((source) => source.id).includes(MANGADEX_ID),
-  );
 
   const search = await gql(
     a,
