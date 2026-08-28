@@ -77,6 +77,20 @@ const ICON_URLS: Record<string, string> = {
 const CANDIDATES = ['/apple-touch-icon.png', '/favicon.ico'];
 
 const MAX_BYTES = 512 * 1024;
+/**
+ * Below this, an "icon" is a blank.
+ *
+ * Two sites served a 100x100 PNG of 162 bytes — the size a solid, empty image
+ * compresses to. It passes every other check: real content type, non-zero, a
+ * plausible size in pixels. It draws as an empty square, which is the one
+ * outcome the monogram exists to avoid, so it is treated as a miss.
+ *
+ * A size test is a proxy for blankness and a bigger blank would still get
+ * through; it is here because it is cheap and it catches what actually
+ * happened, not because it is exact. The smallest real icon seen across the
+ * catalogue is about four times this.
+ */
+const MIN_BYTES = 256;
 /** Short: nothing waits on this, and a site that is slow to serve a favicon is
  * not going to become fast on the next try. */
 const TIMEOUT_MS = 6_000;
@@ -186,7 +200,7 @@ async function tryImage(url: string): Promise<{ body: Buffer; type: string } | u
     if (!type.startsWith('image/')) return undefined;
 
     const body = Buffer.from(await response.arrayBuffer());
-    if (body.byteLength === 0 || body.byteLength > MAX_BYTES) return undefined;
+    if (body.byteLength < MIN_BYTES || body.byteLength > MAX_BYTES) return undefined;
     return { body, type };
   } catch {
     // Down, blocked, timed out. The caller has other things to try.
@@ -248,7 +262,37 @@ async function declaredIcon(site: string): Promise<{ body: Buffer; type: string 
   return undefined;
 }
 
-async function fetchIcon(pkgName: string, dir: string): Promise<void> {
+/**
+ * A public favicon service, as the very last resort.
+ *
+ * About a fifth of the catalogue sits behind Cloudflare and refuses us
+ * outright — not a challenge that can be solved, just a 403 on every path
+ * including the favicon — so nothing the site itself offers can be read. These
+ * services have the icon anyway, from crawls that are not us.
+ *
+ * Off unless an operator sets `icons.fallback`, because it means telling a
+ * third party which manga domains this server catalogues. It is one request per
+ * site, once, and the answer is cached forever after; a reader's browser is
+ * never involved either way, which is the property this module exists to keep.
+ *
+ * Google answers 404 for a domain it has no icon for, so `tryImage`'s existing
+ * check for a failed response is all the placeholder detection this needs.
+ */
+async function serviceIcon(
+  site: string,
+  fallback: 'none' | 'google',
+): Promise<{ body: Buffer; type: string } | undefined> {
+  if (fallback === 'none') return undefined;
+  let host: string;
+  try {
+    host = new URL(site).hostname;
+  } catch {
+    return undefined;
+  }
+  return tryImage(`https://www.google.com/s2/favicons?sz=64&domain=${encodeURIComponent(host)}`);
+}
+
+async function fetchIcon(pkgName: string, dir: string, fallback: 'none' | 'google'): Promise<void> {
   const configured = SITES[pkgName];
   if (!configured) return;
   const site = configured.replace(/\/+$/, '');
@@ -263,6 +307,7 @@ async function fetchIcon(pkgName: string, dir: string): Promise<void> {
     found = await tryImage(`${site}${path}`);
   }
   found ??= await declaredIcon(site);
+  found ??= await serviceIcon(site, fallback);
 
   if (!found) {
     missing.add(pkgName);
@@ -313,7 +358,12 @@ function schedule(job: () => Promise<void>): void {
  * real icon is fetched in the background for the *next* load. The monogram
  * carries a short cache lifetime for exactly that reason.
  */
-export function sourceIcon(pkgName: string, displayName: string, cacheRoot: string): SourceIcon {
+export function sourceIcon(
+  pkgName: string,
+  displayName: string,
+  cacheRoot: string,
+  fallback: 'none' | 'google' = 'none',
+): SourceIcon {
   const held = memory.get(pkgName);
   if (held) return { ...held, real: true };
 
@@ -326,7 +376,7 @@ export function sourceIcon(pkgName: string, displayName: string, cacheRoot: stri
 
   if (SITES[pkgName] && !missing.has(pkgName) && !warming.has(pkgName)) {
     warming.add(pkgName);
-    schedule(() => fetchIcon(pkgName, dir).finally(() => warming.delete(pkgName)));
+    schedule(() => fetchIcon(pkgName, dir, fallback).finally(() => warming.delete(pkgName)));
   }
 
   return monogram(displayName);
