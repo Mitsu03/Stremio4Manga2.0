@@ -458,6 +458,8 @@ export function createHttpClient(config: Pick<Config, 'flaresolverr'>): HttpClie
     return queues.run(host, interval, async () => {
       breaker.check(host, options.sourceName);
       let lastError: unknown;
+      /** Whether a clearance solve has already been spent on a non-GET here. */
+      let solvedForPost = false;
 
       for (let attempt = 1; attempt <= attempts; attempt += 1) {
         let result: { response: Response; body?: string };
@@ -483,6 +485,27 @@ export function createHttpClient(config: Pick<Config, 'flaresolverr'>): HttpClie
           // This host is behind Cloudflare, so every later request to it takes
           // the slow interval — including the ones already queued behind this.
           challenged.add(host);
+
+          // A solve is a browser fetching a page, and a browser fetching a page
+          // is a GET. Handing it a POST dropped the method and the body in
+          // silence: the site answered "Cannot GET /graphql", which reads like a
+          // broken endpoint rather than like the request having been rewritten
+          // underneath us. Every POST this server makes — admin-ajax, the themed
+          // chapter endpoints, GraphQL — was affected from the moment its host
+          // started challenging.
+          //
+          // The solve is still the right move; what it earns is a `cf_clearance`
+          // cookie in the jar. With that in hand the real request can go
+          // straight out, so solve the *origin* — a GET, and the page a browser
+          // would have visited anyway — and then send the original request once
+          // more as itself. Once per call: a second challenge after clearance is
+          // a refusal, not a race.
+          if ((init.method ?? 'GET').toUpperCase() !== 'GET' && !solvedForPost) {
+            solvedForPost = true;
+            await solveOnce(new URL(url).origin, options);
+            continue;
+          }
+
           // Solving is a whole browser round-trip and the single most
           // ban-worthy thing this server does; never retry the plain request
           // first, and leave the loop either way.
