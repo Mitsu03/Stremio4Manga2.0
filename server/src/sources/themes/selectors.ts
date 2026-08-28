@@ -1,4 +1,4 @@
-import type { Cheerio } from 'cheerio';
+import { load, type Cheerio } from 'cheerio';
 import type { AnyNode } from 'domhandler';
 
 /**
@@ -46,15 +46,43 @@ export interface ThemeSelectors {
 }
 
 /**
- * `override ?? fallback`, but treating an empty string as absent.
+ * Whether Cheerio can parse a selector at all.
+ *
+ * A selector arrives here as *data*, read out of somebody else's Kotlin by a
+ * generator, so it can be malformed in ways a hand-written one never is — a
+ * truncated attribute match, an unbalanced bracket. Cheerio does not quietly
+ * match nothing for those, it throws, and the throw escapes whichever method
+ * used the selector and fails the whole source. One truncated `genreSelector`
+ * took a working site down to zero exactly that way.
+ *
+ * So an override is compiled once, here, against an empty document. Compiling is
+ * what throws; matching nothing is fine and is the caller's problem.
+ */
+const usable = new Map<string, boolean>();
+function parses(candidate: string): boolean {
+  const cached = usable.get(candidate);
+  if (cached !== undefined) return cached;
+  let ok = true;
+  try {
+    load('')(candidate);
+  } catch {
+    ok = false;
+  }
+  usable.set(candidate, ok);
+  return ok;
+}
+
+/**
+ * `override ?? fallback`, treating an empty *or unparseable* override as absent.
  *
  * A selector that came across empty is a parse that went wrong upstream, and
- * handing `''` to Cheerio throws rather than matching nothing — which would
- * turn one bad row into a source that cannot be built at all.
+ * handing `''` to Cheerio throws rather than matching nothing — which would turn
+ * one bad row into a source that cannot be built at all.
  */
 export function selector(override: string | undefined, fallback: string): string {
   const trimmed = override?.trim();
-  return trimmed === undefined || trimmed === '' ? fallback : trimmed;
+  if (trimmed === undefined || trimmed === '' || !parses(trimmed)) return fallback;
+  return trimmed;
 }
 
 /**
@@ -67,7 +95,10 @@ export function selector(override: string | undefined, fallback: string): string
  */
 export function widen(override: string | undefined, fallback: string): string {
   const trimmed = override?.trim();
-  return trimmed === undefined || trimmed === '' ? fallback : `${trimmed}, ${fallback}`;
+  // An unparseable override would poison the whole list, taking the default down
+  // with it — see `parses`.
+  if (trimmed === undefined || trimmed === '' || !parses(trimmed)) return fallback;
+  return `${trimmed}, ${fallback}`;
 }
 
 /**
@@ -90,7 +121,10 @@ export function firstIn(
 ): ReturnType<Cheerio<AnyNode>['find']> | undefined {
   for (const one of list.split(',')) {
     const trimmed = one.trim();
-    if (trimmed === '') continue;
+    // Splitting a whole selector on commas can cut one containing a comma of its
+    // own — `a[title*="x, y"]` — into halves that parse alone into nothing valid.
+    // Skipping a fragment is right; letting it throw loses the rest of the chain.
+    if (trimmed === '' || !parses(trimmed)) continue;
     const found = card.find(trimmed).first();
     if (found.length > 0) return found;
   }
