@@ -60,6 +60,23 @@ const INTERVAL_JITTER = 0.3;
 const MAX_IN_FLIGHT = 16;
 /** Total tries per request, first attempt included. */
 const MAX_ATTEMPTS = 3;
+/**
+ * True only while the smoke suite is replaying recorded HTTP.
+ *
+ * The spacing below exists so a site is never asked two things at once and
+ * never at a machine-perfect period. In replay there is no site: every response
+ * comes off the local disk, and a downloader that waits two seconds between
+ * twenty pages turns a fifteen-second test into a minute of sleeping for
+ * politeness nobody is owed.
+ *
+ * This is the whole of what the server knows about fixtures — the recording and
+ * replaying itself is in `test/fixture-fetch.mjs`, loaded with `--import` from
+ * outside, so no test code is in this bundle. Nothing but that suite sets these
+ * variables, and recording deliberately does not take this branch: a real site
+ * is on the other end then, and it gets the real intervals.
+ */
+const REPLAYING =
+  process.env.S4M_FIXTURES !== undefined && process.env.S4M_FIXTURES_MODE === 'replay';
 /** First backoff; doubles per attempt, jittered, capped. */
 const BACKOFF_BASE_MS = 2_000;
 const BACKOFF_MAX_MS = 30_000;
@@ -452,7 +469,7 @@ export function createHttpClient(config: Pick<Config, 'flaresolverr'>): HttpClie
     // A source may still ask for a slower floor than its tier gives it; nothing
     // may ask for a faster one.
     const floor = challenged.has(host) ? MIN_INTERVAL_MS : CALM_INTERVAL_MS;
-    const interval = Math.max(floor, options.minIntervalMs ?? 0);
+    const interval = REPLAYING ? 0 : Math.max(floor, options.minIntervalMs ?? 0);
     const attempts = Math.min(options.attempts ?? MAX_ATTEMPTS, MAX_ATTEMPTS);
 
     return queues.run(host, interval, async () => {

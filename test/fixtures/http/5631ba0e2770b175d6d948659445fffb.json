@@ -1,0 +1,122 @@
+{
+ "method": "GET",
+ "url": "https://uploads.mangadex.org/covers/1d55e985-8379-41bc-aeca-acd069bcadd0/aa7a0864-1295-490c-805d-b7461b01a733.jpg.512.jpg",
+ "status": 200,
+ "statusText": "OK",
+ "headers": [
+  [
+   "accept-ranges",
+   "bytes"
+  ],
+  [
+   "access-control-allow-credentials",
+   "true"
+  ],
+  [
+   "access-control-allow-headers",
+   "*"
+  ],
+  [
+   "access-control-allow-methods",
+   "GET, OPTIONS"
+  ],
+  [
+   "allow",
+   "GET, OPTIONS"
+  ],
+  [
+   "alt-svc",
+   "h3=\":443\"; ma=86400"
+  ],
+  [
+   "cache-control",
+   "max-age=315360000"
+  ],
+  [
+   "content-length",
+   "103549"
+  ],
+  [
+   "content-type",
+   "image/jpeg"
+  ],
+  [
+   "cross-origin-embedder-policy",
+   "unsafe-none"
+  ],
+  [
+   "cross-origin-opener-policy",
+   "same-origin-allow-popups"
+  ],
+  [
+   "cross-origin-resource-policy",
+   "cross-origin"
+  ],
+  [
+   "date",
+   "Fri, 28 Aug 2026 23:42:55 GMT"
+  ],
+  [
+   "etag",
+   "\"65e87ef7-1947d\""
+  ],
+  [
+   "expires",
+   "Thu, 31 Dec 2037 23:55:55 GMT"
+  ],
+  [
+   "last-modified",
+   "Wed, 06 Mar 2024 14:34:31 GMT"
+  ],
+  [
+   "md-progressive-rollout-bucket",
+   "311998222"
+  ],
+  [
+   "permissions-policy",
+   "fullscreen=(self)"
+  ],
+  [
+   "referrer-policy",
+   "strict-origin"
+  ],
+  [
+   "server",
+   "MangaDex"
+  ],
+  [
+   "strict-transport-security",
+   "max-age=63072000; includeSubDomains; preload"
+  ],
+  [
+   "vary",
+   "Origin, Referer"
+  ],
+  [
+   "via",
+   "HTTP/1.1 EU-CENTRAL-D2x1"
+  ],
+  [
+   "x-cache",
+   "HIT"
+  ],
+  [
+   "x-content-type-options",
+   "nosniff"
+  ],
+  [
+   "x-frame-options",
+   "DENY"
+  ],
+  [
+   "x-request-id",
+   "01a04ac1-46c2-71e2-a615-3bdd09cfdfb2"
+  ],
+  [
+   "x-xss-protection",
+   "1; mode=block"
+  ]
+ ],
+ "body": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",
+ "imageReplacedWithPixel": 103549
+}

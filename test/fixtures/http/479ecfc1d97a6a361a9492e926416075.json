@@ -1,0 +1,134 @@
+{
+ "method": "GET",
+ "url": "https://cmdxd98sb0x3yprd.mangadex.network/data/6ab72a345510b869a45008ffdef96598/6-6a099a19aace6815c52a7d68f7fbfe9eb1d2eca44ee14db29d4cb407a0fa8e56.jpg",
+ "status": 200,
+ "statusText": "OK",
+ "headers": [
+  [
+   "accept-ranges",
+   "bytes"
+  ],
+  [
+   "access-control-allow-credentials",
+   "true"
+  ],
+  [
+   "access-control-allow-headers",
+   "*"
+  ],
+  [
+   "access-control-allow-methods",
+   "GET, OPTIONS"
+  ],
+  [
+   "age",
+   "168343"
+  ],
+  [
+   "allow",
+   "GET, OPTIONS"
+  ],
+  [
+   "cache-control",
+   "public, max-age=604800, immutable"
+  ],
+  [
+   "cf-cache-status",
+   "HIT"
+  ],
+  [
+   "cf-ray",
+   "a3272d1f5aedab0d-LIS"
+  ],
+  [
+   "connection",
+   "keep-alive"
+  ],
+  [
+   "content-length",
+   "328581"
+  ],
+  [
+   "content-type",
+   "image/jpeg"
+  ],
+  [
+   "cross-origin-embedder-policy",
+   "unsafe-none"
+  ],
+  [
+   "cross-origin-opener-policy",
+   "same-origin-allow-popups"
+  ],
+  [
+   "cross-origin-resource-policy",
+   "cross-origin"
+  ],
+  [
+   "date",
+   "Fri, 28 Aug 2026 23:43:06 GMT"
+  ],
+  [
+   "etag",
+   "\"65e87f7a-50385\""
+  ],
+  [
+   "last-modified",
+   "Wed, 06 Mar 2024 14:36:42 GMT"
+  ],
+  [
+   "nel",
+   "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}"
+  ],
+  [
+   "permissions-policy",
+   "fullscreen=(self)"
+  ],
+  [
+   "referrer-policy",
+   "strict-origin"
+  ],
+  [
+   "report-to",
+   "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=O8pC1KQf0OalFGFP1Vy4Nn5igy%2FFm0ydYBNIxacn56oqZVQhqi3PYXhg8k%2BU%2FLjiCRhLjgGOeXcMMOjLV6a32eq0aJlHLqlYsMjx9zgeTnCkRf0SMZLbgQoHBL93I%2Bw89jENOWe9Vqgx1FCg3mS%2BUIvdcQ%3D%3D\"}]}"
+  ],
+  [
+   "server",
+   "cloudflare"
+  ],
+  [
+   "strict-transport-security",
+   "max-age=15552000; includeSubDomains; preload"
+  ],
+  [
+   "vary",
+   "Origin, Referer"
+  ],
+  [
+   "via",
+   "HTTP/1.1 EU-WEST-U1x2"
+  ],
+  [
+   "x-cache",
+   "HIT (fresh)"
+  ],
+  [
+   "x-content-type-options",
+   "nosniff"
+  ],
+  [
+   "x-frame-options",
+   "DENY"
+  ],
+  [
+   "x-request-id",
+   "01a040b8-b99d-72e6-ad9a-bed50093f410"
+  ],
+  [
+   "x-xss-protection",
+   "1; mode=block"
+  ]
+ ],
+ "body": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",
+ "imageReplacedWithPixel": 328581
+}

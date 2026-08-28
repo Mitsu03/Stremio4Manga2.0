@@ -119,7 +119,7 @@ Three workflows, and the split is deliberate:
 
 | workflow | when | what |
 |---|---|---|
-| `ci.yml` — `check` | every PR, every push to main | `lint`, `typecheck`, `build`, `test:offline` |
+| `ci.yml` — `check` | every PR, every push to main | `lint`, `typecheck`, `build`, `test:replay` |
 | `ci.yml` — `container` | every PR, every push to main | `test:podman`: the image built, the offline suite run *inside* it with no network, then the runtime image started for real |
 | `release-install.yml` | PRs touching `install.sh`, `Containerfile`, `deploy/`, `update.ts`, `test/release-install.sh` or either release workflow | `test:release` |
 | `release.yml` | a `v*` tag | the same four checks, then packs and publishes |
@@ -132,11 +132,18 @@ main with a green tick. The web build runs `tsc -b` itself.
 GitHub applies `paths` per workflow, not per job, and this one is worth about a
 minute only when the payload list moves.
 
-**The live half of the smoke suite runs nowhere.** `npm test` — without
-`--offline` — reaches real manga sites, and a site being down for its own reasons
-is not a reason to fail somebody's pull request or block a tag. Nothing
-automated therefore notices a source that has rotted; that is a deliberate trade
-and the reason `docs/README.md` keeps a note on retiring sources by hand.
+`test:replay` is the whole suite — the offline checks plus the 22 that search,
+read a chapter, resolve pages, store reading progress and download to disk —
+run against responses recorded in `test/fixtures/`. Reaching a real site would
+mean a site down for its own reasons could fail somebody's pull request; a
+recording has no such opinion, and takes four seconds.
+
+**What still runs nowhere is the real thing.** `npm test`, with no flag, is the
+only check that the sites still answer the way the recordings say they do.
+Nothing automated notices a source that has rotted, and nothing can without
+taking somebody else's uptime as a dependency — so it is worth a manual run
+before a tag, and `test/fixtures/README.md` says how to re-record when it turns
+out they have moved.
 
 ## The version number, and the one place it lives
 
@@ -476,9 +483,11 @@ Each line is one thing, in order:
 
 1. Every schema change in this release also has a `MIGRATIONS` entry.
 2. Bump `version` in the root `package.json`.
-3. `npm run lint && npm run typecheck && npm run build && npm run test:offline`
+3. `npm run lint && npm run typecheck && npm run build && npm run test:replay`
    locally — or read the CI run on the pull request, which is the same four
-   commands in the same order.
+   commands in the same order. Then `npm test` once, with no flag: it is the
+   only thing that checks the sources against the real sites rather than against
+   a recording, and a tag is a bad time to find out one moved.
 4. `npm run test:release`, if this release changes `install.sh`, the payload
    list, or the workflow that packs it. CI runs it for you on a pull request
    that touches any of those paths; see below.

@@ -12,6 +12,14 @@
  *
  *   node test/smoke.mjs              full run, including live sources
  *   node test/smoke.mjs --offline    skip the checks that need the internet
+ *   node test/smoke.mjs --replay     the same full run, against recorded HTTP
+ *   node test/smoke.mjs --record     a full run that saves what the sites answer
+ *
+ * `--replay` is what CI runs: the live checks exercise the reader and the
+ * downloader without reaching a site, so they cannot fail because somebody
+ * else's server is down. What that cannot tell you is whether the sites still
+ * answer the way they answered when the fixtures were recorded — that is what a
+ * plain run is for, and why it stays a manual one. See test/fixtures/README.md.
  *
  * Exits non-zero on the first failed assertion, naming what was expected.
  */
@@ -19,14 +27,19 @@ import { spawn, spawnSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = resolve(here, '..');
 const serverDir = join(repo, 'server');
 const dist = join(serverDir, 'dist');
+const fixtureModule = join(here, 'fixture-fetch.mjs');
 
 const OFFLINE = process.argv.includes('--offline');
+const RECORD = process.argv.includes('--record');
+const REPLAY = process.argv.includes('--replay');
+/** Where recordings live. Committed, so a fresh clone can run `--replay`. */
+const FIXTURES = join(here, 'fixtures', 'http');
 const PORT = Number(process.env.SMOKE_PORT ?? 8099);
 const ORIGIN = `http://127.0.0.1:${PORT}`;
 
@@ -166,8 +179,17 @@ function setup() {
     }
   }
 
-  server = spawn(process.execPath, [join(dist, 'main.js')], {
-    env: { ...process.env, S4M_CONFIG: join(workDir, 'config.json') },
+  // The fixture layer is loaded into the server, not into this process: it is
+  // the server that talks to the sites. Nothing in `server/src` imports it —
+  // `--import` puts it in front of the bundle from outside.
+  const fixtureArgs = RECORD || REPLAY ? ['--import', pathToFileURL(fixtureModule).href] : [];
+  const fixtureEnv =
+    RECORD || REPLAY
+      ? { S4M_FIXTURES: FIXTURES, S4M_FIXTURES_MODE: RECORD ? 'record' : 'replay' }
+      : {};
+
+  server = spawn(process.execPath, [...fixtureArgs, join(dist, 'main.js')], {
+    env: { ...process.env, ...fixtureEnv, S4M_CONFIG: join(workDir, 'config.json') },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   server.stdout.on('data', () => {});
@@ -468,6 +490,7 @@ async function run() {
     await liveChecks(a, b);
   }
 
+
   section('Backups');
   const backup = await gql(a, 'mutation{createBackup(input:{}){url}}');
   const url = backup.data?.createBackup?.url;
@@ -699,7 +722,8 @@ function countFiles(dir) {
 
 // -------------------------------------------------------------------- main --
 
-log(`Stremio4Manga smoke test${OFFLINE ? ' (offline)' : ''}`);
+const mode = OFFLINE ? ' (offline)' : RECORD ? ' (recording)' : REPLAY ? ' (replay)' : '';
+log(`Stremio4Manga smoke test${mode}`);
 log(`Node ${process.version} on ${process.platform}`);
 
 try {

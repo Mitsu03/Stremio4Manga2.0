@@ -1,0 +1,134 @@
+{
+ "method": "GET",
+ "url": "https://cmdxd98sb0x3yprd.mangadex.network/data/6ab72a345510b869a45008ffdef96598/5-b4c132781ed7721c106cd6d80a25256c744dad118bc14fb874f9b6b0fe03eec3.jpg",
+ "status": 200,
+ "statusText": "OK",
+ "headers": [
+  [
+   "accept-ranges",
+   "bytes"
+  ],
+  [
+   "access-control-allow-credentials",
+   "true"
+  ],
+  [
+   "access-control-allow-headers",
+   "*"
+  ],
+  [
+   "access-control-allow-methods",
+   "GET, OPTIONS"
+  ],
+  [
+   "age",
+   "168342"
+  ],
+  [
+   "allow",
+   "GET, OPTIONS"
+  ],
+  [
+   "cache-control",
+   "public, max-age=604800, immutable"
+  ],
+  [
+   "cf-cache-status",
+   "HIT"
+  ],
+  [
+   "cf-ray",
+   "a3272d167ab2ab0d-LIS"
+  ],
+  [
+   "connection",
+   "keep-alive"
+  ],
+  [
+   "content-length",
+   "440085"
+  ],
+  [
+   "content-type",
+   "image/jpeg"
+  ],
+  [
+   "cross-origin-embedder-policy",
+   "unsafe-none"
+  ],
+  [
+   "cross-origin-opener-policy",
+   "same-origin-allow-popups"
+  ],
+  [
+   "cross-origin-resource-policy",
+   "cross-origin"
+  ],
+  [
+   "date",
+   "Fri, 28 Aug 2026 23:43:04 GMT"
+  ],
+  [
+   "etag",
+   "\"65e87f7a-6b715\""
+  ],
+  [
+   "last-modified",
+   "Wed, 06 Mar 2024 14:36:42 GMT"
+  ],
+  [
+   "nel",
+   "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}"
+  ],
+  [
+   "permissions-policy",
+   "fullscreen=(self)"
+  ],
+  [
+   "referrer-policy",
+   "strict-origin"
+  ],
+  [
+   "report-to",
+   "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=N5GNfld%2B1U7Gkg%2BumXFeAezozhgQ%2FTUxvHCCNSfT4%2BZh9ZzDcJK9c19HXIXZWcOHFI3trg%2BgnwyjKiNC%2FJ8%2Ftn%2BIrSDYnpEmlU0fn741E2lGoQBYWJ31cmWWo7Lc3ObbGnuybi%2BmxdGTo9gnoIw9gPz5%2FQ%3D%3D\"}]}"
+  ],
+  [
+   "server",
+   "cloudflare"
+  ],
+  [
+   "strict-transport-security",
+   "max-age=15552000; includeSubDomains; preload"
+  ],
+  [
+   "vary",
+   "Origin, Referer"
+  ],
+  [
+   "via",
+   "HTTP/1.1 EU-WEST-U1x2"
+  ],
+  [
+   "x-cache",
+   "MISS"
+  ],
+  [
+   "x-content-type-options",
+   "nosniff"
+  ],
+  [
+   "x-frame-options",
+   "DENY"
+  ],
+  [
+   "x-request-id",
+   "01a040b8-b3e4-7481-83b5-bcf2d7cf1a11"
+  ],
+  [
+   "x-xss-protection",
+   "1; mode=block"
+  ]
+ ],
+ "body": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",
+ "imageReplacedWithPixel": 440085
+}

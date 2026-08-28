@@ -1,0 +1,149 @@
+{
+ "method": "GET",
+ "url": "https://api.mangadex.org/at-home/server/868a5029-07b8-44e4-86b5-cd4892c240cb",
+ "status": 200,
+ "statusText": "OK",
+ "headers": [
+  [
+   "accept-ranges",
+   "bytes"
+  ],
+  [
+   "access-control-allow-credentials",
+   "true"
+  ],
+  [
+   "access-control-expose-headers",
+   "*"
+  ],
+  [
+   "alt-svc",
+   "h3=\":443\"; ma=86400"
+  ],
+  [
+   "cache-control",
+   "no-cache, private"
+  ],
+  [
+   "content-encoding",
+   "gzip"
+  ],
+  [
+   "content-length",
+   "717"
+  ],
+  [
+   "content-type",
+   "application/json"
+  ],
+  [
+   "cross-origin-embedder-policy",
+   "unsafe-none"
+  ],
+  [
+   "cross-origin-opener-policy",
+   "same-origin-allow-popups"
+  ],
+  [
+   "cross-origin-resource-policy",
+   "cross-origin"
+  ],
+  [
+   "date",
+   "Fri, 28 Aug 2026 23:42:56 GMT"
+  ],
+  [
+   "md-edge-crs",
+   "Tk9ORQ"
+  ],
+  [
+   "md-progressive-rollout-bucket",
+   "311998222"
+  ],
+  [
+   "permissions-policy",
+   "fullscreen=(self)"
+  ],
+  [
+   "referrer-policy",
+   "strict-origin"
+  ],
+  [
+   "server",
+   "MangaDex"
+  ],
+  [
+   "strict-transport-security",
+   "max-age=63072000; includeSubDomains; preload"
+  ],
+  [
+   "vary",
+   "Origin"
+  ],
+  [
+   "via",
+   "HTTP/1.1 EU-CENTRAL-D2x1"
+  ],
+  [
+   "x-cache",
+   "MISS"
+  ],
+  [
+   "x-content-type-options",
+   "nosniff"
+  ],
+  [
+   "x-frame-options",
+   "DENY"
+  ],
+  [
+   "x-ratelimit-limit",
+   "40"
+  ],
+  [
+   "x-ratelimit-remaining",
+   "38"
+  ],
+  [
+   "x-ratelimit-retry-after",
+   "1787960576"
+  ],
+  [
+   "x-ratelimit-retry-in",
+   "0"
+  ],
+  [
+   "x-request-id",
+   "01a04ac1-4799-7c44-b2c8-6a52af72ed7f"
+  ],
+  [
+   "x-xss-protection",
+   "1; mode=block"
+  ]
+ ],
+ "json": {
+  "result": "ok",
+  "baseUrl": "https://cmdxd98sb0x3yprd.mangadex.network",
+  "chapter": {
+   "hash": "6ab72a345510b869a45008ffdef96598",
+   "data": [
+    "1-cb59e9e36816f52e93bb542e746a32d4c8fdfa47b72643eaa679fa3c842113e8.jpg",
+    "2-b1aea1ad28c0fba265db0fa0303fe13aa73cbe1b11f3bbdf52695a508f8df3fa.jpg",
+    "3-e695d582cb704d8791d461b726e66d7302cf077fb09aec5ea8f986cc58aa8e3f.jpg",
+    "4-0fd26c316209b1ec14ac72e9d447c392b8f13bc920b797c182464a581f9f2b9d.jpg",
+    "5-b4c132781ed7721c106cd6d80a25256c744dad118bc14fb874f9b6b0fe03eec3.jpg",
+    "6-6a099a19aace6815c52a7d68f7fbfe9eb1d2eca44ee14db29d4cb407a0fa8e56.jpg",
+    "7-81462681253cca4bab9066b44de7b7a3ba597ea08e36186c6dfc6451550f87c8.jpg"
+   ],
+   "dataSaver": [
+    "1-cd9f139626b25e392bbe7374a2da3ba48b6e936d2d06cdf4d05466e986e732f8.jpg",
+    "2-a591d1684a2428353671ced1437fac9e073cd49fe5be7b4e05dc33a45a431554.jpg",
+    "3-84da56950bf01a16f571f0ce4a9298ce95cb43061fca2ead39c5ca5bc2117f60.jpg",
+    "4-1e7ac184adc64745084e5bfdc3ca885aecd194e9be2a43bd86c72ab271660286.jpg",
+    "5-084355ce078643b511d3af0931baf7b7def0077328b2369a548d0896b7743506.jpg",
+    "6-baa7af3856af9868b91ea8221788bc2c240efb78da3fcc85a2df6d110745e611.jpg",
+    "7-d77a41d0999e2857e0c385757ce85c7116954343425ef99d3b3266993fe005fb.jpg"
+   ]
+  }
+ }
+}
