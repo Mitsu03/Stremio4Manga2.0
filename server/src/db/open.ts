@@ -9,6 +9,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import schema from './schema.sql';
+import { MIGRATIONS, SCHEMA_VERSION } from './migrations.js';
 
 export type Row = Record<string, unknown>;
 export type Param = string | number | null | Uint8Array;
@@ -26,6 +27,84 @@ export interface Db {
 export const bool = (value: boolean): number => (value ? 1 : 0);
 export const fromBool = (value: unknown): boolean => value === 1 || value === true;
 
+/**
+ * Bring the database at `file` up to SCHEMA_VERSION, or refuse to touch it.
+ *
+ * SQLite's `user_version` is a single integer in the file header that belongs
+ * to the application — no table to create, nothing to migrate before the
+ * migrations can run, and it is already there in every database this has ever
+ * written. Three cases, and the middle one is the reason this exists:
+ *
+ *   no tables          a fresh install: run schema.sql, stamp the current
+ *                      version, done.
+ *   tables, version 0  a database from 2.0.0 or earlier, made before there was
+ *                      any versioning. Its shape *is* version 1, so stamp it as
+ *                      such and let the ladder carry it the rest of the way.
+ *   version n          apply everything above n, one transaction each.
+ *
+ * A version *above* SCHEMA_VERSION is the fourth case, and the only one that
+ * refuses rather than repairs: the database has been through a migration this
+ * build has never heard of, which happens when a server is rolled back to an
+ * older release. Opening it anyway would mean a build reading columns that
+ * moved out from under it, so it stops and says what to do instead.
+ */
+function applySchema(raw: DatabaseSync, file: string): void {
+  const read = () =>
+    Number((raw.prepare('PRAGMA user_version').get() as { user_version?: number })?.user_version ?? 0);
+
+  let version = read();
+
+  if (version > SCHEMA_VERSION) {
+    throw new Error(
+      `${file} was written by a newer version of Stremio4Manga (database ` +
+        `version ${version}; this build understands ${SCHEMA_VERSION}). ` +
+        'Migrations are forward-only, so a downgrade needs the database backup ' +
+        'the update took before it ran — see docs/RELEASING.md.',
+    );
+  }
+
+  if (version === 0) {
+    const tables = raw
+      .prepare("SELECT count(*) AS n FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'")
+      .get() as { n: number };
+
+    // Running schema.sql on the pre-versioning database too, not just the fresh
+    // one: every statement in it is CREATE ... IF NOT EXISTS, so on an existing
+    // database it is a no-op except for anything that was added to schema.sql
+    // during 2.0.0's life and only ever appeared by this route. Skipping it here
+    // would quietly drop that.
+    raw.exec(schema);
+    version = tables.n === 0 ? SCHEMA_VERSION : 1;
+    raw.exec(`PRAGMA user_version = ${version}`);
+  }
+
+  for (const migration of MIGRATIONS) {
+    if (migration.to <= version) continue;
+    // One transaction per step, covering the SQL and the stamp together. A
+    // migration that throws halfway therefore leaves the database on the
+    // version it started at rather than on a number that describes neither
+    // shape, and the next start retries it from a known state.
+    raw.exec('BEGIN IMMEDIATE');
+    try {
+      raw.exec(migration.sql);
+      raw.exec(`PRAGMA user_version = ${migration.to}`);
+      raw.exec('COMMIT');
+    } catch (error) {
+      try {
+        raw.exec('ROLLBACK');
+      } catch {
+        // Already gone; the migration's own error is the one worth reporting.
+      }
+      throw new Error(
+        `Migrating ${file} to database version ${migration.to} failed: ` +
+          `${(error as Error).message}. The database is unchanged, still at ` +
+          `version ${version}.`,
+      );
+    }
+    version = migration.to;
+  }
+}
+
 export function openDb(file: string): Db {
   mkdirSync(dirname(file), { recursive: true });
 
@@ -42,7 +121,7 @@ export function openDb(file: string): Db {
   }
 
   raw.exec('PRAGMA busy_timeout = 5000');
-  raw.exec(schema);
+  applySchema(raw, file);
 
   let depth = 0;
 

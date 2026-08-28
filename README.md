@@ -27,6 +27,7 @@ so no build tools.
 | **[docs/README.md](docs/README.md)** | What it is, what it needs, installing on either platform, accounts, AniList, and how sources work. **Start here.** |
 | [docs/DEPLOY.md](docs/DEPLOY.md) | A real deployment: the config a public server needs, TLS with Caddy, `trustProxy`, the systemd unit, backups, FlareSolverr, and moving a library in from the old Java server. |
 | [docs/ACCOUNTS.md](docs/ACCOUNTS.md) | The whole lifetime of an account — where the row and the scrypt hash live, what changing a password does to open sessions, what `remove` destroys. |
+| [docs/RELEASING.md](docs/RELEASING.md) | Cutting a release, and moving a server onto one: what the release tarball contains, where the version number lives, the database migration ladder, `s4m update` and `s4m rollback`, and the checklist to read every time. |
 | [docs/UI-HISTORY.md](docs/UI-HISTORY.md) | How the interface got the way it is. |
 
 ## Layout

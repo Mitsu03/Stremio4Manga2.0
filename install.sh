@@ -23,6 +23,7 @@ PREFIX=/opt/stremio4manga
 DATA_DIR=/var/lib/stremio4manga
 SERVICE_USER=stremio4manga
 SERVICE_NAME=stremio4manga
+S4M_BIN=/usr/local/bin/s4m
 LISTEN_HOST=127.0.0.1
 LISTEN_PORT=8080
 ORIGIN=""
@@ -316,6 +317,31 @@ export npm_config_audit=false
 
 info "server/dist and web/dist built"
 
+# --------------------------------------------------------------- 3b. s4m --
+
+# A wrapper rather than a symlink to server/bin/s4m.js, for two reasons: the
+# file is not marked executable in the repository, and its `#!/usr/bin/env node`
+# would have to find node on a PATH that `sudo` has usually already stripped.
+# Both go away when the absolute path to the interpreter is written down here.
+#
+# It matters because `s4m update` is how this install gets to the next release,
+# and an update command nobody can type is an update command nobody runs.
+step "Command: $S4M_BIN"
+
+if [ -e "$S4M_BIN" ] && [ ! -f "$S4M_BIN" ]; then
+  warn "$S4M_BIN exists and is not a regular file; leaving it alone."
+  note "run s4m as: $NODE_BIN $PREFIX/server/bin/s4m.js"
+else
+  mkdir -p "$(dirname "$S4M_BIN")"
+  cat > "$S4M_BIN" <<EOF
+#!/bin/sh
+# Installed by Stremio4Manga's install.sh. Regenerated on every re-run.
+exec "$NODE_BIN" "$PREFIX/server/bin/s4m.js" "\$@"
+EOF
+  chmod 755 "$S4M_BIN"
+  info "s4m version, s4m users, s4m update"
+fi
+
 # ------------------------------------------------------------ 4. data dir --
 
 step "Data directory: $DATA_DIR"
@@ -601,6 +627,12 @@ $C_GREEN==>$C_OFF $C_BOLD Done.$C_OFF
                    $ACCOUNT_CMD users passwd NAME
                    $ACCOUNT_CMD users list
                    $ACCOUNT_CMD users remove NAME --yes
+
+  Updates          sudo s4m update --check
+                   sudo s4m update --yes --restart
+                   Installs the latest release over this one; the config, the
+                   database and the downloads are not touched, and the build it
+                   replaces is kept for \`sudo s4m rollback\`. See docs/RELEASING.md.
 
 EOF
 
