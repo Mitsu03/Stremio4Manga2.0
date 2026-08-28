@@ -2277,7 +2277,8 @@
       "baseUrl": "https://mangadistrict.com",
       "id": "1000000000000000071",
       "contentWarning": "MIXED",
-      "versionName": "1.0.0"
+      "versionName": "1.0.0",
+      "retired": "same site as the hand-written `mangadistrict` source, which is the better implementation and carries its own rate-limit floor"
     },
     {
       "pkgName": "en.mangadrama",
@@ -3959,7 +3960,8 @@
         "minIntervalMs": 3000
       },
       "unportedOverrides": 14,
-      "id": "1000000000000000127"
+      "id": "1000000000000000127",
+      "retired": "same site as the hand-written `rizzfables` source, which is the better implementation and carries its own rate-limit floor"
     },
     {
       "pkgName": "en.rizzcomicunoriginal",
@@ -4771,7 +4773,8 @@
       "versionName": "1.0.0",
       "config": {
         "mangaPath": "manga-list"
-      }
+      },
+      "retired": "vyvymanga.org answers 410 Gone; it now redirects to mangaowl.io, which en.mangaowlio already covers"
     },
     {
       "pkgName": "it.walpurgisscan",

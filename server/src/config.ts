@@ -38,6 +38,18 @@ export interface Config {
   session: { idleMs: number; absoluteMs: number };
   login: { maxFailures: number; windowMs: number; lockoutMs: number };
   flaresolverr: { url: string; timeoutMs: number };
+  /**
+   * Where a source's icon may be looked up when the site itself yields none.
+   *
+   * `none` is the default and keeps the promise the icon code is built on: the
+   * only host ever contacted for a source's icon is that source's own site.
+   * `google` adds a last resort for the sites that block us outright — about a
+   * fifth of the catalogue sits behind Cloudflare and refuses even a favicon —
+   * at the cost of telling Google which manga domains this server catalogues.
+   * One request per site, once, then cached; a reader's browser is never
+   * involved either way. Off unless an operator turns it on deliberately.
+   */
+  icons: { fallback: 'none' | 'google' };
   logging: { file: string; maxBytes: number; keep: number };
 }
 
@@ -97,6 +109,7 @@ export function loadConfig(path: string): Config {
   const login = asRecord(raw.login ?? {}, 'login');
   const solver = asRecord(raw.flaresolverr ?? {}, 'flaresolverr');
   const logging = asRecord(raw.logging ?? {}, 'logging');
+  const icons = asRecord(raw.icons ?? {}, 'icons');
 
   const secureCookies =
     typeof raw.secureCookies === 'boolean' ? raw.secureCookies : origin.startsWith('https://');
@@ -130,6 +143,9 @@ export function loadConfig(path: string): Config {
     flaresolverr: {
       url: typeof solver.url === 'string' ? solver.url : '',
       timeoutMs: typeof solver.timeoutMs === 'number' ? solver.timeoutMs : 60_000,
+    },
+    icons: {
+      fallback: icons.fallback === 'google' ? 'google' : 'none',
     },
     logging: {
       file: from(logging.file, join(dataDir, 'stremio4manga.log')),

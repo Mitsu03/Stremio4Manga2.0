@@ -179,7 +179,10 @@ export function createApiHandler(deps: { config: Config; db: Db; log: Logger }):
     const rawPage = form.get('lastPageRead');
     const lastPageRead = rawPage === null ? undefined : Number(rawPage);
     if (lastPageRead !== undefined && !Number.isFinite(lastPageRead)) {
-      return sendJson(res, 400, { error: 'bad_request', message: 'lastPageRead must be a number.' });
+      return sendJson(res, 400, {
+        error: 'bad_request',
+        message: 'lastPageRead must be a number.',
+      });
     }
 
     const known = recordProgress(readerDeps, session.username, mangaId, sourceOrder, {
@@ -268,7 +271,12 @@ export function createApiHandler(deps: { config: Config; db: Db; log: Logger }):
         notFound(res);
         return true;
       }
-      const icon = sourceIcon(definition.pkgName, definition.name, dataPaths(config).cache);
+      const icon = sourceIcon(
+        definition.pkgName,
+        definition.name,
+        dataPaths(config).cache,
+        config.icons.fallback,
+      );
       res.writeHead(200, {
         'Content-Type': icon.type,
         'Content-Length': String(icon.body.byteLength),
