@@ -51,6 +51,12 @@ jobs:
 
       - run: npm run lint
 
+      # esbuild strips types without checking them, so a server type error would
+      # otherwise be bundled into a release with nothing having looked at it.
+      # In step with ci.yml — a green pull request is only evidence about the tag
+      # if the two run the same commands in the same order.
+      - run: npm run typecheck
+
       - run: npm run build
 
       # Offline only: the online half of the smoke test reaches real manga

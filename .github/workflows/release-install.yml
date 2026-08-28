@@ -1,0 +1,73 @@
+# Proves the release path still installs, on the pull requests that can break it.
+#
+# `docs/RELEASING.md` says the payload list lives in four places —
+# `release.yml` packs it, `update.ts` swaps it as `PAYLOAD`, the `Containerfile`
+# copies it, and `test/release-install.sh` packs it again — in three languages,
+# none of which can see the other three. Nothing type-checks that agreement, and
+# the way it fails is a tarball that extracts and then will not boot, discovered
+# after a tag, on somebody else's server.
+#
+# `npm run test:release` is the check that sees it: it packs the archives exactly
+# as release.yml packs them, serves them and a synthetic release document over
+# file://, and runs the real installer against them in a throwaway container.
+#
+# Its own workflow rather than a job in ci.yml, because it is worth running only
+# when one of those four places moves — GitHub applies `paths` per workflow, not
+# per job. Everything else is covered by CI, which runs on everything.
+name: Release install
+
+# The list is written twice because GitHub's workflow parser does not resolve
+# YAML anchors — an alias here is a syntax error, not a shortcut. Keep the two
+# copies identical.
+on:
+  pull_request:
+    paths:
+      - 'install.sh'
+      - 'Containerfile'
+      - 'deploy/**'
+      - 'server/src/update.ts'
+      - 'test/release-install.sh'
+      - '.github/workflows/release.yml'
+      - '.github/workflows/release-install.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'install.sh'
+      - 'Containerfile'
+      - 'deploy/**'
+      - 'server/src/update.ts'
+      - 'test/release-install.sh'
+      - '.github/workflows/release.yml'
+      - '.github/workflows/release-install.yml'
+
+# Read-only: nothing here publishes, and the release it installs is one it
+# packed itself. No tag is created and nothing reaches GitHub's release API.
+permissions:
+  contents: read
+
+concurrency:
+  group: release-install-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # The script builds before it packs, on purpose: packing a stale
+      # `server/dist` would make this pass on output nobody produced today. That
+      # build needs the toolchain, so the install does too.
+      - run: npm ci --no-audit --no-fund
+
+      - name: Ensure podman
+        run: podman --version || (sudo apt-get update && sudo apt-get install -y podman)
+
+      # The same command a person runs locally, so a failure here reproduces
+      # with one command on a laptop.
+      - run: npm run test:release

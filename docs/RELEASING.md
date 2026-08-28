@@ -113,6 +113,31 @@ the machine that wrote it — trying it for real means publishing a tag, and a t
 is awkward to take back. The seam that makes it testable is `S4M_RELEASE_API`,
 which the test points at a local directory and nothing else ever sets.
 
+### What CI runs, and what it does not
+
+Three workflows, and the split is deliberate:
+
+| workflow | when | what |
+|---|---|---|
+| `ci.yml` — `check` | every PR, every push to main | `lint`, `typecheck`, `build`, `test:offline` |
+| `ci.yml` — `container` | every PR, every push to main | `test:podman`: the image built, the offline suite run *inside* it with no network, then the runtime image started for real |
+| `release-install.yml` | PRs touching `install.sh`, `Containerfile`, `deploy/`, `update.ts`, `test/release-install.sh` or either release workflow | `test:release` |
+| `release.yml` | a `v*` tag | the same four checks, then packs and publishes |
+
+`typecheck` earns its place: `server/build.js` is esbuild, which strips types
+without checking them, so before it existed a type error in the server reached
+main with a green tick. The web build runs `tsc -b` itself.
+
+`release-install.yml` is a separate file rather than a job in `ci.yml` because
+GitHub applies `paths` per workflow, not per job, and this one is worth about a
+minute only when the payload list moves.
+
+**The live half of the smoke suite runs nowhere.** `npm test` — without
+`--offline` — reaches real manga sites, and a site being down for its own reasons
+is not a reason to fail somebody's pull request or block a tag. Nothing
+automated therefore notices a source that has rotted; that is a deliberate trade
+and the reason `docs/README.md` keeps a note on retiring sources by hand.
+
 ## The version number, and the one place it lives
 
 The workspace root `package.json` `version` field. Everything else derives from
@@ -451,11 +476,12 @@ Each line is one thing, in order:
 
 1. Every schema change in this release also has a `MIGRATIONS` entry.
 2. Bump `version` in the root `package.json`.
-3. `npm run lint && npm run build && npm run test:offline` locally — or read the
-   CI run on the pull request, which is the same three commands in the same
-   order.
+3. `npm run lint && npm run typecheck && npm run build && npm run test:offline`
+   locally — or read the CI run on the pull request, which is the same four
+   commands in the same order.
 4. `npm run test:release`, if this release changes `install.sh`, the payload
-   list, or the workflow that packs it.
+   list, or the workflow that packs it. CI runs it for you on a pull request
+   that touches any of those paths; see below.
 5. Commit, and land it through a pull request so CI has actually seen it.
 6. `git tag vX.Y.Z` — the same X.Y.Z as `package.json`.
 7. `git push origin vX.Y.Z`.
