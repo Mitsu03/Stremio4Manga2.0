@@ -16,6 +16,7 @@
  *   * lazy-loaded covers, which hide the real URL in one of half a dozen
  *     `data-*` attributes.
  */
+import { createDecipheriv, createHash } from 'node:crypto';
 import { load, type CheerioAPI, type Cheerio } from 'cheerio';
 import type { AnyNode } from 'domhandler';
 import { firstIn, selector, widen, type ThemeSelectors } from './selectors.js';
@@ -114,6 +115,83 @@ const CARD = '.page-item-detail, .c-tabs-item__content, .manga__item';
  * Order matters: `data-src` is the real one when both exist.
  */
 const IMAGE_ATTRS = ['data-src', 'data-lazy-src', 'data-cfsrc', 'data-original', 'srcset', 'src'];
+
+/**
+ * CryptoJS's OpenSSL key derivation: MD5(previous ‖ password ‖ salt), repeated
+ * until there are enough bytes for a key and an IV.
+ *
+ * Not a choice anyone would make today. It is what `CryptoJS.AES.decrypt` does
+ * with a passphrase, and the WordPress plugin below encrypts with exactly that,
+ * so it is what has to be undone.
+ */
+function openSslKey(password: string, salt: Buffer): { key: Buffer; iv: Buffer } {
+  const secret = Buffer.from(password, 'utf8');
+  let derived = Buffer.alloc(0);
+  let block = Buffer.alloc(0);
+  while (derived.length < 48) {
+    block = createHash('md5')
+      .update(Buffer.concat([block, secret, salt]))
+      .digest();
+    derived = Buffer.concat([derived, block]);
+  }
+  return { key: derived.subarray(0, 32), iv: derived.subarray(32, 48) };
+}
+
+/**
+ * The page list of a chapter behind the "chapter protector" plugin.
+ *
+ * Some Madara installs stop printing `<img>` into the reader and ship the image
+ * URLs as an AES blob with the key sitting in the same script — which protects
+ * nothing, and is presumably meant to defeat naive scrapers. Ignoring it costs
+ * every chapter on those sites, and the sites are not rare: the one that led
+ * here does not even declare the feature upstream.
+ *
+ * Returns undefined when the document is an ordinary one, which is the signal to
+ * parse it the normal way.
+ */
+function protectedPages(document: CheerioAPI): string[] | undefined {
+  const holder = document('#chapter-protector-data').first();
+  if (holder.length === 0) return undefined;
+
+  // The script is inline on most installs and a base64 data URL on the rest.
+  const src = holder.attr('src') ?? '';
+  const prefix = 'data:text/javascript;base64,';
+  const script = src.startsWith(prefix)
+    ? Buffer.from(src.slice(prefix.length), 'base64').toString('utf8')
+    : holder.html() ?? '';
+
+  const between = (after: string): string | undefined => {
+    const start = script.indexOf(after);
+    if (start === -1) return undefined;
+    const from = start + after.length;
+    const end = script.indexOf("';", from);
+    return end === -1 ? undefined : script.slice(from, end);
+  };
+
+  const password = between("wpmangaprotectornonce='");
+  const raw = between("chapter_data='");
+  if (password === undefined || raw === undefined) return undefined;
+
+  try {
+    const data = JSON.parse(raw.replaceAll('\\/', '/')) as { ct?: string; s?: string };
+    if (!data.ct || !data.s) return undefined;
+    const { key, iv } = openSslKey(password, Buffer.from(data.s, 'hex'));
+    const decipher = createDecipheriv('aes-256-cbc', key, iv);
+    const plain = Buffer.concat([
+      decipher.update(Buffer.from(data.ct, 'base64')),
+      decipher.final(),
+    ]).toString('utf8');
+    // Doubly encoded: a JSON string whose content is itself a JSON array.
+    const inner = JSON.parse(plain) as string;
+    const urls = JSON.parse(inner) as unknown;
+    if (!Array.isArray(urls)) return undefined;
+    return urls.filter((url): url is string => typeof url === 'string' && url !== '');
+  } catch {
+    // A changed key, a changed shape, a padding error: fall back to reading the
+    // document, which is a better answer than failing the chapter outright.
+    return undefined;
+  }
+}
 
 function imageFrom(element: Cheerio<AnyNode>, base: string): string | null {
   const img = element.find('img').first();
@@ -413,52 +491,69 @@ export function createMadaraSource(config: MadaraConfig, deps: SourceDeps): Sour
       const html = await http.text(manga.url);
       const $ = load(html);
 
-      if (chapterSource !== 'ajax' && chapterSource !== 'manga-ajax') {
-        const inPage = parseChapters($);
-        if (inPage.length > 0 || chapterSource === 'page') {
-          if (inPage.length === 0) throw new NoResultsError();
-          return inPage;
-        }
-      }
-
-      // Asked for explicitly, this is the only thing to try; reached from
-      // `auto`, it is tried before admin-ajax because a site on this mode can
-      // still be advertising a post id that admin-ajax will refuse.
-      if (chapterSource === 'manga-ajax') {
-        const chapters = parseChapters(load(await chaptersFromMangaAjax(manga.url)));
-        if (chapters.length === 0) throw new NoResultsError();
-        return chapters;
-      }
-
       // The numeric post id is what admin-ajax keys on. It is exposed either as
       // the shortcode's data attribute or in the `manga_bookmark` script block.
       const postId =
         $('div[id^=manga-chapters-holder]').attr('data-id') ??
         $('.wp-manga-action-button[data-post]').attr('data-post') ??
         /"?post_id"?\s*[:=]\s*"?(\d+)/.exec(html)?.[1];
-      // No post id and nothing in the page still leaves the slug endpoint, which
-      // is the shape most current installs use.
-      if (!postId) {
-        const chapters = parseChapters(load(await chaptersFromMangaAjax(manga.url)));
-        if (chapters.length === 0) {
-          throw new NoResultsError(`${config.name} did not expose a chapter list`);
+
+      const attempts = {
+        page: async (): Promise<SourceChapter[]> => parseChapters($),
+        'manga-ajax': async (): Promise<SourceChapter[]> =>
+          parseChapters(load(await chaptersFromMangaAjax(manga.url))),
+        ajax: async (): Promise<SourceChapter[]> =>
+          postId === undefined ? [] : parseChapters(load(await chaptersFromAjax(postId))),
+      };
+
+      /**
+       * `chapterSource` orders the attempts; it does not narrow them to one.
+       *
+       * A declared value is what the *extension* said, and extensions go stale:
+       * three sites here declare the slug endpoint and answer 404 on it while
+       * still rendering the list into the page. Treating the declaration as the
+       * only thing to try made those sources with no chapters at all, when the
+       * answer was already in the document. So it decides where to look first
+       * and the rest stay as fallbacks — except `page`, which is the one mode
+       * meaning "this install has no endpoint", and where trying the others
+       * would be two requests spent to learn nothing.
+       */
+      const order: (keyof typeof attempts)[] =
+        chapterSource === 'page'
+          ? ['page']
+          : chapterSource === 'manga-ajax'
+            ? ['manga-ajax', 'page', 'ajax']
+            : chapterSource === 'ajax'
+              ? ['ajax', 'page', 'manga-ajax']
+              : // `auto`: the page first, because it is already fetched. Then the
+                // slug endpoint, because an install on that mode can still be
+                // advertising a post id that admin-ajax will refuse.
+                ['page', 'manga-ajax', 'ajax'];
+
+      for (const attempt of order) {
+        let chapters: SourceChapter[] = [];
+        try {
+          chapters = await attempts[attempt]();
+        } catch {
+          // A 404 or a 400 from one endpoint says that endpoint is not there,
+          // which is a reason to try the next one rather than to fail the source.
+          continue;
         }
-        return chapters;
+        if (chapters.length > 0) return chapters;
       }
-
-      const chapters = parseChapters(load(await chaptersFromAjax(postId)));
-      if (chapters.length > 0) return chapters;
-
-      // admin-ajax answered, but with nothing. On an install that has moved to
-      // the slug endpoint that is what an obsolete post id looks like, so the
-      // other form is worth one request before calling the source empty.
-      const viaSlug = parseChapters(load(await chaptersFromMangaAjax(manga.url)));
-      if (viaSlug.length === 0) throw new NoResultsError();
-      return viaSlug;
+      throw new NoResultsError(`${config.name} did not expose a chapter list`);
     },
 
     async getPageList(chapter) {
       const $ = load(await http.text(chapter.url));
+
+      // Checked before the markup, because an install with the protector prints
+      // no reader images at all — the document parses cleanly to nothing.
+      const encrypted = protectedPages($);
+      if (encrypted !== undefined && encrypted.length > 0) {
+        return encrypted.map((url, index) => ({ index, url: absoluteUrl(baseUrl, url) }));
+      }
+
       const pages: SourcePage[] = [];
       $(PAGE_IMG).each((_, element) => {
         const img = $(element);
