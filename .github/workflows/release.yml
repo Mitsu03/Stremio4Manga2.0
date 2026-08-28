@@ -77,8 +77,32 @@ jobs:
           echo "asset=$name" >> "$GITHUB_ENV"
           ls -lh "$name"
 
-      # `s4m update` verifies the download against this before extracting
-      # anything, so the checksum is part of the release, not a courtesy.
+      # The second archive, and the reason a fresh install no longer needs a
+      # checkout. The runtime payload above is what the server opens; this is
+      # what the *installer* opens, and the two are deliberately separate files
+      # because `s4m update` must never be tempted to swap install-time assets
+      # under a running deployment. It carries no build output, so it is tens of
+      # kilobytes.
+      - name: Package the install assets
+        run: |
+          set -euo pipefail
+          name="stremio4manga-${{ env.version }}-install.tar.gz"
+          tar -czf "$name" \
+            install.sh \
+            deploy \
+            docs \
+            README.md
+          sha256sum "$name" > "$name.sha256"
+          echo "install_asset=$name" >> "$GITHUB_ENV"
+          ls -lh "$name"
+
+      # `s4m update` verifies the download against the .sha256 before extracting
+      # anything, so the checksums are part of the release, not a courtesy.
+      #
+      # install.sh is attached loose as well as inside the install archive. That
+      # is the bootstrap: /releases/latest/download/install.sh is a stable URL,
+      # so the first command an admin runs on a new machine can be a curl rather
+      # than a git clone.
       - name: Publish
         env:
           GH_TOKEN: ${{ github.token }}
@@ -87,14 +111,26 @@ jobs:
             --title "$GITHUB_REF_NAME" \
             --generate-notes \
             "${{ env.asset }}" \
-            "${{ env.asset }}.sha256"
+            "${{ env.asset }}.sha256" \
+            "${{ env.install_asset }}" \
+            "${{ env.install_asset }}.sha256" \
+            install.sh
 
   # The other way to keep a server current: let the container runtime do it.
   # `podman auto-update` pulls a labelled image on a timer and rolls back if the
   # new one fails to start, which is the whole update mechanism for free — but
   # only for people running the container. The tarball above is for the systemd
   # install that install.sh produces, which is the documented default.
+  #
+  # `needs: release` is not sequencing for its own sake. Without it this job
+  # runs in parallel with the one above, which means a tag whose lint, build or
+  # tests failed still publishes `:latest` — and every machine with
+  # `podman auto-update` enabled pulls it, unattended. Podman's rollback only
+  # catches an image that fails to start; a build that starts and misbehaves
+  # goes straight through. The gate is the checks in `release`, so this waits
+  # for them.
   image:
+    needs: release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
