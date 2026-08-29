@@ -1767,6 +1767,7 @@
       "contentWarning": "SAFE",
       "versionName": "1.0.0",
       "config": {
+        "listingPageParam": "paged",
         "selectors": {
           "searchItem": "article.cx-poster-card",
           "searchTitle": "a.cx-poster-card__body-link",

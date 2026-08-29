@@ -248,9 +248,10 @@
       }
     },
     "en.hadesscans": {
-      "checked": "2026-08-28",
-      "note": "reskinned since upstream last looked; upstream's selector is stale",
+      "checked": "2026-08-29",
+      "note": "reskinned since upstream last looked; upstream's selector is stale, and the skin also lost the theme's own `page` query var — its archive pages on WordPress's `paged`, so `?page=2` answered with page one",
       "config": {
+        "listingPageParam": "paged",
         "selectors": {
           "searchItem": "article.cx-poster-card",
           "searchTitle": "a.cx-poster-card__body-link",

@@ -52,6 +52,16 @@ export interface MangaThemesiaConfig {
    *   filter it in the browser, so this does the same here, over one request.
    */
   searchMode?: 'query' | 'client';
+  /**
+   * Which query var the *archive* pages on, for the install that does not read
+   * the theme's own.
+   *
+   * `page` is the theme's, and is right almost everywhere. A skinned install
+   * can lose it and fall back to WordPress's `paged`, which then answers every
+   * `?page=N` with page one. Only the archive: the search is WordPress's own
+   * query and always pages on `paged` — see `browseUrl`.
+   */
+  listingPageParam?: 'page' | 'paged';
   usesCloudflare?: boolean;
   minIntervalMs?: number;
   /** Java date pattern the site writes chapter dates in, e.g. `dd/MM/yyyy`. */
@@ -119,6 +129,7 @@ export function createMangaThemesiaSource(config: MangaThemesiaConfig, deps: Sou
   const mangaPath = config.mangaPath ?? 'manga';
   const listPath = config.listPath ?? mangaPath;
   const searchMode = config.searchMode ?? 'query';
+  const listingPageParam = config.listingPageParam ?? 'page';
   const http = deps.http;
 
   const filters: FilterSpec[] = [
@@ -205,9 +216,25 @@ export function createMangaThemesiaSource(config: MangaThemesiaConfig, deps: Sou
     };
   }
 
+  /**
+   * Where to ask for one page of a listing — and which of WordPress's two page
+   * numbers to ask it with.
+   *
+   * The archive and the search are two different queries, and they are paged by
+   * different query vars. The theme's archive at `/${listPath}` registers its
+   * own `page`. WordPress's search does not read that one at all — `page` is
+   * the query var for the children of a static page — and takes `paged`
+   * instead. Sending `page` to a search therefore got page one back, every
+   * time, on 68 of the 69 installs this engine serves: "load more" appended the
+   * titles already on screen and a search could not be walked past its first
+   * ten results.
+   *
+   * `paged` and not the pretty `/page/N/` form of it, because not every install
+   * has that rewrite rule: the ones that do not answer it with a 404, and a
+   * search that errors is worse than one that repeats.
+   */
   function browseUrl(page: number, query: string, changes: FilterChange[]): string {
     const params = new URLSearchParams();
-    if (page > 1) params.set('page', String(page));
     for (const change of changes) {
       const spec = filters[change.position];
       if (!spec || spec.kind !== 'select' || !change.selectState) continue;
@@ -215,14 +242,22 @@ export function createMangaThemesiaSource(config: MangaThemesiaConfig, deps: Sou
       if (spec.name === 'Status') params.set('status', STATUS[change.selectState] ?? '');
       if (spec.name === 'Type') params.set('type', TYPE[change.selectState] ?? '');
     }
-    if (query === '') return `${baseUrl}/${listPath}?${params.toString()}`;
+    if (query === '') {
+      if (page > 1) params.set(listingPageParam, String(page));
+      return `${baseUrl}/${listPath}?${params.toString()}`;
+    }
     // Text search is WordPress's own, on the site root. The archive at
     // `/${listPath}` accepts `?s=` too but ignores it and answers with the full
     // catalogue, which is worse than an error: it looks like a search that
     // matched everything.
+    if (page > 1) params.set('paged', String(page));
     params.set('s', query);
     return `${baseUrl}/?${params.toString()}`;
   }
+
+  /** The archive in one order, on `listingPageParam`'s page number. */
+  const listingUrl = (page: number, order: string): string =>
+    `${baseUrl}/${listPath}?${listingPageParam}=${page}&order=${order}`;
 
   /** `<div class="imptdt">Status <i>ongoing</i></div>` — matched on the label. */
   function infoRow($: CheerioAPI, label: RegExp): string {
@@ -245,10 +280,10 @@ export function createMangaThemesiaSource(config: MangaThemesiaConfig, deps: Sou
     contentWarning: config.contentWarning,
 
     async getPopular(page) {
-      return parseList(await http.text(`${baseUrl}/${listPath}?page=${page}&order=popular`));
+      return parseList(await http.text(listingUrl(page, 'popular')));
     },
     async getLatest(page) {
-      return parseList(await http.text(`${baseUrl}/${listPath}?page=${page}&order=update`));
+      return parseList(await http.text(listingUrl(page, 'update')));
     },
     async search(query, page, changes = []) {
       if (query !== '' && searchMode === 'client') {
