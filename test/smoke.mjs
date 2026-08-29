@@ -265,6 +265,9 @@ function checkCatalogueData() {
     'minIntervalMs',
     'omitSort',
     'listingMode',
+    // Which query var a MangaThemesia archive pages on, for the one skinned
+    // install that lost the theme's own and fell back to WordPress's.
+    'listingPageParam',
     'genres',
     'headers',
     'usesCloudflare',
