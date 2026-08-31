@@ -354,6 +354,16 @@ function zoomFromMeta(meta: Array<{ key: string; value: string }>): ZoomLevels {
 
 // Past this a pointer is panning rather than tapping, so the tap it ends on must not turn the page.
 const DRAG_SLOP = 8
+/**
+ * How far across the stage a finger has to travel before it is a page turn.
+ *
+ * A fraction rather than a pixel count, so the gesture asks the same *effort* of a phone and a
+ * desktop - the same reasoning the auto-scroll speeds use. Deliberately far above `DRAG_SLOP`:
+ * 8px means "this was not a tap", which is nowhere near enough commitment to throw a page away.
+ */
+const SWIPE_FRACTION = 0.15
+/** A floor for the fraction above, so a very narrow window cannot make the gesture trivial. */
+const SWIPE_MIN = 48
 // Two taps closer together than this, and nearer than DOUBLE_TAP_SLOP apart, are one gesture.
 const DOUBLE_TAP_MS = 320
 const DOUBLE_TAP_SLOP = 40
@@ -568,7 +578,7 @@ const TAP_LAYOUTS: Record<TapLayout, { name: string; hint: string; regions: TapR
   },
   off: {
     name: 'Off',
-    hint: 'No tap zones — the keyboard and this panel turn the page.',
+    hint: 'No tap zones — swipe, the keyboard or this panel turn the page.',
     regions: [],
   },
 }
@@ -736,6 +746,10 @@ export default function ReaderPage() {
   // Set once a pointer has travelled far enough to be a pan, so the click it ends with is not a tap.
   const panned = useRef(false)
   const lastTap = useRef<{ at: number; x: number; y: number } | null>(null)
+  // Where a one-finger gesture began, kept separately from `pointers` because that map is overwritten
+  // on every move - it tracks where each finger *is*, and a swipe is a question about where it
+  // started. Cleared the moment a second finger lands: a pinch is not a swipe.
+  const swipeStart = useRef<{ id: number; x: number; y: number } | null>(null)
   // Measured per page url, and kept in state rather than only in a ref because the layout is built
   // from it. The ref alongside is what stops a page being measured twice.
   const [crops, setCrops] = useState<Record<string, PageCrop | null>>({})
@@ -1343,6 +1357,9 @@ export default function ReaderPage() {
     if (!zoomable) return
     pointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY })
     panned.current = false
+    swipeStart.current = pointers.current.size === 1
+      ? { id: event.pointerId, x: event.clientX, y: event.clientY }
+      : null
     if (pointers.current.size === 2) {
       const [first, second] = [...pointers.current.values()]
       pinchStart.current = { distance: Math.hypot(first.x - second.x, first.y - second.y), scale: zoom.scale }
@@ -1378,6 +1395,38 @@ export default function ReaderPage() {
     if (!zoomable) return
     pointers.current.delete(event.pointerId)
     if (pointers.current.size < 2) pinchStart.current = null
+
+    // A swipe turns the page. This is the gesture `onPointerMove` hands off at fit size, where its
+    // own comment says a drag "is a swipe over the tap zones, which is the reader's business rather
+    // than this one's" - nothing had ever picked it up, so until now a horizontal drag did nothing
+    // at all, in every one of the five tap layouts including `off`, which has no touch navigation
+    // otherwise.
+    const started = swipeStart.current
+    if (started && started.id === event.pointerId) {
+      swipeStart.current = null
+      const deltaX = event.clientX - started.x
+      const deltaY = event.clientY - started.y
+      const width = readerStageRef.current?.getBoundingClientRect().width ?? 0
+      const far = Math.max(SWIPE_MIN, width * SWIPE_FRACTION)
+      // Zoomed in, a drag pans and has already moved the page; only at fit size is it a turn. Mouse
+      // is left out on purpose - dragging with a pointer that has no momentum is not a page-turn
+      // idiom, and it would fight text selection.
+      const swipeable = zoom.scale === ZOOM_MIN && pointers.current.size === 0
+        && (event.pointerType === 'touch' || event.pointerType === 'pen')
+      // Mostly sideways, or a diagonal scroll attempt in a fit-width page would turn the page out
+      // from under the reader.
+      if (swipeable && Math.abs(deltaX) >= far && Math.abs(deltaX) > Math.abs(deltaY)) {
+        // The page follows the finger: swiping left carries the current page off to the left and
+        // brings in the one to its right. `leftPage`/`rightPage` already carry the reading direction
+        // and the spread pairing, so this needs no mirror of its own and turns by two on a spread.
+        const target = deltaX < 0 ? rightPage : leftPage
+        // Before the click that follows: both the turn zones and the panel toggle test `panned`, so
+        // this is what stops a swipe ending over a tap zone from turning the page a second time.
+        panned.current = true
+        if (!blocked(target)) goToPage(target)
+        return
+      }
+    }
 
     // Touch has no dblclick worth relying on, so the double tap is counted here. Mouse double clicks
     // arrive as `dblclick` instead, which the stage handles.
