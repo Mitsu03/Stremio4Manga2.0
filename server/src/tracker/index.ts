@@ -17,6 +17,12 @@
  * alone would need; `authRequiresVerifier` tells the client which of the two it
  * is starting, since only the client can hold the verifier across a navigation.
  *
+ * Both halves also take the `redirectUri` — where the browser comes back to.
+ * AniList ignores it: its redirect is registered on the AniList app itself.
+ * MyAnimeList sends it on the authorize request and must repeat it
+ * byte-identically on the exchange, so it comes from one place rather than
+ * being rebuilt twice.
+ *
  * **Remote deletion.** `unbindTrack(deleteRemoteTrack: true)` can only do
  * anything on a tracker whose API offers it, so that is a property of the
  * tracker rather than a comparison against a constant.
@@ -27,6 +33,8 @@
  */
 import * as anilist from './anilist.js';
 import { ANILIST_ICON, ANILIST_TRACKER_ID } from './anilist.js';
+import * as myanimelist from './myanimelist.js';
+import { MYANIMELIST_ICON, MYANIMELIST_TRACKER_ID } from './myanimelist.js';
 
 /** One title as a tracker's search answers it — `TrackSearchType`, field for field. */
 export interface TrackerSearch {
@@ -86,14 +94,21 @@ export interface Tracker {
   /** Whether `unbindTrack(deleteRemoteTrack: true)` can reach the remote list. */
   readonly supportsRemoteDeletion: boolean;
 
-  /** Null when the installation has no client id for this tracker. */
-  authUrl(): string | null;
+  /**
+   * Where to send the browser, or null when the installation has no client id
+   * for this tracker. `redirectUri` is where the browser comes back to.
+   */
+  authUrl(redirectUri: string): string | null;
 
   /**
    * Turn the URL the browser came back to into a token. Null when the callback
    * carries nothing usable, which is a wrong-callback rather than a failure.
    */
-  exchangeCallback(callbackUrl: string, codeVerifier: string | null): Promise<TrackerToken | null>;
+  exchangeCallback(
+    callbackUrl: string,
+    codeVerifier: string | null,
+    redirectUri: string,
+  ): Promise<TrackerToken | null>;
 
   viewer(token: string): Promise<TrackerViewer>;
   search(token: string, query: string): Promise<TrackerSearch[]>;
@@ -114,6 +129,7 @@ const anilistTracker: Tracker = {
   authRequiresVerifier: false,
   supportsRemoteDeletion: true,
 
+  // The redirect is registered on the AniList app itself, so it is not sent.
   authUrl: () => anilist.authUrl(),
   exchangeCallback: async (callbackUrl) => anilist.tokenFromCallback(callbackUrl),
 
@@ -131,7 +147,36 @@ const anilistTracker: Tracker = {
   statusFromNumber: (status) => anilist.statusFromNumber(status),
 };
 
-const REGISTRY: readonly Tracker[] = [anilistTracker];
+const myanimelistTracker: Tracker = {
+  id: MYANIMELIST_TRACKER_ID,
+  name: 'MyAnimeList',
+  icon: MYANIMELIST_ICON,
+  // Authorization code with PKCE: the verifier has to outlive a navigation,
+  // and only the client is still there when the browser comes back.
+  authRequiresVerifier: true,
+  supportsRemoteDeletion: true,
+
+  authUrl: (redirectUri) => myanimelist.authUrl(redirectUri),
+  exchangeCallback: (callbackUrl, codeVerifier, redirectUri) =>
+    myanimelist.exchangeCode(callbackUrl, codeVerifier, redirectUri),
+
+  viewer: (token) => myanimelist.viewer(token),
+  search: (token, query) => myanimelist.search(token, query),
+  mediaById: (token, remoteId) => myanimelist.mediaById(token, remoteId),
+  findListEntry: (token, remoteUser, remoteId) =>
+    myanimelist.findListEntry(token, remoteUser, remoteId),
+  updateProgress: (token, remoteId, progress, status) =>
+    myanimelist.updateProgress(token, remoteId, progress, status),
+  deleteListEntry: (token, remoteUser, remoteId) =>
+    myanimelist.deleteListEntry(token, remoteUser, remoteId),
+
+  statusToNumber: (status) => myanimelist.statusToNumber(status),
+  statusFromNumber: (status) => myanimelist.statusFromNumber(status),
+};
+
+// AniList first because it is the one this server shipped with and the one
+// `importAnilistLibrary` speaks to; the UI lists them in this order.
+const REGISTRY: readonly Tracker[] = [anilistTracker, myanimelistTracker];
 
 /** Every tracker this build knows, in the order the UI should list them. */
 export function allTrackers(): readonly Tracker[] {

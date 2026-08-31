@@ -832,6 +832,13 @@ type TrackerType {
   isTokenExpired: Boolean!
   """Where to send the browser to start OAuth; the client rewrites `state`."""
   authUrl: String
+  """
+  Whether the client must generate a PKCE verifier, put it on `authUrl` as
+  `code_challenge`, hold it across the navigation and hand it back to
+  `loginTrackerOAuth`. False for an implicit grant, which has nothing to
+  exchange and so nothing to remember.
+  """
+  authRequiresVerifier: Boolean!
   """Resolved from the tracker the first time it is asked for; null when unreachable."""
   user: TrackerUserType
 }
@@ -881,6 +888,11 @@ input LoginTrackerOAuthInput {
   trackerId: Int!
   """The whole callback URL, fragment included — the token is in it."""
   callbackUrl: String!
+  """
+  The PKCE verifier the client generated before the navigation. Required by a
+  tracker whose `authRequiresVerifier` is true, ignored by one whose is false.
+  """
+  codeVerifier: String
 }
 
 type LoginTrackerOAuthPayload {
