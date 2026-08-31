@@ -3681,6 +3681,105 @@ wrong chapter. The right id is already in hand — `fetchChapterPages` returns `
 
 ---
 
+## 57. A way out when a source is stuck behind Cloudflare
+
+*Suwayomi-Server [PR #2261](https://github.com/Suwayomi/Suwayomi-Server/pull/2261) (merged
+2026-08-13) added a `clearCookiesAndCache` mutation to break a verification loop that persists once
+the stored cookies and the browser cache disagree with a changed user-agent. Scout report #72,
+finding 1. **The upstream mutation's name and shape do not transfer** — that was a Kotlin server
+clearing a CEF browser's cache, and 2.0 has neither. What transfers is the problem, which this
+server has in its own form: `server/src/sources/http.ts` keeps a `CookieJar` whose whole purpose is
+holding `cf_clearance` (`:151-198`), bound to the User-Agent that earned it, and the file's own
+comment says sending that cookie under a different UA "invalidates it immediately and asks for a
+fresh challenge, which is exactly the loop that gets an address banned". Nothing anywhere clears it.*
+
+Branch: `feat/clear-source-cookies`
+
+**Behaviour.** An action in Settings, beside the backup controls: press it and the server throws away
+every cookie it is holding for source sites, the User-Agents bound to them, and the record of which
+hosts have challenged before. The next request to any source starts from nothing and solves a fresh
+challenge. `LibraryPage.tsx:1230-1231` and `SearchPage.tsx:145` already name "a source behind
+Cloudflare with no FlareSolverr" as a routine sweep failure — the app diagnoses this out loud today
+and offers nothing that acts on it.
+
+1. **The state to clear is closure-local, so a resolver cannot reach it.** `createHttpClient`
+   (`server/src/sources/http.ts:405`) closes over `jar`, `queues`, `breaker` and the `challenged`
+   set; none is a property of anything exported. The first commit is therefore an extraction, not a
+   feature: add `reset(): void` to the `HttpClient` interface (`:123-125`) and implement it on the
+   object `createHttpClient` returns, clearing the jar's `byHost` and `agents` maps and emptying
+   `challenged`. Do not write the resolver first and reach in — there is nothing to reach.
+2. `challenged` is the interesting half. Its comment (`:409-417`) says nothing removes a host once
+   added, deliberately: "the cost of staying slow for a site that has relaxed is a slower sweep, and
+   the cost of the opposite is a block." A manual reset is the one case where clearing it is right —
+   the person pressing the button is asserting the situation changed — so clear it here and leave the
+   automatic behaviour exactly as it is.
+3. Leave the `HostQueues` alone. The per-host interval is politeness, not stuck state, and dropping
+   it means the first sweep after the button lands as a burst on a site that has just challenged.
+4. `clearSourceCookies(input: ClearSourceCookiesInput!): ClearSourceCookiesPayload!` on the `Mutation`
+   type (`server/src/graphql/schema.graphql:980`), following the `input`/`payload` pair every other
+   mutation there uses. The resolver goes in a new `server/src/graphql/resolvers/sources.ts` and
+   reaches the client through `registry.ts`, which owns the singleton (`httpClient()`, `:203`) —
+   **not** through `GraphQLContext`, which carries `userId`, `db`, `config` and `log` and no HTTP
+   client (`server/src/types.ts:25-30`).
+5. **One jar serves every account.** `client` is module-level in `registry.ts` (`:196-206`) and its
+   own comment explains why a second client would be wrong: the queue, the jar, the clearance and the
+   breaker are all per-client. So this button clears cookies for everybody on the server, which is
+   fine on a single-user install and worth saying plainly in the button's own description on a shared
+   one. Say it in the UI copy rather than inventing per-account jars for it — partitioning the jar
+   would mean every account solving its own Cloudflare challenge, which is the loop this exists to
+   escape.
+6. The button goes in `SettingsPage.tsx` in the same card shape as the backup export/import actions,
+   with a confirm step: it is not destructive to data, but it does throw away a clearance that took a
+   solver run to earn, and pressing it while a sweep is running makes that sweep slower.
+7. Say what happened. The payload returns the number of hosts cleared, so the toast reads "cleared
+   cookies for 12 sites" rather than a bare success — a button whose effect is invisible reads as a
+   button that did nothing, and this one's effect is by definition somewhere else.
+
+---
+
+## 58. A page that follows the finger
+
+*Suwayomi-WebUI issue [#1091](https://github.com/Suwayomi/Suwayomi-WebUI/issues/1091), "Swipe Support
+in Manga Reader" — open and unbuilt there too, recorded because it is a documented, wanted
+interaction on the client whose reader UX this one already mirrors closely. Scout report #72, finding
+2. Re-verified against `9d4d1fa`: the line numbers in the report had drifted, the code had not.*
+
+Branch: `feat/reader-swipe`
+
+**Behaviour.** In paged mode, dragging horizontally past a threshold turns the page in the drag's
+direction, as an alternative to tapping a fixed zone. Today a horizontal drag at fit zoom does
+nothing at all, in any of the five tap layouts — including `off`, where the reader currently has no
+touch navigation whatsoever.
+
+1. The gap is one early return. `onPointerMove` bails at `if (zoom.scale === ZOOM_MIN) return`
+   (`ReaderPage.tsx:1370`), and the comment above it (`:1368-1369`) says why: "at fit size a drag is a
+   swipe over the tap zones, which is the reader's business rather than this one's." That was written
+   as a hand-off. Nothing ever picked it up — `TAP_LAYOUTS` fires on a tap, never on distance or
+   direction.
+2. Track the gesture where the reader already tells a tap from a drag rather than adding a second
+   notion of one: `panned` (`:737`) and `DRAG_SLOP` (`:356`) exist for the zoom code and mean exactly
+   the right thing here. Record the pointer-down x, and in `onPointerUp` (`:1377`) — at `ZOOM_MIN`,
+   one pointer, `pointerType === 'touch'` — read the horizontal delta.
+3. Past a swipe threshold, turn. The threshold is not `DRAG_SLOP`: 8px is "this was a drag, not a
+   tap", which is far too eager for a page turn. Use a fraction of the stage width so it reads the
+   same on a phone and a desktop, the way `AUTO_SCROLL_SECONDS_PER_SCREEN` (`:598`) already reasons
+   about speed.
+4. Direction comes from `advance` (`:1078`), which is already `direction === 'rtl' ? -1 : 1`, and the
+   turn goes through `goToPage` (`:931`) — the single entry point the tap zones, the keyboard and the
+   panel stepper all use. Do not add a second navigation path; the spread pairing and the progress
+   reporting hang off that one.
+5. **A swipe that turns must not also fire a tap zone.** `onPointerUp` already guards the double-tap
+   on `!panned.current` (`:1384`); the turn has to set `panned` before the click that follows, or a
+   swipe left in the `sides` layout turns the page and then turns it again on the tap.
+6. Strip mode gets nothing. `zoomable` is `mode === 'paged'` (`:1202`), a strip scrolls vertically,
+   and a horizontal drag there is either nothing or a pan — leave it as it is.
+7. Nothing in the options panel. This is the same navigation the tap zones already do, reached
+   another way, so it needs no setting of its own — and it is the answer for the `off` tap layout,
+   whose hint currently reads "No tap zones — the keyboard and this panel turn the page" (`:571`).
+   Update that hint once the swipe works, since it stops being true.
+
+---
+
 ## Working notes
 
 - Lint with `npm run lint` (oxlint) and typecheck via `npm run build` before each PR.
