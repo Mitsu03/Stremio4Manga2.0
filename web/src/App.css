@@ -584,6 +584,12 @@ button.result-row { width: 100%; text-align: left; cursor: pointer; font: inheri
 .theme-preview.system i:first-child { background: linear-gradient(90deg, #26334e 0 50%, #ff6971 50%); }
 .theme-preview.system i:nth-child(2) { background: #ffffff; }
 .theme-preview.system i:nth-child(3) { background: #202d47; }
+.theme-preview.tokyo-night { background: #1a1b26; border: 1px solid #2f344d; }
+.theme-preview.tokyo-night i { background: #24283b; }
+.theme-preview.tokyo-night i:first-child { background: #7aa2f7; }
+.theme-preview.sepia { background: #f4ecdd; border: 1px solid #e0d3bd; }
+.theme-preview.sepia i { background: #fdf6e8; }
+.theme-preview.sepia i:first-child { background: #3b2f24; }
 
 /* The language is one of the few settings that can be drawn as the word for itself, so the control
    is the two-letter tag, sized and framed like the theme swatches beside it. */
@@ -1189,10 +1195,9 @@ button.result-row { width: 100%; text-align: left; cursor: pointer; font: inheri
    a chip, and AniList is a pane of its own rather than a card in a stack.
    Everything below uses the existing theme variables, so light and dark follow automatically. */
 
-/* The one colour this patch introduces: readable ink on an aqua fill, which flips with the theme.
-   Everything else is an existing token from index.css. */
-.settings-page { --on-aqua: #ffffff; }
-:root[data-theme="dark"] .settings-page { --on-aqua: #0d1424; }
+/* Readable ink on an aqua fill used to live here, scoped to this page and to the dark theme by
+   name. It is a token in index.css now, declared by every palette like the other twenty-seven —
+   a palette that had to be remembered here as well would be a palette waiting to be forgotten. */
 
 /* Shell ---------------------------------------------------------------------------------------- */
 
