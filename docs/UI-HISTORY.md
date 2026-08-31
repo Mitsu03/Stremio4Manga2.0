@@ -19,11 +19,11 @@ the weekly scout reads this file and an unrecorded rejection comes back as a fre
 > anything under `server/build/generated/` belonged to version 1's Suwayomi server. That server is
 > gone: 2.0 is a Node process and `server/src/` is TypeScript throughout.
 >
-> Two claims in sections 52–56 are load-bearing and were true of *that* server rather than this one,
-> so they are worth naming rather than leaving for somebody to trip over:
+> Two claims in sections 52–56 were load-bearing and true of *that* server rather than this one, so
+> they are worth naming rather than leaving for somebody to trip over:
 >
-> - **KOReader sync is not in this build.** The section-56 note that the server side "has been pulled
->   in, in full" was about version 1. There is no `koSync` anything in `server/src/` or `web/src/`.
+> - **KOReader sync was never in this build**, and section 56 is now a rejection rather than a plan,
+>   partly for that reason. There is no `koSync` anything in `server/src/` or `web/src/`.
 > - **AniList is the only tracker.** The six registered in version 1 did not come across.
 >   `server/src/tracker/` is `anilist.ts`, `credentials.ts` and `records.ts`. Other tracker names
 >   appear only under `server/src/backup/`, where a restored `.tachibk` reports them as *not*
@@ -3451,10 +3451,12 @@ session could not see; both collapsed against the checkout sitting beside it:
   `TrackerManager.kt:10-34` registers six over the same surface AniList already uses — MyAnimeList 1,
   AniList 2, Kitsu 3, Shikimori 4, Bangumi 5, MangaUpdates 7 — with Komga, Kavita and Suwayomi
   declared and commented out.
-- It called KOReader sync "the expensive path" if the server-side feature had not been pulled in. It
-  has been, in full: `koSyncStatus` plus `connectKoSyncAccount`, `logoutKoSyncAccount`,
-  `pushKoSyncProgress` and `pullKoSyncProgress`, all wired in at `TachideskGraphQLSchema.kt:103,123`,
-  with seven `koreaderSync*` fields already on `SettingsType`. Section 56 is a UI section only.
+- ~~It called KOReader sync "the expensive path" if the server-side feature had not been pulled in.
+  It has been, in full: `koSyncStatus` plus `connectKoSyncAccount`, `logoutKoSyncAccount`,
+  `pushKoSyncProgress` and `pullKoSyncProgress` … Section 56 is a UI section only.~~ **True of
+  version 1's Kotlin server only, and moot since (2026-08-31).** None of it came across the rewrite,
+  which would have made section 56 a whole protocol rather than a UI section — and the section is now
+  a rejection regardless. The scout's original instinct, that this was the expensive path, was right.
 
 One premise was wrong in the other direction, and section 53 is built around the correction: it is
 not `boundSourceId()` that names a card's source. That helper returns the **bound manga id**
@@ -3618,66 +3620,28 @@ leaving the reader gives it back. Off is what happens today.
 
 ---
 
-## 56. The e-ink device reads the same page
+## 56. KOReader sync — rejected
 
-*Suwayomi-Server issue #1813 added KOReader Sync protocol support upstream; Kavita and komga carry the
-same capability independently. Nothing in `src` mentions KOReader or a sync server.*
+*Kept as a section rather than deleted, because an unrecorded rejection comes back as a fresh finding
+the next time the scout reads this file. Do not re-propose it.*
 
-Branch: `feat/koreader-sync`
+**Rejected after inspection (2026-08-31): it is not wanted. The plan this section used to hold was
+also costed against a server that no longer exists.**
 
-**Behaviour.** A card in Settings signs the server in to a KOReader Sync service — the public
-`sync.koreader.rocks` or a self-hosted one — and from then on the page a chapter is left on travels
-both ways: progress made in Inkstream shows up on a KOReader e-ink device, and progress made there is
-waiting when the chapter is opened here. Independent of the AniList link, which tracks chapters, not
-pages.
+It was written up from Suwayomi-Server issue #1813 as a **UI-only** section, on the strength of
+version 1's Kotlin server already exposing `koSyncStatus`, `connectKoSyncAccount`,
+`logoutKoSyncAccount`, `pushKoSyncProgress` and `pullKoSyncProgress`, with seven `koreaderSync*`
+fields on `SettingsType`. None of that came across the 2.0 rewrite. `server/src/` contains no
+`koSync` anything, so building it here would have meant implementing the KOReader Sync protocol from
+scratch — the account handshake, the document-hash identity, the mapping between a page in a chapter
+and KOReader's own position format, and the conflict strategy — before any of the interface it
+described could exist.
 
-**This is a UI section.** The report hedged that the server side might need pulling in first; it is
-already here, on `personal`, and every operation below was read off the fork's own source and
-confirmed wired into the schema at `TachideskGraphQLSchema.kt:103,123`. All five are `@RequireAuth`:
+That re-costing is not why it is rejected; it is rejected because it is not wanted. The re-costing is
+recorded so nobody re-opens it on the old "UI-only" estimate.
 
-```graphql
-query   { koSyncStatus { isLoggedIn serverAddress username } }
-mutation { connectKoSyncAccount(input: { serverAddress: $address, username: $user, password: $pass }) {
-             message status { isLoggedIn serverAddress username } } }
-mutation { logoutKoSyncAccount(input: {}) { status { isLoggedIn serverAddress username } } }
-mutation { pushKoSyncProgress(input: { chapterId: $chapterId }) { success chapter { id lastPageRead } } }
-mutation { pullKoSyncProgress(input: { chapterId: $chapterId }) {
-             chapter { id lastPageRead } syncConflict { deviceName remotePage } } }
-```
-
-**The scalar quirk that will bite.** `chapterId` is the chapter's **database id**, not the
-`sourceOrder` the reader's URL carries. `updateReaderProgress` (`ReaderPage.tsx:506-514`) works in
-source order against the REST endpoint, and passing that same number here would silently sync the
-wrong chapter. The right id is already in hand — `fetchChapterPages` returns `chapter { id … }`
-(`:68`).
-
-1. The Settings card, modelled on the AniList banner and its `SETTINGS_QUERY`/`LOGOUT_TRACKER_MUTATION`
-   pair (`SettingsPage.tsx:80-101`): address, username and password into `connectKoSyncAccount`;
-   once `koSyncStatus.isLoggedIn`, the address and username with a disconnect that calls
-   `logoutKoSyncAccount`. The password is never read back — `koSyncStatus` deliberately returns no
-   key. Default the address field to `https://sync.koreader.rocks/`, which is the server's own default
-   (`ServerConfig.kt:715`).
-2. `koSyncStatus` gates everything else. Signed out, the reader does no sync work at all and issues no
-   mutation; the card is the only surface that ever touches the account.
-3. **Push.** After `updateReaderProgress` (`:506-514`) writes a page, fire `pushKoSyncProgress` with
-   the chapter's database id, debounced on the settled page rather than fired per scroll tick — the
-   strip would otherwise push once per frame.
-4. **Pull.** On chapter open, after `fetchChapterPages` returns and *before* the reader restores
-   `lastPageRead` (`:960`), call `pullKoSyncProgress`. The mutation writes the row itself when it
-   decides to (`KoreaderSyncMutation.kt`, on `syncResult.shouldUpdate`), so the reader takes the page
-   off the payload it gets back instead of deciding for itself which side is newer.
-5. **Conflict.** `syncConflict { deviceName remotePage }` comes back non-null only when the server's
-   strategy is `PROMPT` (`KoreaderSyncConflictStrategy`). Show it as a dismissable line over the page —
-   the device name and the page, with a jump to it — never a modal. A dialog on chapter open blocks
-   the one thing the reader came for.
-6. Strategy is server state, not UI state: `koreaderSyncStrategyForward` and
-   `koreaderSyncStrategyBackward` are on `SettingsType` and set through the settings mutation the app
-   already uses. Two choice rows in the same card. Leave `koreaderSyncPercentageTolerance` and
-   `koreaderSyncChecksumMethod` alone — `BINARY` is the right default (`ServerConfig.kt:786`) — and
-   ignore `koreaderSyncStrategy` entirely: it is deprecated on the schema, kept for migration.
-7. `koreaderSyncDeviceId` is not offered as a field. A device id the reader can retype is a device id
-   that can collide with another client's, and the sync service uses it to decide whose progress it is
-   looking at.
+**This covers anything KOReader, not only the sync service** — progress sync, KOReader-format export,
+a companion mode. All of it is out of scope for this project.
 
 ---
 
