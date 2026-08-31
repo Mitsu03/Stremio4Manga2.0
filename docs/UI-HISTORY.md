@@ -3465,10 +3465,13 @@ not `boundSourceId()` that names a card's source. That helper returns the **boun
 entry has chapters of its own — and a filter keyed on anything else would disagree with the badge
 printed beside it.
 
-Five of the seven were taken and are the sections below. The other two — named colour palettes, and
+Five of the seven were taken and are the sections below. ~~The other two — named colour palettes, and
 tracking beyond AniList — were neither taken nor rejected, so they get **no entry here on purpose**:
 an undecided finding recorded in this file would read as settled. They stay live on scout issue #67,
-which is left open for them.
+which is left open for them.~~ **Both were decided on 2026-08-31 and both were taken** — they are
+sections 59 and 60, and the note above them records how each was re-priced. Issue #67 is closed:
+every one of its seven findings now has an entry in this file, five built, one rejected (section 56)
+and two planned.
 
 ---
 
@@ -3747,6 +3750,175 @@ touch navigation whatsoever.
    another way, so it needs no setting of its own — and it is the answer for the `off` tap layout,
    whose hint currently reads "No tap zones — the keyboard and this panel turn the page" (`:571`).
    Update that hint once the swipe works, since it stops being true.
+
+---
+
+## Sections 59–60 — the two #67 held back, decided 2026-08-31
+
+Five of the 2026-08-24 scout's seven findings were decided at triage; findings 3 and 6 were left as
+"not now" and issue #67 was kept open holding them. Both are taken here, re-verified against
+`4791351`. Both are still genuinely absent. **Both were mispriced, in opposite directions, and one
+of the two mispricings was written by the triage itself.**
+
+- Finding 3 was filed as "cheap but pure chrome — every named palette is a set of custom properties
+  the whole app then has to honour". The honouring is already built: 27 tokens on `:root`
+  (`web/src/index.css:1-33`), redefined once under `[data-theme="dark"]` (`:36-64`), and every
+  component in the app reads through `var(--…)`. It is cheaper than filed. What it is not is one
+  file — see section 59, step 4.
+- Finding 6's cost came from the triage comment on #67, not from the report: *"It does —
+  `TrackerManager.kt:10-34` registers six over the same surface AniList already uses."* That is
+  version 1's Kotlin server, and it is the same premise that made KOReader look like a UI section
+  until section 56 was rewritten as a rejection. It did not survive the rewrite either.
+  `server/src/tracker/` holds `anilist.ts`, `credentials.ts` and `records.ts`, and
+  `resolvers/track.ts:4-7` states the singular as a decision: *"There is exactly one tracker,
+  AniList, and its id is 2 … `tracker(id:)` answers null for anything else rather than inventing a
+  second one."* The six names that do exist (`server/src/backup/restore.ts:62-70`) are a lookup
+  table for reading Suwayomi backup files, not a registry.
+
+The lesson is recorded here because it has now cost two sections: **a correction on a scout issue
+carries the verification date of the session that wrote it.** When one correction in a comment has
+already been struck through, its siblings are suspect rather than independently sound. A correction
+citing a `.kt` path is a fact about a codebase this repository replaced.
+
+---
+
+## 59. More than one dark
+
+*Mihon [PR #3502](https://github.com/mihonapp/mihon/pull/3502) adds a Tokyo Night theme; the same
+release cycle shipped it as one of several selectable named palettes rather than a single alternate
+dark mode. Scout report of 2026-08-24, finding 3, held on issue #67 as "not now" until 2026-08-31.
+Re-verified against `4791351`: `ThemePreference` is still `'system' | 'light' | 'dark'`
+(`web/src/utils/theme.ts:3`) and there is still exactly one alternate palette.*
+
+Branch: `feat/theme-palettes`
+
+**Behaviour.** The Theme card in Settings grows past three buttons: alongside device, light and dark
+sit named palettes — a Tokyo Night, a warmer paper — each shown as the swatch the card already
+draws. Picking one repaints the app, and it is the palette the person meets at the sign-in page next
+time too. Nothing else changes: a palette is a set of colours, not a layout.
+
+1. **The app already honours a palette; it just only has two.** `web/src/index.css:1-33` defines 27
+   custom properties on `:root` and `:36-64` redefines every one of them under
+   `:root[data-theme="dark"]`. No component hard-codes a colour. A new palette is one more
+   `:root[data-theme="…"]` block of the same 27 tokens — not a change to any component, and not a
+   change to the server's data. Do not begin by refactoring the token set; it is already the right
+   shape.
+2. Widen the type and the store together. `ThemePreference` (`theme.ts:3`) gains the palette names,
+   and the `choice()` call at `:8` gains them in its options array — that array is the validator
+   (`web/src/utils/settings.ts:258-266` returns `null` for anything not in it, which falls back to
+   the default), so a name added to the type but not to the array reads as `'system'` forever, and
+   nothing will tell you.
+3. **`applyTheme` resolves to a binary today and cannot keep doing so.** `theme.ts:15-20` computes
+   `resolved` as `'dark' | 'light'`, stamps it on `data-theme`, and hands the same value to
+   `style.colorScheme`. A palette is neither. Give each palette a declared flavour — a
+   `Record<ThemePreference, 'light' | 'dark'>` beside the list — and split the two uses:
+   `data-theme` takes the palette name, `colorScheme` takes its flavour. `colorScheme` is what makes
+   form controls, scrollbars and the browser's own chrome match, so a dark palette that forgets it
+   gets white scrollbars.
+4. **There is a second copy of the palette, and it is on the server.**
+   `server/src/http/pages.ts:39-52` hand-writes a nine-token subset of both themes for the sign-in
+   page, because that page has to paint before any bundle exists (`:1-14` explains why it is served
+   from there at all). Its pre-paint script (`:82-90`) reads `localStorage['stremio4manga:theme']`
+   and collapses it to `dark ? 'dark' : 'light'`. Every new palette needs its nine tokens added
+   there and its flavour known to that script, or somebody on Tokyo Night signs in through a page
+   that is still plain dark. This is the step a "UI-only" estimate misses; it is small, but it is
+   not optional and it is not under `web/`.
+5. `web/src/App.css:1195` scopes `--on-aqua: #0d1424` to `[data-theme="dark"]` alone — the only
+   theme-conditional rule outside `index.css`. It is the ink that goes on an aqua fill, so a dark
+   palette that omits it loses the contrast on the settings page and nothing else. Either give every
+   dark-flavoured palette the same override, or — better, and one line — promote `--on-aqua` into
+   the token block itself so a palette declares it like the other 27.
+6. The swatch is free. The card already renders a `theme-preview` span carrying the option's value
+   as a class, with three `<i>` bars styled per value (`web/src/pages/SettingsPage.tsx:996`); a
+   palette gets its preview by adding one CSS class of the same shape. Add the entry to
+   `themeOptions` (`:144-148`) and it appears — `chooseTheme` (`:727-730`) is already generic over
+   the type.
+7. Labels go through `t()`, so each palette needs its Portuguese string in
+   `web/src/utils/translations.ts` beside `'Use dark theme'` (`:213-215`). A palette's *name* is a
+   proper noun and stays untranslated; the label around it ("Use Tokyo Night") is not.
+8. Keep the count small and the names concrete. This is chrome, and a palette's cost is not writing
+   it but honouring it afterwards: every token added to `index.css` from then on has to be added to
+   every palette, and step 4 means every palette also has a copy on the server. Two named palettes
+   is a feature; nine is a maintenance surface.
+
+---
+
+## 60. A title that answers to more than one tracker
+
+*Mihon [PR #3047](https://github.com/mihonapp/mihon/pull/3047) adds MangaBaka as an additional
+simultaneous tracker — OAuth sign-in, search, progress and score sync — alongside whatever is
+already linked, rather than one tracker replacing another. Scout report of 2026-08-24, finding 6,
+held on issue #67 as "not now" until 2026-08-31. **Re-priced upward at that point:** the triage
+comment that lowered its cost was reading version 1's Kotlin `TrackerManager`, which is not this
+server. See the note above section 59.*
+
+Branch: `feat/multi-tracker`
+
+**Behaviour.** A title can carry more than one tracker link at once — AniList and MyAnimeList, say —
+each with its own progress, score and status, each syncing independently. The detail page's tracking
+row becomes one row per linked tracker, and Settings gains a connection card per tracker rather than
+the single AniList banner.
+
+**This is the largest section in this file, and it is several PRs rather than one.** The steps below
+are grouped so each group lands on its own.
+
+1. **Start from what is already plural, because most of it is.** The database is: `track_record` is
+   `UNIQUE (manga_id, tracker_id)` (`server/src/db/schema.sql:143`) with an index on
+   `(user_id, tracker_id)` (`:146`), and `tracker_credential` has primary key `(user_id, tracker_id)`
+   (`:157`). The GraphQL surface is: `tracker(id: Int!)`, `searchTracker(trackerId:)`,
+   `loginTrackerOAuth(trackerId:)`, `logoutTracker(trackerId:)` and `bindTrack(trackerId:)` all take
+   an id already (`server/src/graphql/schema.graphql:871-905, 980-981, 1031-1036`), and
+   `TrackRecordType.trackerId` is on the record (`:842`). Every function in `credentials.ts` and
+   `records.ts` takes a `trackerId: number`. **Neither the schema nor the storage needs a
+   migration.** Do not write one.
+2. What is singular is the implementation behind that surface, in three places, plus the UI in front
+   of it. Find all three before writing anything: `resolvers/track.ts` builds `trackerView()` for
+   AniList only and answers `null` for any other id; `records.ts` imports `* as anilist` directly and
+   `fieldsFromEntry` (`:281`) takes an `anilist.AniListEntry`; `records.ts:237` gates remote deletion
+   on `record.trackerId === ANILIST_TRACKER_ID`.
+3. **Commit one: an interface, with AniList as its only implementation.** Define the shape a tracker
+   must satisfy from what `anilist.ts` already exports (`:126-201, 440-640`) — `authUrl()`,
+   `tokenFromCallback()`, `viewer()`, `search()`, `mediaById()`, `findListEntry()`,
+   `updateProgress()`, `deleteListEntry()`, `statusToNumber()`/`statusFromNumber()` — plus its
+   identity (`id`, `name`, `icon`). Put it in a new `server/src/tracker/index.ts` with a registry
+   keyed by id. Land it with AniList alone and nothing else changed: behaviour identical, one
+   indirection added. Every later step is small only because this one exists.
+4. Commit two: route the resolver and the record layer through the registry. `trackerView()` builds
+   from a registry entry rather than from `anilist` constants; `tracker(id:)` answers for anything
+   registered; `records.ts:237` asks the registry whether a tracker supports remote deletion instead
+   of comparing against a constant. Still one tracker registered, so still no behaviour change — and
+   that is the point: this commit is verifiable against the app exactly as it stands.
+5. **Commit three is the real work, and it is not "another OAuth".** AniList uses implicit grant —
+   the token arrives in the URL fragment and `tokenFromCallback` (`anilist.ts:156`) reads it.
+   MyAnimeList uses authorization-code with PKCE, which needs a verifier held across the round trip
+   and a server-side exchange with a client *secret*; Kitsu uses a password grant with no redirect at
+   all. The single callback route `/handle/oauth/result` (`web/src/App.tsx:47`,
+   `SettingsPage.tsx:709`) carries no tracker discriminator, so it cannot tell whose callback it is
+   holding. Decide the second tracker first, then design the handshake for its grant type
+   specifically — a generic "OAuth for trackers" abstraction written before a second real grant type
+   exists will be wrong in a way that is expensive to unpick. Note too that `S4M_ANILIST_CLIENT_ID`
+   (`anilist.ts:20-28`) is per-installation deployment configuration: a second tracker means a second
+   variable and a second entry in `docs/DEPLOY.md`.
+6. Commit four: the UI. Nineteen call sites read `ANILIST_TRACKER_ID`
+   (`web/src/utils/tracking.ts:3`) across `LibraryPage.tsx`, `ReaderPage.tsx`, `SettingsPage.tsx` and
+   `utils/libraryStats.ts`, and they are not all the same shape. Three kinds, handled differently:
+   - **"the record for this manga"** (`LibraryPage.tsx:216, 418, 1152`, `libraryStats.ts:109-113`) —
+     a `.find()` on the tracker id. These need a policy, not a parameter: with two links, which one
+     is *the* progress? Either store a primary tracker per title or take the highest
+     `lastChapterRead`. Do not leave the answer to array order.
+   - **"progress across the library"** (`LibraryPage.tsx:686, 1064, 1181`, `libraryStats.ts:182`) —
+     the read-through and statistics paths. Same policy, applied once in a shared helper rather than
+     re-decided at each site.
+   - **"this tracker's own surface"** (`SettingsPage.tsx:710, 1077`, `ReaderPage.tsx:867`) — the
+     connect/disconnect banner and the "open on AniList" link. These stay per-tracker and become a
+     loop over what is registered.
+7. `importAnilistLibrary` (`schema.graphql:1038`) stays AniList-only and keeps its name. It is a
+   one-off bulk import of an existing AniList list, not part of the tracking loop, and generalising
+   it would mean an importer per tracker for a button pressed once.
+8. **Settle what the second tracker is before starting.** Every step above is sized by that answer,
+   and the report's own example (MangaBaka) is not obviously the right one here — MyAnimeList is the
+   larger list and the harder handshake, Kitsu the easier handshake and the smaller list. The order
+   above holds regardless, but step 5 cannot be specified until the choice is made.
 
 ---
 
