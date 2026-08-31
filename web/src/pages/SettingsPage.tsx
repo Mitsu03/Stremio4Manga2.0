@@ -51,7 +51,8 @@ import {
 } from '../utils/libraryStats'
 import type { BoundStatsResult, DownloadedChaptersResult, LibraryStatsResult } from '../utils/libraryStats'
 import type { ThemePreference } from '../utils/theme'
-import { ANILIST_TRACKER_ID, LAST_SYNC_QUERY, SET_LAST_SYNC_MUTATION, formatSince, lastSyncFromMeta, statusNames } from '../utils/tracking'
+import { ANILIST_TRACKER_ID, LAST_SYNC_QUERY, SET_LAST_SYNC_MUTATION, formatSince, lastSyncFromMeta, statusNames, trackKey } from '../utils/tracking'
+import { startTrackerLogin } from '../utils/oauth'
 
 // What the connection is actually worth, counted the way the library shelves count it: one entry
 // per AniList title, deduplicated by remoteId because a series imported from AniList and the same
@@ -65,25 +66,31 @@ const TRACKED_TITLES_QUERY = `
     mangas(condition: { inLibrary: true }) {
       nodes {
         id
-        trackRecords { nodes { trackerId remoteId status score } }
+        trackRecords { nodes { trackerId remoteId status score lastChapterRead } }
       }
     }
   }
 `
 
 interface TrackedTitlesResult {
-  mangas: { nodes: Array<{ id: number; trackRecords: { nodes: Array<{ trackerId: number; remoteId: string; status: number; score: number }> } }> }
+  mangas: { nodes: Array<{ id: number; trackRecords: { nodes: Array<{ trackerId: number; remoteId: string; status: number; score: number; lastChapterRead: number }> } }> }
 }
 
-// user is resolved from AniList itself the first time it is asked for, so a connection made before
-// the server cached the profile still fills in — it stays null when AniList cannot be reached.
+// Every tracker the server has, rather than AniList by id: which ones exist is the server's answer,
+// and asking for the list is what lets a second one appear here without a change to this file.
+//
+// user is resolved from the tracker itself the first time it is asked for, so a connection made
+// before the server cached the profile still fills in — it stays null when the tracker is
+// unreachable.
 const SETTINGS_QUERY = `
   query AppSettings {
-    tracker(id: 2) {
+    trackers {
       id
       name
+      icon
       isLoggedIn
       authUrl
+      authRequiresVerifier
       user {
         name
         avatarUrl
@@ -127,14 +134,18 @@ interface RestoreStatusResult {
 
 type Validation = ValidateBackupResult['validateBackup']
 
+interface TrackerConnection {
+  id: number
+  name: string
+  icon: string
+  isLoggedIn: boolean
+  authUrl: string | null
+  authRequiresVerifier: boolean
+  user: { name: string; avatarUrl: string | null } | null
+}
+
 interface SettingsResult {
-  tracker: {
-    id: number
-    name: string
-    isLoggedIn: boolean
-    authUrl: string | null
-    user: { name: string; avatarUrl: string | null } | null
-  }
+  trackers: TrackerConnection[]
 }
 
 interface ImportLibraryResult {
@@ -185,10 +196,10 @@ function Icon({ name }: { name: IconName }) {
   return <svg viewBox="0 0 24 24" aria-hidden="true">{paths[name]}</svg>
 }
 
-type SettingsTab = 'anilist' | 'statistics' | 'categories' | 'backup' | 'appearance' | 'language'
+type SettingsTab = 'tracking' | 'statistics' | 'categories' | 'backup' | 'appearance' | 'language'
 
 const settingsTabs: Array<{ id: SettingsTab; label: string }> = [
-  { id: 'anilist', label: 'AniList' },
+  { id: 'tracking', label: 'Tracking' },
   { id: 'statistics', label: 'Statistics' },
   { id: 'categories', label: 'Categories' },
   { id: 'backup', label: 'Backup & restore' },
@@ -471,12 +482,13 @@ function LibraryStatsCard() {
 
   const totals = useMemo(() => countLibrary(entries, boundData?.mangas.nodes ?? []), [entries, boundData])
 
-  // One AniList record can hang off several library rows, so the scores are collected per remoteId
-  // before they are averaged — the same dedupe the connection pane counts tracked titles with.
+  // One remote record can hang off several library rows, so the scores are collected per link
+  // before they are averaged — the same dedupe the connection pane counts tracked titles with. The
+  // key carries the tracker, because a remote id is only unique inside its own.
   const scoreByRemote = new Map<string, number>()
   for (const node of trackedData?.mangas.nodes ?? []) {
     for (const record of node.trackRecords.nodes) {
-      if (record.trackerId === ANILIST_TRACKER_ID) scoreByRemote.set(record.remoteId, record.score)
+      scoreByRemote.set(trackKey(record), record.score)
     }
   }
   const { mean, scored } = meanScore([...scoreByRemote.values()])
@@ -526,7 +538,7 @@ export default function SettingsPage() {
     requestPolicy: 'cache-and-network',
   })
   const [, setLastSync] = useMutation(SET_LAST_SYNC_MUTATION)
-  const [tab, setTab] = useState<SettingsTab>('anilist')
+  const [tab, setTab] = useState<SettingsTab>('tracking')
   const [theme, setTheme] = useState<ThemePreference>(() => getThemePreference())
   const language = useLanguage()
 
@@ -708,15 +720,6 @@ export default function SettingsPage() {
     }
   }, [refetch, refetchAuto, restoreId])
 
-  const startAniListLogin = () => {
-    if (!data?.tracker.authUrl) return
-    const authUrl = new URL(data.tracker.authUrl)
-    authUrl.searchParams.set('state', JSON.stringify({
-      redirectUrl: `${window.location.origin}/handle/oauth/result`,
-      trackerId: ANILIST_TRACKER_ID,
-    }))
-    window.location.assign(authUrl)
-  }
 
   const runImport = async () => {
     setImportedCount(null)
@@ -738,16 +741,18 @@ export default function SettingsPage() {
   if (fetching) return <div className="state-panel"><p>{t('Loading settings...')}</p></div>
   if (error) return <div className="state-panel error"><h2>{t('Settings unavailable')}</h2><p>{friendlyError(error)}</p></div>
 
-  const connected = Boolean(data?.tracker.isLoggedIn)
-  const account = data?.tracker.user ?? null
+  const trackers = data?.trackers ?? []
+  // AniList keeps one surface of its own: the list import, which is a bulk export of that service's
+  // list rather than part of the tracking loop, and which is drawn on its card alone.
+  const anyConnected = trackers.some((tracker) => tracker.isLoggedIn)
   const lastSync = lastSyncFromMeta(syncData?.metas.nodes)
 
-  // One AniList record can hang off several library rows (the imported stub and the copy added from
-  // a source), so the shelf counts are taken over distinct remoteIds.
+  // One remote record can hang off several library rows (the imported stub and the copy added from
+  // a source), so the shelf counts are taken over distinct links, tracker included.
   const byRemote = new Map<string, number>()
   for (const node of trackedData?.mangas.nodes ?? []) {
     for (const record of node.trackRecords.nodes) {
-      if (record.trackerId === ANILIST_TRACKER_ID) byRemote.set(record.remoteId, record.status)
+      byRemote.set(trackKey(record), record.status)
     }
   }
   const shelfCounts = new Map<string, number>()
@@ -1037,65 +1042,90 @@ export default function SettingsPage() {
     <div className="settings-page settings-shell">
       <SettingsRail active={tab} onSelect={setTab} />
       <div className="settings-pane">
-        {/* The AniList pane says what the connection is worth as two numbers and a bar rather than a
-            row of small print: the count and the last sync are the two things people come here to
-            check, and the split is the shape of the library behind them. */}
-        {tab === 'anilist' && (
+        {/* The tracking pane says what the connections are worth as two numbers and a bar rather
+            than a row of small print: the count and the last sync are the two things people come
+            here to check, and the split is the shape of the library behind them. The numbers are
+            across every tracker, because the reader has one library however many lists it is on. */}
+        {tab === 'tracking' && (
           <div className="anilist-pane">
             <header className="settings-pane-header">
-              <span className="eyebrow">{t('Connection')}</span>
-              <h1>AniList</h1>
+              <span className="eyebrow">{t('Connections')}</span>
+              <h1>{t('Tracking')}</h1>
             </header>
 
-            <section className="anilist-banner">
-              <TrackerAvatar name={account?.name ?? 'AniList'} url={account?.avatarUrl ?? null} />
-              <div className="anilist-banner-copy">
-                <span className="anilist-banner-status">
-                  <span className={`status-dot ${connected ? 'online' : ''}`} />
-                  {connected ? t('Connected as') : t('Not connected')}
-                </span>
-                <h2>{connected ? account?.name ?? t('Connected') : t('Connect to import your list')}</h2>
-                {importResult.error && <span className="inline-error">{friendlyError(importResult.error)}</span>}
-                {logoutResult.error && <span className="inline-error">{friendlyError(logoutResult.error)}</span>}
-                {importedCount !== null && (
-                  <span className="anilist-banner-note">
-                    {t(importedCount === 1 ? '{count} title imported' : '{count} titles imported', { count: importedCount })}
-                  </span>
-                )}
-              </div>
-              {/* Import carries its word: it is the one slow, whole-library action on the page, and an
-                  icon alone made it look as incidental as the avatar beside it. */}
-              <div className="anilist-banner-actions">
-                {connected ? (
-                  <>
-                    <button
-                      type="button"
-                      className={`settings-text-button${importResult.fetching ? ' loading' : ''}`}
-                      disabled={importResult.fetching}
-                      onClick={runImport}
-                      title={t('Import your AniList list into the library')}
-                    ><Icon name="import" />{importResult.fetching ? t('Importing…') : t('Import list')}</button>
-                    <button
-                      type="button"
-                      className={`settings-icon-button settings-disconnect-button${logoutResult.fetching ? ' loading' : ''}`}
-                      disabled={logoutResult.fetching}
-                      onClick={async () => {
-                        await logoutTracker({ trackerId: ANILIST_TRACKER_ID })
-                        refetch({ requestPolicy: 'network-only' })
-                      }}
-                      aria-label={t('Disconnect AniList')}
-                      title={t('Disconnect AniList')}
-                    ><Icon name="disconnect" /></button>
-                  </>
-                ) : (
-                  <button type="button" className="settings-text-button" onClick={startAniListLogin} title={t('Connect AniList')}>
-                    <Icon name="connect" />{t('Connect')}
-                  </button>
-                )}
-              </div>
-            </section>
+            {/* One card per tracker the server registered, rather than one banner for AniList.
+                Import appears only on AniList's: `importAnilistLibrary` is a bulk export of one
+                service's list, not part of the tracking loop, and it keeps its name for that
+                reason. A tracker the installation has no client id for arrives with a null
+                authUrl and draws as unconnectable, which is the state this card already had. */}
+            {trackers.map((tracker) => {
+              const isAnilist = tracker.id === ANILIST_TRACKER_ID
+              return (
+                <section className="anilist-banner" key={tracker.id}>
+                  <TrackerAvatar name={tracker.user?.name ?? tracker.name} url={tracker.user?.avatarUrl ?? null} />
+                  <div className="anilist-banner-copy">
+                    <span className="anilist-banner-status">
+                      <span className={`status-dot ${tracker.isLoggedIn ? 'online' : ''}`} />
+                      {tracker.isLoggedIn ? t('Connected as') : t('Not connected')}
+                    </span>
+                    <h2>
+                      {tracker.isLoggedIn
+                        ? tracker.user?.name ?? tracker.name
+                        : tracker.authUrl
+                          ? t('Connect {name}', { name: tracker.name })
+                          : t('{name} is not configured on this server', { name: tracker.name })}
+                    </h2>
+                    {isAnilist && importResult.error && <span className="inline-error">{friendlyError(importResult.error)}</span>}
+                    {logoutResult.error && <span className="inline-error">{friendlyError(logoutResult.error)}</span>}
+                    {isAnilist && importedCount !== null && (
+                      <span className="anilist-banner-note">
+                        {t(importedCount === 1 ? '{count} title imported' : '{count} titles imported', { count: importedCount })}
+                      </span>
+                    )}
+                  </div>
+                  {/* Import carries its word: it is the one slow, whole-library action on the page, and an
+                      icon alone made it look as incidental as the avatar beside it. */}
+                  <div className="anilist-banner-actions">
+                    {tracker.isLoggedIn ? (
+                      <>
+                        {isAnilist && (
+                          <button
+                            type="button"
+                            className={`settings-text-button${importResult.fetching ? ' loading' : ''}`}
+                            disabled={importResult.fetching}
+                            onClick={runImport}
+                            title={t('Import your AniList list into the library')}
+                          ><Icon name="import" />{importResult.fetching ? t('Importing…') : t('Import list')}</button>
+                        )}
+                        <button
+                          type="button"
+                          className={`settings-icon-button settings-disconnect-button${logoutResult.fetching ? ' loading' : ''}`}
+                          disabled={logoutResult.fetching}
+                          onClick={async () => {
+                            await logoutTracker({ trackerId: tracker.id })
+                            refetch({ requestPolicy: 'network-only' })
+                          }}
+                          aria-label={t('Disconnect {name}', { name: tracker.name })}
+                          title={t('Disconnect {name}', { name: tracker.name })}
+                        ><Icon name="disconnect" /></button>
+                      </>
+                    ) : (
+                      <button
+                        type="button"
+                        className="settings-text-button"
+                        disabled={!tracker.authUrl}
+                        onClick={() => startTrackerLogin(tracker)}
+                        title={t('Connect {name}', { name: tracker.name })}
+                      >
+                        <Icon name="connect" />{t('Connect')}
+                      </button>
+                    )}
+                  </div>
+                </section>
+              )
+            })}
 
-            {connected && (
+            {anyConnected && (
               <>
                 <div className="anilist-stats">
                   <div>

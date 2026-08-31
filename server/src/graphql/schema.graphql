@@ -990,6 +990,8 @@ type Query {
   settings: SettingsType!
 
   tracker(id: Int!): TrackerType
+  """Every tracker this build knows, in the order the UI should list them."""
+  trackers: [TrackerType!]!
   searchTracker(input: SearchTrackerInput!): SearchTrackerPayload!
 
   validateBackup(input: ValidateBackupInput!): ValidateBackupResult!

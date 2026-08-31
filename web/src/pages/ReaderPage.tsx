@@ -5,7 +5,7 @@ import { apiFetch } from '../api/session'
 import { friendlyError } from '../utils/errors'
 import { t } from '../utils/i18n'
 import { ENQUEUE_DOWNLOADS_MUTATION, START_DOWNLOADER_MUTATION } from '../utils/downloads'
-import { ANILIST_TRACKER_ID } from '../utils/tracking'
+import { primaryRecord, TRACKER_NAMES } from '../utils/tracking'
 import {
   DEFAULT_KEYBINDS,
   KEYBIND_GROUPS,
@@ -29,7 +29,7 @@ const READER_QUERY = `
     manga(id: $mangaId) {
       id title
       meta { key value }
-      trackRecords { nodes { trackerId remoteUrl } }
+      trackRecords { nodes { trackerId remoteUrl lastChapterRead } }
     }
     chapters(condition: { mangaId: $mangaId }, order: { by: SOURCE_ORDER }) {
       nodes { id name sourceOrder chapterNumber realUrl isDownloaded }
@@ -87,7 +87,7 @@ interface ReaderQueryResult {
     id: number
     title: string
     meta: Array<{ key: string; value: string }>
-    trackRecords: { nodes: Array<{ trackerId: number; remoteUrl: string | null }> }
+    trackRecords: { nodes: Array<{ trackerId: number; remoteUrl: string | null; lastChapterRead: number }> }
   }
   chapters: { nodes: ReaderChapter[] }
 }
@@ -860,15 +860,19 @@ export default function ReaderPage() {
   const fetchedChapter = pagesResult.data?.fetchChapterPages
   const prepared = fetchedChapter?.chapter.id === chapter?.id ? fetchedChapter : undefined
 
-  // The series on AniList, alongside the chapter on its source. A bound track record names the exact
-  // entry; without one there is nothing to point at but a search, which is still better than leaving
-  // the reader to type the title in themselves. The two cases say which they are in the label.
-  const anilistUrl = data?.manga.trackRecords.nodes
-    .find((record) => record.trackerId === ANILIST_TRACKER_ID)?.remoteUrl || null
+  // The series on its tracker, alongside the chapter on its source. A bound track record names the
+  // exact entry; without one there is nothing to point at but a search, which is still better than
+  // leaving the reader to type the title in themselves. The two cases say which they are in the
+  // label, and so does the tracker: a title linked to MyAnimeList opens on MyAnimeList.
+  const trackedLink = primaryRecord(data?.manga.trackRecords.nodes ?? [])
+  const trackedUrl = trackedLink?.remoteUrl || null
+  const trackedName = trackedLink ? TRACKER_NAMES[trackedLink.trackerId] ?? 'AniList' : 'AniList'
+  // Nothing bound means no tracker has claimed this title, so the search falls back to AniList —
+  // the one this server can always reach, connected or not.
   const anilistSearchUrl = data?.manga.title
     ? `https://anilist.co/search/manga?search=${encodeURIComponent(data.manga.title)}`
     : null
-  const anilistHref = anilistUrl ?? anilistSearchUrl
+  const trackedHref = trackedUrl ?? anilistSearchUrl
 
   const setMode = (nextMode: ReaderMode) => {
     if (nextMode === 'strip') setStripAnchor(page > 0 ? page : 'free')
@@ -2121,14 +2125,14 @@ export default function ReaderPage() {
             )}
             {/* The same trip outwards, one shelf over: the series as AniList knows it, for the
                 synopsis, the rating or the chapter count the source never reports. */}
-            {anilistHref && (
+            {trackedHref && (
               <a
                 className="reader-panel-icon anilist-link"
-                href={anilistHref}
+                href={trackedHref}
                 target="_blank"
                 rel="noreferrer noopener"
-                aria-label={anilistUrl ? t('Open this title on AniList') : t('Search for this title on AniList')}
-                title={anilistUrl ? t('Open on AniList') : t('Find on AniList')}
+                aria-label={trackedUrl ? t('Open this title on {name}', { name: trackedName }) : t('Search for this title on AniList')}
+                title={trackedUrl ? t('Open on {name}', { name: trackedName }) : t('Find on AniList')}
               >
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M6.361 2.943 0 21.056h4.942l1.077-3.133H11.4l1.052 3.133H22.9c.71 0 1.1-.392 1.1-1.101V17.53c0-.71-.39-1.101-1.1-1.101h-6.483V4.045c0-.71-.392-1.102-1.101-1.102h-2.422c-.71 0-1.101.392-1.101 1.102v1.064l-.85-2.166zm.598 10.993 1.478-4.834 1.53 4.834z" />

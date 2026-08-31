@@ -24,6 +24,7 @@ import {
 } from '../utils/bindings'
 import type { ChapterFilter, ChapterOrder } from '../utils/bindings'
 import { chapterTotalLabel, formatChapterNumber, formatUploadDate, hasFinishedPublishing } from '../utils/progress'
+import { primaryRecord, trackIdentity } from '../utils/tracking'
 import {
   browsableSources,
   INITIAL_SOURCE_COUNT,
@@ -165,38 +166,41 @@ const UPDATE_CHAPTERS_BOOKMARK_MUTATION = `
   }
 `
 
-const ANILIST_TRACKER_QUERY = `
-  query AniListTracker {
-    tracker(id: 2) { id name icon isLoggedIn }
+// Every tracker the server registered, so a title can be bound to more than one of them. The list
+// is the server's answer rather than an id written here, which is what lets a second tracker appear
+// on this page without a change to it.
+const TRACKERS_QUERY = `
+  query TrackersForTracking {
+    trackers { id name icon isLoggedIn }
   }
 `
 
-const SEARCH_ANILIST_QUERY = `
-  query SearchAniList($query: String!) {
-    searchTracker(input: { trackerId: 2, query: $query }) {
+const SEARCH_TRACKER_QUERY = `
+  query SearchTracker($trackerId: Int!, $query: String!) {
+    searchTracker(input: { trackerId: $trackerId, query: $query }) {
       trackSearches { remoteId title coverUrl publishingStatus publishingType totalChapters trackingUrl }
     }
   }
 `
 
-const BIND_ANILIST_MUTATION = `
-  mutation BindAniList($mangaId: Int!, $remoteId: LongString!) {
-    bindTrack(input: { mangaId: $mangaId, trackerId: 2, remoteId: $remoteId }) {
+const BIND_TRACK_MUTATION = `
+  mutation BindTrack($mangaId: Int!, $trackerId: Int!, $remoteId: LongString!) {
+    bindTrack(input: { mangaId: $mangaId, trackerId: $trackerId, remoteId: $remoteId }) {
       trackRecord { id mangaId trackerId remoteId title lastChapterRead totalChapters remoteUrl }
     }
   }
 `
 
-const BIND_ANILIST_RECORD_MUTATION = `
-  mutation BindAniListRecord($mangaId: Int!, $trackRecordId: Int!) {
+const BIND_TRACK_RECORD_MUTATION = `
+  mutation BindTrackRecord($mangaId: Int!, $trackRecordId: Int!) {
     bindTrackRecord(input: { mangaId: $mangaId, trackRecordId: $trackRecordId }) {
       trackRecord { id mangaId trackerId remoteId title lastChapterRead totalChapters remoteUrl }
     }
   }
 `
 
-const UNBIND_ANILIST_MUTATION = `
-  mutation UnbindAniList($recordId: Int!) {
+const UNBIND_TRACK_MUTATION = `
+  mutation UnbindTrack($recordId: Int!) {
     unbindTrack(input: { recordId: $recordId, deleteRemoteTrack: false }) { trackRecord { id } }
   }
 `
@@ -212,6 +216,7 @@ const FETCH_TRACK_MUTATION = `
 /** uploadDate is a GraphQL Long, so it arrives as a string of milliseconds — 0 when the source publishes no date. */
 interface ChapterNode { id: number; name: string; chapterNumber: number; sourceOrder: number; scanlator: string | null; pageCount: number; isRead: boolean; isDownloaded: boolean; isBookmarked: boolean; uploadDate: string }
 interface TrackRecord { id: number; mangaId: number; trackerId: number; remoteId: string; title: string; lastChapterRead: number; totalChapters: number; remoteUrl: string }
+interface TrackerSummary { id: number; name: string; icon: string; isLoggedIn: boolean }
 interface MangaDetail { id: number; title: string; thumbnailUrl: string | null; description: string | null; author: string | null; status: string; inLibrary: boolean; sourceId: string; realUrl: string | null; genre: string[]; source: { id: string; name: string; iconUrl: string | null } | null; meta: Array<{ key: string; value: string }>; trackRecords: { nodes: TrackRecord[] } }
 interface FetchChapterPagesResult { fetchChapterPages: { pages: string[]; chapter: { id: number; pageCount: number } } | null }
 /** A library row, with just enough of it to match a title and to describe the match afterwards. */
@@ -251,7 +256,7 @@ function readingSourceOf(row: LibraryTitle): number {
 function librarySeries(rows: LibraryTitle[]): LibraryTitle[] {
   const series = new Map<string, LibraryTitle>()
   for (const row of rows) {
-    const key = row.trackRecords.nodes.find((record) => record.trackerId === 2)?.remoteId || normalizeTitle(row.title)
+    const key = trackIdentity(row.trackRecords.nodes) ?? normalizeTitle(row.title)
     const found = series.get(key)
     // The bound row is the copy being read, so it is the one worth offering to open.
     if (!found || (readingSourceOf(row) !== row.id && readingSourceOf(found) === found.id)) series.set(key, row)
@@ -262,7 +267,7 @@ function librarySeries(rows: LibraryTitle[]): LibraryTitle[] {
 // Lists the chapters of a given manga, fetching them from the source once if the DB has none.
 // When a source returns several scanlator groups (duplicate chapter numbers), a filter lets the
 // user pick one group; the choice is remembered per manga.
-function ChapterList({ mangaId, anilistProgress = 0, anilistTotal = 0, finished = false, returnMangaId = mangaId, onEmpty, onLatestChapter, onLocalReadThrough }: { mangaId: number; anilistProgress?: number; anilistTotal?: number; finished?: boolean; returnMangaId?: number; onEmpty?: (empty: boolean) => void; onLatestChapter?: (latest: number) => void; onLocalReadThrough?: (readThrough: number) => void }) {
+function ChapterList({ mangaId, trackedProgress = 0, trackedTotal = 0, finished = false, returnMangaId = mangaId, onEmpty, onLatestChapter, onLocalReadThrough }: { mangaId: number; trackedProgress?: number; trackedTotal?: number; finished?: boolean; returnMangaId?: number; onEmpty?: (empty: boolean) => void; onLatestChapter?: (latest: number) => void; onLocalReadThrough?: (readThrough: number) => void }) {
   const [{ data, fetching, error }, refetch] = useQuery<{ manga: { id: number; meta: Array<{ key: string; value: string }> } | null; chapters: { nodes: ChapterNode[] } }>({ query: CHAPTERS_QUERY, variables: { mangaId }, requestPolicy: 'cache-and-network' })
   const [chaptersResult, fetchChapters] = useMutation(FETCH_CHAPTERS_MUTATION)
   const [, setChapterView] = useMutation(SET_CHAPTER_VIEW_MUTATION)
@@ -344,8 +349,8 @@ function ChapterList({ mangaId, anilistProgress = 0, anilistTotal = 0, finished 
     () => chapters.reduce((latest, chapter) => chapter.isRead ? Math.max(latest, chapter.chapterNumber) : latest, 0),
     [chapters],
   )
-  const readThrough = Math.max(anilistProgress, localReadThrough)
-  const hasProgress = anilistProgress > 0 || chapters.some((chapter) => chapter.isRead)
+  const readThrough = Math.max(trackedProgress, localReadThrough)
+  const hasProgress = trackedProgress > 0 || chapters.some((chapter) => chapter.isRead)
   const chapterStates = useMemo(
     () => visible.map((chapter) => ({ chapter, read: chapter.isRead || (readThrough > 0 && chapter.chapterNumber <= readThrough) })),
     [readThrough, visible],
@@ -543,7 +548,7 @@ function ChapterList({ mangaId, anilistProgress = 0, anilistTotal = 0, finished 
   // "Read through chapter 43" says nothing about how much is left, so pin it against the same
   // denominator the library chips use — "of 147?" while the series is still running. With neither
   // an AniList total nor chapters to count there is nothing to compare against, so say nothing.
-  const total = chapterTotalLabel(anilistTotal, latestChapter, readThrough, finished)
+  const total = chapterTotalLabel(trackedTotal, latestChapter, readThrough, finished)
   const readThroughSuffix = total.label === '?' ? '' : t(' of {total}', { total: total.label })
 
   if (error) return <div className="notice error">{friendlyError(error)}</div>
@@ -801,7 +806,15 @@ function ChapterList({ mangaId, anilistProgress = 0, anilistTotal = 0, finished 
   )
 }
 
-function AniListTrackingControl({
+/**
+ * One tracker's link for this title: the toggle, and the picker behind it.
+ *
+ * One instance per connected tracker, so a title can sit on two lists at once with its own progress
+ * on each. Everything that used to be an AniList constant is now the `tracker` prop — the id the
+ * search and the bind are scoped to, and the name and mark the control draws itself with.
+ */
+function TrackerTrackingControl({
+  tracker,
   mangaId,
   title,
   activeRecord,
@@ -811,6 +824,7 @@ function AniListTrackingControl({
   finished = false,
   onChanged,
 }: {
+  tracker: TrackerSummary
   mangaId: number
   title: string
   activeRecord?: TrackRecord
@@ -821,10 +835,9 @@ function AniListTrackingControl({
   onChanged: () => Promise<void>
 }) {
   const client = useClient()
-  const [{ data: trackerData, fetching: trackerFetching, error: trackerError }] = useQuery<{ tracker: { icon: string; isLoggedIn: boolean } }>({ query: ANILIST_TRACKER_QUERY })
-  const [bindResult, bindAniList] = useMutation(BIND_ANILIST_MUTATION)
-  const [bindRecordResult, bindAniListRecord] = useMutation(BIND_ANILIST_RECORD_MUTATION)
-  const [unbindResult, unbindAniList] = useMutation(UNBIND_ANILIST_MUTATION)
+  const [bindResult, bindAniList] = useMutation(BIND_TRACK_MUTATION)
+  const [bindRecordResult, bindAniListRecord] = useMutation(BIND_TRACK_RECORD_MUTATION)
+  const [unbindResult, unbindAniList] = useMutation(UNBIND_TRACK_MUTATION)
   const [pickerOpen, setPickerOpen] = useState(false)
   const [searchText, setSearchText] = useState(title)
   const [searching, setSearching] = useState(false)
@@ -844,8 +857,8 @@ function AniListTrackingControl({
     setSearching(true)
     setActionError(null)
     const result = await client.query<{ searchTracker: { trackSearches: AniListSearchResult[] } }>(
-      SEARCH_ANILIST_QUERY,
-      { query: trimmed },
+      SEARCH_TRACKER_QUERY,
+      { trackerId: tracker.id, query: trimmed },
       { requestPolicy: 'network-only' },
     ).toPromise()
     setSearching(false)
@@ -871,7 +884,7 @@ function AniListTrackingControl({
 
   const chooseMatch = async (match: AniListSearchResult) => {
     setActionError(null)
-    const result = await bindAniList({ mangaId, remoteId: match.remoteId })
+    const result = await bindAniList({ mangaId, trackerId: tracker.id, remoteId: match.remoteId })
     if (result.error) setActionError(friendlyError(result.error))
     else {
       setPickerOpen(false)
@@ -887,61 +900,58 @@ function AniListTrackingControl({
     else await onChanged()
   }
 
-  const busy = loadingManga || trackerFetching || bindResult.fetching || bindRecordResult.fetching || unbindResult.fetching
-  const isLoggedIn = trackerData?.tracker.isLoggedIn === true
+  const busy = loadingManga || bindResult.fetching || bindRecordResult.fetching || unbindResult.fetching
   const total = activeRecord && chapterTotalLabel(activeRecord.totalChapters, latestChapter, activeRecord.lastChapterRead, finished)
   const progress = activeRecord ? `${Math.floor(activeRecord.lastChapterRead)} / ${total ? total.label : '?'}` : null
   const controlLabel = activeRecord
-    ? t('AniList tracking is on for {title}, chapter {progress}. Turn it off', { title: activeRecord.title, progress: progress ?? '' })
-    : t('AniList tracking is off. Turn it on')
+    ? t('{name} tracking is on for {title}, chapter {progress}. Turn it off', { name: tracker.name, title: activeRecord.title, progress: progress ?? '' })
+    : t('{name} tracking is off. Turn it on', { name: tracker.name })
+
+  const mark = tracker.icon
+    ? <img src={tracker.icon} alt="" />
+    : <span>{tracker.name.slice(0, 2).toUpperCase()}</span>
 
   return (
     <div className="anilist-tracking-control">
-      {trackerError || (!isLoggedIn && !trackerFetching) ? (
-        <Link className="button anilist-tracking-button" to="/settings" aria-label={t('Connect AniList in settings')} title={t('Connect AniList')}>
-          {trackerData?.tracker.icon ? <img src={trackerData.tracker.icon} alt="" /> : <span>AL</span>}
-        </Link>
-      ) : (
-        <button
-          type="button"
-          className={`button anilist-tracking-button${activeRecord ? ' active' : ''}${busy ? ' loading' : ''}`}
-          disabled={busy}
-          aria-pressed={Boolean(activeRecord)}
-          aria-label={controlLabel}
-          title={activeRecord ? t('AniList: tracking {progress}', { progress: progress ?? '' }) : t('AniList: tracking off')}
-          onClick={activeRecord ? disableTracking : enableTracking}
-        >
-          {trackerData?.tracker.icon ? <img src={trackerData.tracker.icon} alt="" /> : <span>AL</span>}
-          <i className="tracking-status-dot" aria-hidden="true" />
-        </button>
-      )}
+      <button
+        type="button"
+        className={`button anilist-tracking-button${activeRecord ? ' active' : ''}${busy ? ' loading' : ''}`}
+        disabled={busy}
+        aria-pressed={Boolean(activeRecord)}
+        aria-label={controlLabel}
+        title={activeRecord
+          ? t('{name}: tracking {progress}', { name: tracker.name, progress: progress ?? '' })
+          : t('{name}: tracking off', { name: tracker.name })}
+        onClick={activeRecord ? disableTracking : enableTracking}
+      >
+        {mark}
+        <i className="tracking-status-dot" aria-hidden="true" />
+      </button>
 
       {pickerOpen && !activeRecord && (
         <div className="anilist-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setPickerOpen(false) }}>
-          <section className="anilist-modal" role="dialog" aria-modal="true" aria-labelledby={`anilist-title-${mangaId}`}>
+          <section className="anilist-modal" role="dialog" aria-modal="true" aria-labelledby={`anilist-title-${tracker.id}-${mangaId}`}>
             <header className="anilist-modal-header">
-              <div className="anilist-modal-mark" aria-hidden="true">
-                {trackerData?.tracker.icon ? <img src={trackerData.tracker.icon} alt="" /> : <span>AL</span>}
-              </div>
+              <div className="anilist-modal-mark" aria-hidden="true">{mark}</div>
               <div>
-                <span className="eyebrow">{t('AniList tracking')}</span>
-                <h2 id={`anilist-title-${mangaId}`}>{t('Choose the matching manga')}</h2>
+                <span className="eyebrow">{t('{name} tracking', { name: tracker.name })}</span>
+                <h2 id={`anilist-title-${tracker.id}-${mangaId}`}>{t('Choose the matching manga')}</h2>
                 <p>{t('Progress will update after you finish the last page of a chapter.')}</p>
               </div>
-              <button type="button" className="anilist-modal-close" aria-label={t('Close AniList matching')} title={t('Close')} onClick={() => setPickerOpen(false)}>
+              <button type="button" className="anilist-modal-close" aria-label={t('Close matching')} title={t('Close')} onClick={() => setPickerOpen(false)}>
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
               </button>
             </header>
             <div className="anilist-picker">
               <form className="anilist-search" onSubmit={(event) => { event.preventDefault(); runSearch(searchText) }}>
-                <label htmlFor={`anilist-search-${mangaId}`}>
+                <label htmlFor={`anilist-search-${tracker.id}-${mangaId}`}>
                   <span className="eyebrow">{t('Search title')}</span>
-                  <input id={`anilist-search-${mangaId}`} value={searchText} onChange={(event) => setSearchText(event.target.value)} autoFocus />
+                  <input id={`anilist-search-${tracker.id}-${mangaId}`} value={searchText} onChange={(event) => setSearchText(event.target.value)} autoFocus />
                 </label>
                 <button type="submit" className="button quiet" disabled={searching}>{searching ? t('Searching…') : t('Search')}</button>
               </form>
-              {searching && <p className="muted">{t('Searching AniList…')}</p>}
-              {!searching && searchResults.length === 0 && !actionError && <p className="muted">{t('No AniList matches found. Try another title.')}</p>}
+              {searching && <p className="muted">{t('Searching {name}…', { name: tracker.name })}</p>}
+              {!searching && searchResults.length === 0 && !actionError && <p className="muted">{t('No matches found on {name}. Try another title.', { name: tracker.name })}</p>}
               <div className="anilist-match-grid">
                 {searchResults.map((match) => (
                   <button className="anilist-match" type="button" key={match.remoteId} disabled={bindResult.fetching} onClick={() => chooseMatch(match)}>
@@ -1179,10 +1189,11 @@ export default function MangaDetailPage() {
   const [checkingDuplicates, setCheckingDuplicates] = useState(false)
   const [{ data, fetching, error }, refetchDetail] = useQuery<{ manga: MangaDetail }>({ query: MANGA_DETAIL_QUERY, variables: { mangaId: id } })
   const [{ data: boundData, fetching: boundFetching }, refetchBound] = useQuery<{ manga: MangaDetail }>({ query: MANGA_DETAIL_QUERY, variables: { mangaId: boundId ?? 0 }, pause: boundId === null })
+  const [{ data: trackersData }] = useQuery<{ trackers: TrackerSummary[] }>({ query: TRACKERS_QUERY })
   const [libraryResult, toggleLibrary] = useMutation(TOGGLE_LIBRARY_MUTATION)
   const [saveSourceBindingResult, saveSourceBinding] = useMutation(SET_SOURCE_BINDING_MUTATION)
   const [deleteSourceBindingResult, deleteSourceBinding] = useMutation(DELETE_SOURCE_BINDING_MUTATION)
-  const [, bindAniListRecord] = useMutation(BIND_ANILIST_RECORD_MUTATION)
+  const [, bindAniListRecord] = useMutation(BIND_TRACK_RECORD_MUTATION)
   const [, fetchTrack] = useMutation(FETCH_TRACK_MUTATION)
   const [, updateChaptersRead] = useMutation(UPDATE_CHAPTERS_READ_MUTATION)
   const [, fetchMangaDetails] = useMutation(FETCH_MANGA_DETAILS_MUTATION)
@@ -1311,23 +1322,28 @@ export default function MangaDetailPage() {
   //      newly picked source shows every chapter as unread even though AniList knows better.
   useEffect(() => {
     if (boundId === null || boundFetching || !boundData?.manga) return
-    const original = data?.manga?.trackRecords.nodes.find((record) => record.trackerId === 2)
-    const bound = boundData.manga.trackRecords.nodes.find((record) => record.trackerId === 2)
+    // Per tracker, because the title can be linked to more than one and each link has to reach the
+    // bound source's row separately — a title tracked on both services binds twice, not once.
+    const originals = data?.manga?.trackRecords.nodes ?? []
+    const boundRecords = boundData.manga.trackRecords.nodes
+    const unbound = originals.filter(
+      (record) => !boundRecords.some((entry) => entry.trackerId === record.trackerId),
+    )
 
-    if (original && !bound) {
+    if (unbound.length > 0) {
       refreshedBoundRef.current = boundId
-      bindAniListRecord({ mangaId: boundId, trackRecordId: original.id }).then(async (result) => {
+      Promise.all(unbound.map(async (record) => {
+        const result = await bindAniListRecord({ mangaId: boundId, trackRecordId: record.id })
         const boundRecordId = result.data?.bindTrackRecord?.trackRecord?.id as number | undefined
         if (boundRecordId) await fetchTrack({ recordId: boundRecordId })
-        refetchBound({ requestPolicy: 'network-only' })
-      })
+      })).then(() => refetchBound({ requestPolicy: 'network-only' }))
       return
     }
 
-    if (bound && refreshedBoundRef.current !== boundId) {
+    if (boundRecords.length > 0 && refreshedBoundRef.current !== boundId) {
       refreshedBoundRef.current = boundId
-      fetchTrack({ recordId: bound.id }).then((result) => {
-        if (!result.error) refetchBound({ requestPolicy: 'network-only' })
+      Promise.all(boundRecords.map((record) => fetchTrack({ recordId: record.id }))).then((results) => {
+        if (results.every((result) => !result.error)) refetchBound({ requestPolicy: 'network-only' })
       })
     }
   }, [boundId, boundFetching, data, boundData, bindAniListRecord, fetchTrack, refetchBound])
@@ -1401,7 +1417,7 @@ export default function MangaDetailPage() {
   useEffect(() => {
     if (!duplicates || duplicates.length === 0) return
     let cancelled = false
-    const progressOf = (entry: LibraryTitle) => entry.trackRecords.nodes.find((record) => record.trackerId === 2)?.lastChapterRead ?? 0
+    const progressOf = (entry: LibraryTitle) => primaryRecord(entry.trackRecords.nodes)?.lastChapterRead ?? 0
     void client
       .query<{ mangas: { nodes: DuplicateSourceNode[] } }>(
         DUPLICATE_SOURCE_QUERY,
@@ -1416,7 +1432,7 @@ export default function MangaDetailPage() {
           const entry = duplicates.find((match) => match.readsFrom === node.id)?.entry
           const readThrough = Math.max(
             entry ? progressOf(entry) : 0,
-            node.trackRecords.nodes.find((record) => record.trackerId === 2)?.lastChapterRead ?? 0,
+            primaryRecord(node.trackRecords.nodes)?.lastChapterRead ?? 0,
             node.chapters.nodes.reduce((latest, chapter) => chapter.isRead ? Math.max(latest, chapter.chapterNumber) : latest, 0),
           )
           const numbers = [...new Set(node.chapters.nodes.map((chapter) => chapter.chapterNumber))]
@@ -1452,12 +1468,23 @@ export default function MangaDetailPage() {
   if (!data?.manga) return null
 
   const manga = data.manga
-  const originalAniListRecord = manga.trackRecords.nodes.find((record) => record.trackerId === 2)
-  const boundAniListRecord = boundData?.manga?.trackRecords.nodes.find((record) => record.trackerId === 2)
-  const activeAniListRecord = boundId ? boundAniListRecord : originalAniListRecord
-  const inheritedAniListRecord = boundId && originalAniListRecord ? originalAniListRecord : undefined
-  const anilistProgress = Math.max(originalAniListRecord?.lastChapterRead ?? 0, boundAniListRecord?.lastChapterRead ?? 0)
-  const anilistTotal = activeAniListRecord?.totalChapters ?? 0
+  // One tracker at a time, because a title can now be linked to more than one and each keeps its own
+  // progress. The two lists are the title's own row and the row of the source it is bound to; which
+  // of them is "active" is the same rule it always was.
+  const linksFor = (trackerId: number) => {
+    const original = manga.trackRecords.nodes.find((record) => record.trackerId === trackerId)
+    const bound = boundData?.manga?.trackRecords.nodes.find((record) => record.trackerId === trackerId)
+    return {
+      active: boundId ? bound : original,
+      inherited: boundId && original ? original : undefined,
+    }
+  }
+  const connectedTrackers = (trackersData?.trackers ?? []).filter((tracker) => tracker.isLoggedIn)
+  // The chapter list wants one number for "how far the trackers say this has been read", and the
+  // furthest ahead is the only answer that never marks a chapter unread that was read elsewhere.
+  const trackedRecords = [...manga.trackRecords.nodes, ...(boundData?.manga?.trackRecords.nodes ?? [])]
+  const trackedProgress = trackedRecords.reduce((furthest, record) => Math.max(furthest, record.lastChapterRead), 0)
+  const trackedTotal = primaryRecord(trackedRecords)?.totalChapters ?? 0
   const finishedPublishing = hasFinishedPublishing(manga.status, boundData?.manga?.status)
   const refresh = () => refetchDetail({ requestPolicy: 'network-only' })
   const refreshTracking = async () => {
@@ -1495,7 +1522,7 @@ export default function MangaDetailPage() {
     }
     // Take the outgoing source's read-through before switching. AniList is folded in so a title
     // whose chapters were never flagged read locally still carries its real progress across.
-    const readThrough = Math.max(anilistProgress, localReadThrough)
+    const readThrough = Math.max(trackedProgress, localReadThrough)
     const fromSource = activeSourceName ?? t('the previous source')
     setSourceBinding(id, picked)
     setBoundId(picked)
@@ -1696,16 +1723,30 @@ export default function MangaDetailPage() {
                 </svg>
               </button>
             )}
-            <AniListTrackingControl
-              mangaId={boundId ?? id}
-              title={manga.title}
-              activeRecord={activeAniListRecord}
-              inheritedRecord={inheritedAniListRecord}
-              loadingManga={Boolean(boundId && boundFetching)}
-              latestChapter={latestChapter}
-              finished={finishedPublishing}
-              onChanged={refreshTracking}
-            />
+            {/* One toggle per connected tracker; with a single one connected this is the control
+                it has always been. None connected is the one case that is not a toggle — there is
+                nothing to turn on yet, so it points at the page where that is fixed. */}
+            {connectedTrackers.length === 0 ? (
+              <Link className="button anilist-tracking-button" to="/settings" aria-label={t('Connect a tracker in settings')} title={t('Connect a tracker')}>
+                <span>AL</span>
+              </Link>
+            ) : connectedTrackers.map((tracker) => {
+              const links = linksFor(tracker.id)
+              return (
+                <TrackerTrackingControl
+                  key={tracker.id}
+                  tracker={tracker}
+                  mangaId={boundId ?? id}
+                  title={manga.title}
+                  activeRecord={links.active}
+                  inheritedRecord={links.inherited}
+                  loadingManga={Boolean(boundId && boundFetching)}
+                  latestChapter={latestChapter}
+                  finished={finishedPublishing}
+                  onChanged={refreshTracking}
+                />
+              )
+            })}
             {libraryResult.error && <span className="inline-error">{friendlyError(libraryResult.error)}</span>}
           </div>
         </div>
@@ -1880,9 +1921,9 @@ export default function MangaDetailPage() {
           onUseOwnSource={picking && boundId !== null && !ownEmpty && ownSourceName ? { name: ownSourceName, onUse: unbind } : undefined}
         />
       ) : boundId ? (
-        <ChapterList mangaId={boundId} anilistProgress={anilistProgress} anilistTotal={anilistTotal} finished={finishedPublishing} returnMangaId={id} onLatestChapter={setLatestChapter} onLocalReadThrough={setLocalReadThrough} />
+        <ChapterList mangaId={boundId} trackedProgress={trackedProgress} trackedTotal={trackedTotal} finished={finishedPublishing} returnMangaId={id} onLatestChapter={setLatestChapter} onLocalReadThrough={setLocalReadThrough} />
       ) : (
-        <ChapterList mangaId={id} anilistProgress={anilistProgress} anilistTotal={anilistTotal} finished={finishedPublishing} onEmpty={setOwnEmpty} onLatestChapter={setLatestChapter} onLocalReadThrough={setLocalReadThrough} />
+        <ChapterList mangaId={id} trackedProgress={trackedProgress} trackedTotal={trackedTotal} finished={finishedPublishing} onEmpty={setOwnEmpty} onLatestChapter={setLatestChapter} onLocalReadThrough={setLocalReadThrough} />
       )}
     </div>
   )

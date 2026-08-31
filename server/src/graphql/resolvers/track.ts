@@ -18,7 +18,7 @@
  */
 import type { GraphQLContext } from '../../types.js';
 import type { ResolverGroup } from './index.js';
-import { requireTracker, trackerById, type Tracker } from '../../tracker/index.js';
+import { allTrackers, requireTracker, trackerById, type Tracker } from '../../tracker/index.js';
 import {
   deleteCredential,
   isExpired,
@@ -126,6 +126,9 @@ export const group: ResolverGroup = {
       const tracker = trackerById(args.id);
       return tracker ? trackerView(context, tracker) : null;
     },
+
+    trackers: (_parent: unknown, _args: unknown, context: GraphQLContext) =>
+      allTrackers().map((tracker) => trackerView(context, tracker)),
 
     searchTracker: async (
       _parent: unknown,

@@ -23,7 +23,7 @@ import {
   SOURCES_QUERY,
 } from '../utils/sources'
 import type { FetchSourceMangaBulkResult, SourceMangaNode, SourceNode } from '../utils/sources'
-import { ANILIST_TRACKER_ID, SET_LAST_SYNC_MUTATION, statusNames } from '../utils/tracking'
+import { primaryRecord, trackIdentity, SET_LAST_SYNC_MUTATION, statusNames } from '../utils/tracking'
 import { choice, preference, structured } from '../utils/settings'
 
 const LIBRARY_QUERY = `
@@ -208,12 +208,16 @@ interface TrackRecord {
 }
 
 /**
- * The AniList id of a series, which is the only identity every row agrees on. Titles are not: the
+ * The tracker id of a series, which is the only identity every row agrees on. Titles are not: the
  * same series indexed by two sources comes back as "Ms. Mystic" on one and "MISS MYSTIC" on the
  * other, and no amount of normalising makes those equal. Both rows carry AniList 87443.
+ *
+ * Namespaced by tracker, because a remote id is only unique inside its own tracker, and taken from
+ * a fixed tracker order rather than from whichever link is furthest ahead: two rows for one series
+ * have to agree on this even when their progress does not.
  */
-function anilistId(records: Array<{ trackerId: number; remoteId?: string }>): string | undefined {
-  return records.find((record) => record.trackerId === ANILIST_TRACKER_ID)?.remoteId || undefined
+function trackedId(records: Array<{ trackerId: number; remoteId?: string }>): string | undefined {
+  return trackIdentity(records)
 }
 
 interface LibrarySource { id: string; name: string; iconUrl: string | null }
@@ -414,8 +418,8 @@ function titleInitials(title: string): string {
   return searchKey(title).split(/[^\p{L}\p{N}]+/u).filter(Boolean).map((word) => word[0]).join('')
 }
 
-function anilistRecord(item: LibraryManga): TrackRecord | undefined {
-  return item.trackRecords.nodes.find((record) => record.trackerId === ANILIST_TRACKER_ID)
+function trackedRecord(item: LibraryManga): TrackRecord | undefined {
+  return primaryRecord(item.trackRecords.nodes)
 }
 
 // The bound source is persisted server-side in the manga's meta (shared across browsers), with the
@@ -443,9 +447,9 @@ function cardSource(item: LibraryManga, bound: LibrarySource | null | undefined)
 // id settling anything left so the choice cannot wander between renders.
 function preferredEntry(a: LibraryManga, b: LibraryManga): LibraryManga {
   const score = (item: LibraryManga) => [
-    anilistRecord(item) ? 1 : 0,
+    trackedRecord(item) ? 1 : 0,
     boundSourceId(item) !== null ? 1 : 0,
-    anilistRecord(item)?.lastChapterRead ?? 0,
+    trackedRecord(item)?.lastChapterRead ?? 0,
     -item.id,
   ]
   const [left, right] = [score(a), score(b)]
@@ -464,11 +468,11 @@ function preferredEntry(a: LibraryManga, b: LibraryManga): LibraryManga {
 function deduplicateLibrary(items: LibraryManga[]): LibraryManga[] {
   const remoteByTitle = new Map<string, string>()
   for (const item of items) {
-    const remoteId = anilistId(item.trackRecords.nodes)
+    const remoteId = trackedId(item.trackRecords.nodes)
     if (remoteId) remoteByTitle.set(titleKey(item.title), remoteId)
   }
   const seriesKey = (item: LibraryManga) =>
-    anilistId(item.trackRecords.nodes) ?? remoteByTitle.get(titleKey(item.title)) ?? titleKey(item.title)
+    trackedId(item.trackRecords.nodes) ?? remoteByTitle.get(titleKey(item.title)) ?? titleKey(item.title)
   const series = new Map<string, LibraryManga>()
   for (const item of items) {
     const key = seriesKey(item)
@@ -608,7 +612,7 @@ function ContinueReadingShelf({ libraryByBound, libraryByRemote, libraryByTitle,
   const remoteByTitle = useMemo(() => {
     const map = new Map<string, string>()
     for (const chapter of data?.chapters.nodes ?? []) {
-      const remoteId = anilistId(chapter.manga.trackRecords.nodes)
+      const remoteId = trackedId(chapter.manga.trackRecords.nodes)
       if (remoteId) map.set(titleKey(chapter.manga.title), remoteId)
     }
     for (const [key, entry] of libraryByTitle) if (entry.remoteId) map.set(key, entry.remoteId)
@@ -616,7 +620,7 @@ function ContinueReadingShelf({ libraryByBound, libraryByRemote, libraryByTitle,
   }, [data, libraryByTitle])
 
   const remoteFor = (title: string, records: Array<{ trackerId: number; remoteId?: string }>) =>
-    anilistId(records) ?? remoteByTitle.get(titleKey(title))
+    trackedId(records) ?? remoteByTitle.get(titleKey(title))
   const seriesKey = (title: string, records: Array<{ trackerId: number; remoteId?: string }>) =>
     remoteFor(title, records) ?? titleKey(title)
 
@@ -683,7 +687,7 @@ function ContinueReadingShelf({ libraryByBound, libraryByRemote, libraryByTitle,
     const map = new Map<number, RecentState>()
     for (const node of stateData?.mangas.nodes ?? []) {
       const entry = entryFor(node.id, node.title, remoteFor(node.title, node.trackRecords.nodes))
-      const progress = node.trackRecords.nodes.find((record) => record.trackerId === ANILIST_TRACKER_ID)?.lastChapterRead ?? 0
+      const progress = primaryRecord(node.trackRecords.nodes)?.lastChapterRead ?? 0
       const localReadThrough = node.chapters.nodes.reduce((latest, chapter) => chapter.isRead ? Math.max(latest, chapter.chapterNumber) : latest, 0)
       // The library entry's own AniList record counts too: it is where progress lands once a title
       // has been read on the bound source, and this copy may never have seen any of it.
@@ -1045,7 +1049,7 @@ export default function LibraryPage() {
   const sweepIds = useMemo(() => {
     const ids = new Set<number>()
     for (const item of data?.mangas.nodes ?? []) {
-      if (anilistRecord(item)?.status === COMPLETED_STATUS) continue
+      if (trackedRecord(item)?.status === COMPLETED_STATUS) continue
       const bound = boundByManga.get(item.id)
       if (bound !== undefined) ids.add(bound)
     }
@@ -1061,7 +1065,7 @@ export default function LibraryPage() {
   const unreadByBound = useMemo(() => {
     const map = new Map<number, BoundState>()
     for (const node of unreadData?.mangas.nodes ?? []) {
-      const progress = node.trackRecords.nodes.find((record) => record.trackerId === ANILIST_TRACKER_ID)?.lastChapterRead ?? 0
+      const progress = primaryRecord(node.trackRecords.nodes)?.lastChapterRead ?? 0
       const chapterNumbers = [...new Set(node.chapters.nodes.map((chapter) => chapter.chapterNumber))].sort((a, b) => a - b)
       map.set(node.id, {
         chapterNumbers,
@@ -1083,7 +1087,7 @@ export default function LibraryPage() {
   // Read-through takes the best of the entry's own record and the bound source's, exactly as the
   // shelf counters do: whichever was synced last is the one that knows.
   const boundEntryFor = (item: LibraryManga): BoundEntry => {
-    const record = anilistRecord(item)
+    const record = trackedRecord(item)
     const bound = unreadByBound.get(boundByManga.get(item.id) ?? -1)
     return {
       entryId: item.id,
@@ -1121,7 +1125,7 @@ export default function LibraryPage() {
     return map
   }
   const libraryByRemote = useMemo(
-    () => keyedEntries((item) => anilistId(item.trackRecords.nodes)),
+    () => keyedEntries((item) => trackedId(item.trackRecords.nodes)),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [data, boundByManga, unreadByBound],
   )
@@ -1149,7 +1153,7 @@ export default function LibraryPage() {
     const rolledBack: Array<{ title: string; progress: number }> = []
     const pending: Array<Promise<unknown>> = []
     for (const node of unreadData?.mangas.nodes ?? []) {
-      const record = node.trackRecords.nodes.find((entry) => entry.trackerId === ANILIST_TRACKER_ID)
+      const record = primaryRecord(node.trackRecords.nodes)
       if (!record) continue
       const progress = syncedProgress.get(record.id) ?? record.lastChapterRead
       if (!(progress > 0)) continue
@@ -1162,23 +1166,25 @@ export default function LibraryPage() {
     return rolledBack
   }
 
-  // Read progress is pushed to AniList from the bound-source track record, not from the
-  // library entry's own record, so the shelf counters drift out of date. Pull every AniList
-  // record back down from the remote so the library reflects the real progress.
+  // Read progress is pushed to the tracker from the bound-source track record, not from the
+  // library entry's own record, so the shelf counters drift out of date. Pull every track
+  // record back down from its tracker so the library reflects the real progress.
   //
   // The bound sources are refreshed alongside the entries, and they are the ones that matter most:
   // a bound source is not itself in the library, so a sync that only walked `inLibrary` rows left
   // the very record progress is pushed from — the one the continue-reading cards read back — stuck
-  // at whatever it last pushed. Rolling a title back on AniList then changed the shelf but not the
-  // card, and no amount of syncing or re-importing could shift it.
-  const refreshFromAniList = async () => {
+  // at whatever it last pushed. Rolling a title back on the tracker then changed the shelf but not
+  // the card, and no amount of syncing or re-importing could shift it.
+  //
+  // Every record is pulled, whichever tracker it belongs to: `fetchTrack` resolves the tracker from
+  // the record itself, so a title linked to two of them refreshes both.
+  const refreshTracking = async () => {
     if (syncState) return
     const recordIds = [...new Set(
       [
         ...(data?.mangas.nodes ?? []).flatMap((item) => item.trackRecords.nodes),
         ...(unreadData?.mangas.nodes ?? []).flatMap((node) => node.trackRecords.nodes),
       ]
-        .filter((record) => record.trackerId === ANILIST_TRACKER_ID)
         .map((record) => record.id),
     )]
     if (recordIds.length === 0) return
@@ -1592,7 +1598,7 @@ export default function LibraryPage() {
   // The number on the cover, and the key the unread order sorts by. One derivation for both, so a
   // shelf sorted by unread cannot disagree with the chips it is showing.
   const unreadFor = (item: LibraryManga): number | null => {
-    const progress = anilistRecord(item)
+    const progress = trackedRecord(item)
     const bound = unreadByBound.get(boundByManga.get(item.id) ?? -1)
     // Prefer the bound source, but reconcile its chapters with AniList progress the same way the
     // detail page does: a chapter counts as read if the DB flagged it OR it sits at/below the
@@ -1646,9 +1652,9 @@ export default function LibraryPage() {
   // Sorted once, before the shelves are cut out of it: filtering and grouping both keep their input
   // order, so one sort covers the status shelves and the category shelves alike.
   const manga = sortLibrary(deduplicateLibrary(data?.mangas.nodes ?? [])
-    .filter((item) => anilistRecord(item)?.status !== COMPLETED_STATUS))
+    .filter((item) => trackedRecord(item)?.status !== COMPLETED_STATUS))
   const groups = manga.reduce<Record<string, LibraryManga[]>>((result, item) => {
-    const anilist = anilistRecord(item)
+    const anilist = trackedRecord(item)
     const label = anilist ? statusNames[anilist.status] ?? 'Other' : 'Other'
     ;(result[label] ??= []).push(item)
     return result
@@ -1786,7 +1792,7 @@ export default function LibraryPage() {
     <div className="library-page">
       <header className="library-header">
         <div className="library-titlebar">
-          <div><span className="eyebrow">{t('AniList library')}</span><h1>{t('Your shelves')}</h1></div>
+          <div><span className="eyebrow">{t('Tracked library')}</span><h1>{t('Your shelves')}</h1></div>
           <div className="library-toolbar">
             {/* The one control here that is not a glyph, because there is nothing for a glyph to
                 stand in for: the field's content *is* the message. Its readout is the count beside
@@ -1960,7 +1966,7 @@ export default function LibraryPage() {
             <button
               type="button"
               className={`library-sync-button${syncState ? ' loading' : ''}`}
-              onClick={refreshFromAniList}
+              onClick={refreshTracking}
               disabled={syncState !== null}
               aria-label={syncState
                 ? t('Syncing {done} of {total} from AniList', { done: syncState.done, total: syncState.total })
@@ -2241,7 +2247,7 @@ export default function LibraryPage() {
           <div className="shelf-heading"><h2>{t(shelf.label)}</h2><span>{shelf.items.length}</span></div>
           <div className="grid">
             {shelf.items.map((item) => {
-              const progress = anilistRecord(item)
+              const progress = trackedRecord(item)
               const bound = unreadByBound.get(boundByManga.get(item.id) ?? -1)
               const unread = unreadFor(item)
               const checked = selected.has(item.id)
