@@ -17,6 +17,7 @@ import * as chapter from './chapter.js';
 import * as search from './search.js';
 import * as download from './download.js';
 import * as backup from './backup.js';
+import * as sources from './sources.js';
 // Adding a group means adding it here and to `groups` below; nothing else in
 // the server needs to learn about it.
 
@@ -50,6 +51,7 @@ const groups: ResolverGroup[] = [
   search.group,
   download.group,
   backup.group,
+  sources.group,
 ];
 
 function merge(): Record<string, FieldMap> {

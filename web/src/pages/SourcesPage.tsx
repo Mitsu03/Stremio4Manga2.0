@@ -43,6 +43,14 @@ const FETCH_EXTENSIONS_MUTATION = `
   mutation FetchExtensions { fetchExtensions(input: {}) { extensions { pkgName } } }
 `
 
+const CLEAR_COOKIES_MUTATION = `
+  mutation ClearSourceCookies {
+    clearSourceCookies(input: {}) {
+      hosts
+    }
+  }
+`
+
 const ADD_EXTENSION_STORE_MUTATION = `
   mutation AddExtensionStore($indexUrl: String!) {
     addExtensionStore(input: { indexUrl: $indexUrl }) {
@@ -95,6 +103,7 @@ export default function SourcesPage() {
   const [, updateExtension] = useMutation(UPDATE_EXTENSION_MUTATION)
   const [, fetchExtensions] = useMutation(FETCH_EXTENSIONS_MUTATION)
   const [, addExtensionStore] = useMutation(ADD_EXTENSION_STORE_MUTATION)
+  const [, clearCookies] = useMutation<{ clearSourceCookies: { hosts: number } }>(CLEAR_COOKIES_MUTATION)
   const [query, setQuery] = useState('')
   const [browsing, setBrowsing] = useState(false)
   const [catalogueQuery, setCatalogueQuery] = useState('')
@@ -105,6 +114,10 @@ export default function SourcesPage() {
   const [catalogueBusy, setCatalogueBusy] = useState(false)
   const [updatingAll, setUpdatingAll] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
+  // Said out loud because the effect is entirely somewhere else: a button whose result is invisible
+  // reads as a button that did nothing.
+  const [actionNote, setActionNote] = useState<string | null>(null)
+  const [clearingCookies, setClearingCookies] = useState(false)
 
   const extensions = useMemo(() => data?.extensions.nodes ?? [], [data])
   const stores = useMemo(() => data?.extensionStores.nodes ?? [], [data])
@@ -204,6 +217,30 @@ export default function SourcesPage() {
     refetch({ requestPolicy: 'network-only' })
   }
 
+  /**
+   * The escape hatch for a source stuck behind a Cloudflare challenge, which happens when the stored
+   * clearance and the User-Agent it was earned under stop agreeing. Throwing the pair away costs one
+   * fresh challenge and is the only thing that ends the loop.
+   *
+   * No confirmation step: nothing of the reader's is destroyed, and the worst an accidental press
+   * costs is one solver round on the next search. The count afterwards is what says it happened.
+   */
+  const clearSourceCookies = async () => {
+    setActionError(null)
+    setActionNote(null)
+    setClearingCookies(true)
+    const result = await clearCookies({})
+    setClearingCookies(false)
+    if (result.error) { setActionError(friendlyError(result.error)); return }
+    const hosts = result.data?.clearSourceCookies.hosts ?? 0
+    setActionNote(hosts === 0
+      ? t('There were no stored cookies to clear.')
+      : t(hosts === 1
+        ? 'Cleared the cookies for {count} site. It will have to say hello again — and so will every account on this server.'
+        : 'Cleared the cookies for {count} sites. They will have to say hello again — and so will every account on this server.',
+      { count: hosts }))
+  }
+
   const updateAll = async () => {
     if (outdated.length === 0) return
     setUpdatingAll(true)
@@ -233,6 +270,16 @@ export default function SourcesPage() {
         <div className="sources-header-actions">
           <span>{t('{count} installed', { count: installedCount })}</span>
           <button type="button" className={`source-icon-button${catalogueBusy ? ' loading' : ''}`} disabled={catalogueBusy || stores.length === 0} onClick={refreshCatalogue} aria-label={t('Refresh catalogue')} title={t('Refresh catalogue')}><Icon name="refresh" /></button>
+          {/* A source stuck behind a Cloudflare challenge is a failure this page already names but
+              could not act on. The shield is the icon a challenge is drawn with everywhere else. */}
+          <button
+            type="button"
+            className={`source-icon-button${clearingCookies ? ' loading' : ''}`}
+            disabled={clearingCookies}
+            onClick={clearSourceCookies}
+            aria-label={t('Clear stored cookies for every source')}
+            title={t('Clear stored cookies for every source')}
+          ><Icon name="shield" /></button>
           <button
             type="button"
             className={`source-icon-button source-update-all${updatingAll ? ' loading' : ''}`}
@@ -251,6 +298,7 @@ export default function SourcesPage() {
 
       {error && <div className="notice error">{friendlyError(error)}</div>}
       {actionError && <div className="notice error">{actionError}</div>}
+      {actionNote && <div className="notice" role="status">{actionNote}</div>}
 
       {/* A handful of installed sources are read at a glance, and a search field over them would be
           furniture. It appears once the list is long enough to need it. */}

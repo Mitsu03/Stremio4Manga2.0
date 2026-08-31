@@ -3728,9 +3728,15 @@ and offers nothing that acts on it.
    one. Say it in the UI copy rather than inventing per-account jars for it — partitioning the jar
    would mean every account solving its own Cloudflare challenge, which is the loop this exists to
    escape.
-6. The button goes in `SettingsPage.tsx` in the same card shape as the backup export/import actions,
-   with a confirm step: it is not destructive to data, but it does throw away a clearance that took a
-   solver run to earn, and pressing it while a sweep is running makes that sweep slower.
+6. ~~The button goes in `SettingsPage.tsx` in the same card shape as the backup export/import
+   actions, with a confirm step.~~ **Changed when built (2026-08-31).** Settings has six tabs -
+   AniList, Statistics, Categories, Backup, Appearance, Language - and none of them is about
+   sources; "beside the backup controls" would have filed a source-recovery action under Backup,
+   where nobody looking for it would go. It is an icon button in the Sources page header instead,
+   beside Refresh catalogue, which is the page a reader is already on when a source misbehaves.
+   The confirm step went with it: nothing of the reader's is destroyed, and the worst an accidental
+   press costs is one solver round on the next search - a confirmation for that is friction spent
+   on nothing.
 7. Say what happened. The payload returns the number of hosts cleared, so the toast reads "cleared
    cookies for 12 sites" rather than a bare success — a button whose effect is invisible reads as a
    button that did nothing, and this one's effect is by definition somewhere else.
