@@ -41,14 +41,29 @@ const STYLE = `
 :root {
   --ink: #18233d; --ink-soft: #526078; --paper: #f4f6fb; --surface: #ffffff;
   --line: #dce2ee; --aqua: #25a8a6; --aqua-ink: #126a68; --error: #9f2937;
-  --shadow: 0 18px 50px rgba(32, 48, 78, 0.12);
+  --shadow: 0 18px 50px rgba(32, 48, 78, 0.12); --on-aqua: #ffffff;
   color-scheme: light;
 }
 :root[data-theme="dark"] {
   --ink: #e8edf7; --ink-soft: #9da9bd; --paper: #0d1424; --surface: #151f32;
   --line: #2a3954; --aqua: #52cbc6; --aqua-ink: #87ddd9; --error: #ff9da7;
-  --shadow: 0 20px 55px rgba(0, 0, 0, 0.32);
+  --shadow: 0 20px 55px rgba(0, 0, 0, 0.32); --on-aqua: #0d1424;
   color-scheme: dark;
+}
+/* Each named palette needs its ten tokens here as well as its full set in web/src/index.css.
+   This page paints before any bundle exists, so a palette missing from this block signs somebody in
+   through a door painted in a theme they did not choose. */
+:root[data-theme="tokyo-night"] {
+  --ink: #c0caf5; --ink-soft: #9aa5ce; --paper: #1a1b26; --surface: #1f2335;
+  --line: #2f344d; --aqua: #7dcfff; --aqua-ink: #a9dfff; --error: #ff8ea2;
+  --shadow: 0 20px 55px rgba(0, 0, 0, 0.4); --on-aqua: #16161e;
+  color-scheme: dark;
+}
+:root[data-theme="sepia"] {
+  --ink: #3b2f24; --ink-soft: #7a6a58; --paper: #f4ecdd; --surface: #fdf6e8;
+  --line: #e0d3bd; --aqua: #2f8f86; --aqua-ink: #1d6259; --error: #9a3427;
+  --shadow: 0 18px 50px rgba(90, 70, 45, 0.14); --on-aqua: #ffffff;
+  color-scheme: light;
 }
 * { box-sizing: border-box; }
 body {
@@ -69,7 +84,7 @@ input {
 input:focus-visible { outline: 2px solid var(--aqua); outline-offset: 1px; border-color: var(--aqua); }
 .field { margin-bottom: 16px; }
 button {
-  width: 100%; padding: 11px 14px; font: inherit; font-weight: 600; color: #fff;
+  width: 100%; padding: 11px 14px; font: inherit; font-weight: 600; color: var(--on-aqua);
   background: var(--aqua); border: 0; border-radius: 10px; cursor: pointer;
 }
 button:hover:not(:disabled) { background: var(--aqua-ink); }
@@ -80,13 +95,19 @@ button:disabled { opacity: 0.6; cursor: progress; }
 `;
 
 // The theme is applied before first paint, from the same key the app uses, so
-// nobody gets a flash of the light card on the way to a dark one.
+// nobody gets a flash of the light card on the way to a dark one. The list of
+// palettes is the same one `web/src/utils/theme.ts` validates against, and a name
+// that is not on it resolves the way "system" does rather than being stamped on
+// the document — which is also what happens to a value written by a newer build.
+const PALETTES = ['light', 'dark', 'tokyo-night', 'sepia'];
 const BOOTSTRAP = `
 (function () {
   try {
+    var palettes = ${JSON.stringify(PALETTES)};
     var pref = localStorage.getItem('stremio4manga:theme') || 'system';
-    var dark = pref === 'dark' || (pref === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
-    document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+    var dark = matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.dataset.theme =
+      palettes.indexOf(pref) === -1 ? (dark ? 'dark' : 'light') : pref;
   } catch (e) {}
 })();
 `;

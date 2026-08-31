@@ -26,6 +26,7 @@
   --error: #9f2937;
   --status-ring: #edf0f5;
   --shadow: 0 18px 50px rgba(32, 48, 78, 0.12);
+  --on-aqua: #ffffff;
   font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
   color: var(--ink);
   background: var(--paper);
@@ -61,6 +62,71 @@
   --error: #ff9da7;
   --status-ring: #202b42;
   --shadow: 0 20px 55px rgba(0, 0, 0, 0.32);
+  --on-aqua: #0d1424;
+}
+
+/* Tokyo Night — the dark one that is not grey. Same 28 tokens, no component knows the difference. */
+:root[data-theme="tokyo-night"] {
+  --ink: #c0caf5;
+  --ink-soft: #9aa5ce;
+  --paper: #1a1b26;
+  --surface: #1f2335;
+  --line: #2f344d;
+  --bookmark: #f7768e;
+  --bookmark-dark: #ff96a8;
+  --aqua: #7dcfff;
+  --aqua-soft: #1b3a4b;
+  --aqua-ink: #a9dfff;
+  --caught-up: #9ece6a;
+  --brand-bg: #2a2f45;
+  --header-bg: rgba(26, 27, 38, 0.9);
+  --cover-bg: #232741;
+  --cover-start: #2a2f4a;
+  --cover-end: #171827;
+  --chip-bg: rgba(13, 14, 22, 0.86);
+  --continue-bg: #24283b;
+  --continue-text: #eaf0ff;
+  --continue-muted: #a9b3d6;
+  --continue-ring: rgba(122, 162, 247, 0.12);
+  --read-wash: rgba(122, 162, 247, 0.08);
+  --read-marker-bg: #2a2f45;
+  --reader-strip: #16161e;
+  --error: #ff8ea2;
+  --status-ring: #262b40;
+  --shadow: 0 20px 55px rgba(0, 0, 0, 0.4);
+  --on-aqua: #16161e;
+}
+
+/* Sepia — a warmer paper for reading by. Light-flavoured, so it declares light ink on its aqua. */
+:root[data-theme="sepia"] {
+  --ink: #3b2f24;
+  --ink-soft: #7a6a58;
+  --paper: #f4ecdd;
+  --surface: #fdf6e8;
+  --line: #e0d3bd;
+  --bookmark: #c85a3f;
+  --bookmark-dark: #a5432f;
+  --aqua: #2f8f86;
+  --aqua-soft: #dcece7;
+  --aqua-ink: #1d6259;
+  --caught-up: #6f8f3f;
+  --brand-bg: #3b2f24;
+  --header-bg: rgba(244, 236, 221, 0.92);
+  --cover-bg: #e8dcc6;
+  --cover-start: #eee3d0;
+  --cover-end: #dccdb2;
+  --chip-bg: rgba(59, 47, 36, 0.84);
+  --continue-bg: #3b2f24;
+  --continue-text: #fdf6e8;
+  --continue-muted: #cbbba3;
+  --continue-ring: rgba(255, 250, 240, 0.06);
+  --read-wash: rgba(122, 106, 88, 0.07);
+  --read-marker-bg: #e9dfcb;
+  --reader-strip: #2a2119;
+  --error: #9a3427;
+  --status-ring: #eae0cc;
+  --shadow: 0 18px 50px rgba(90, 70, 45, 0.14);
+  --on-aqua: #ffffff;
 }
 
 * { box-sizing: border-box; }

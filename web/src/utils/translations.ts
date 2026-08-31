@@ -213,6 +213,8 @@ export const PT: Record<string, string> = {
   'Use device theme': 'Usar o tema do dispositivo',
   'Use light theme': 'Usar o tema claro',
   'Use dark theme': 'Usar o tema escuro',
+  'Use the Tokyo Night palette': 'Usar a paleta Tokyo Night',
+  'Use the Sepia palette': 'Usar a paleta Sepia',
   Language: 'Idioma',
   'The language the app speaks. Titles, chapters and anything else a source writes stay as that source published them.': 'O idioma em que a app fala. Títulos, capítulos e tudo o resto que venha de uma fonte ficam como essa fonte os publicou.',
   'Use English': 'Usar inglês',

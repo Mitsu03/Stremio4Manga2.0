@@ -141,10 +141,16 @@ interface ImportLibraryResult {
   importAnilistLibrary: { manga: Array<{ id: number }> }
 }
 
+// A palette's name is a proper noun and stays as it is in every language; the sentence around it
+// is not, and goes through t() like everything else. Kept deliberately short: every token added to
+// index.css from here on has to be added to each of these, and each has a second copy on the
+// sign-in page. Two named palettes is a feature; nine is a maintenance surface.
 const themeOptions: Array<{ value: ThemePreference; label: string }> = [
   { value: 'system', label: 'Use device theme' },
   { value: 'light', label: 'Use light theme' },
   { value: 'dark', label: 'Use dark theme' },
+  { value: 'tokyo-night', label: 'Use the Tokyo Night palette' },
+  { value: 'sepia', label: 'Use the Sepia palette' },
 ]
 
 // The two-letter tag is the control: a language is one of the few things that can be drawn as the
