@@ -968,6 +968,9 @@ button.result-row { width: 100%; text-align: left; cursor: pointer; font: inheri
 .reader-options-tab { padding: 0.42rem 0.75rem; color: #9aa1ab; background: transparent; border: 0; border-radius: 6px; cursor: pointer; font: 700 0.82rem/1.2 inherit; transition: color 160ms ease, background-color 160ms ease; }
 .reader-options-tab:hover { color: #ffffff; background: #2b2e32; }
 .reader-options-tab[aria-selected="true"] { color: #ff9298; background: rgba(255, 91, 97, 0.16); }
+/* Sits between the tabs and the first group, indented to the body rather than to the head, so it
+   reads as a note on what follows and not as part of the tab strip. */
+.reader-options-scope { margin: 0; padding: 0.6rem 1rem 0; color: #8f969f; font-size: 0.66rem; line-height: 1.45; }
 .reader-options-body[hidden] { display: none; }
 .reader-options-body { padding: 0.35rem 1rem 1.1rem; }
 .reader-options-group { margin-top: 1rem; }

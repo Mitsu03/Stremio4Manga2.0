@@ -685,6 +685,35 @@ async function liveChecks(a, b) {
   check('marking read does not stamp lastReadAt', marked?.lastReadAt === stamp, `${stamp} -> ${marked?.lastReadAt}`);
   check('marking read does set isRead', marked?.isRead === true);
 
+  // The reader's layout and image settings belong to the series rather than to the account
+  // (web/src/utils/mangaSettings.ts): a webtoon read as a long strip must not turn every paged
+  // title into one. They ride on the manga's own meta as a single JSON object under one key, and a
+  // title with no overrides left holds no row at all — so both halves of that contract are checked
+  // here, since a silent failure of either reads as "the reader forgot my settings".
+  section('Reader settings, per manga');
+  const READER_SETTINGS_KEY = 'stremio4manga.reader-settings';
+  const readerSettings = JSON.stringify({ 'reader.mode': 'strip', 'reader.fit': 'width' });
+  await gql(
+    a,
+    `mutation($v:String!){setMangaMeta(input:{meta:{mangaId:${mangaId},key:"${READER_SETTINGS_KEY}",value:$v}}){meta{key}}}`,
+    { v: readerSettings },
+  );
+  const storedSettings = await gql(a, `{manga(id:${mangaId}){meta{key value}}}`);
+  const settingsRow = (storedSettings.data?.manga?.meta ?? []).find((row) => row.key === READER_SETTINGS_KEY);
+  check(
+    'the reader settings are stored on the manga',
+    settingsRow?.value === readerSettings,
+    JSON.stringify(settingsRow),
+  );
+
+  await gql(a, `mutation{deleteMangaMeta(input:{mangaId:${mangaId},key:"${READER_SETTINGS_KEY}"}){meta{key}}}`);
+  const clearedSettings = await gql(a, `{manga(id:${mangaId}){meta{key value}}}`);
+  check(
+    'putting every setting back leaves no row behind',
+    !(clearedSettings.data?.manga?.meta ?? []).some((row) => row.key === READER_SETTINGS_KEY),
+    JSON.stringify(clearedSettings.data?.manga?.meta),
+  );
+
   section('Downloads');
   const enqueued = await gql(
     a,

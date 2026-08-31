@@ -22,6 +22,7 @@ import {
   type ReaderAction,
 } from '../utils/keybinds'
 import { choice, flag, preference, quantity } from '../utils/settings'
+import { adoptMangaSettings, flushMangaSettings, openManga, useMangaPreference } from '../utils/mangaSettings'
 
 const READER_QUERY = `
   query ReaderContext($mangaId: Int!) {
@@ -701,25 +702,25 @@ export default function ReaderPage() {
   const returnQuery = Number.isInteger(returnMangaId) && returnMangaId > 0 ? `?from=${returnMangaId}` : ''
   const chaptersHref = Number.isInteger(returnMangaId) && returnMangaId > 0 ? `/manga/${returnMangaId}` : `/manga/${id}`
   const [page, setPage] = useState(0)
-  const [mode, setModeState] = MODE.use()
-  const [fit, setFit] = FIT.use()
-  const [direction, setDirection] = DIRECTION.use()
-  const [spread, setSpread] = SPREAD.use()
+  const [mode, setModeState] = useMangaPreference(MODE, id)
+  const [fit, setFit] = useMangaPreference(FIT, id)
+  const [direction, setDirection] = useMangaPreference(DIRECTION, id)
+  const [spread, setSpread] = useMangaPreference(SPREAD, id)
   // Which pages turned out to be wider than they are tall, by url. Filled in as images decode —
   // mostly by the prefetch, so the shape of a page is usually known before the turn that shows it.
   const [widePages, setWidePages] = useState<Record<string, boolean>>({})
-  const [spreadOffset, setSpreadOffset] = SPREAD_OFFSET.use()
-  const [sliding, setSliding] = SLIDING.use()
-  const [keyboardScroll, setKeyboardScroll] = KEYBOARD_SCROLL.use()
-  const [progressBar, setProgressBar] = PROGRESS_BAR.use()
+  const [spreadOffset, setSpreadOffset] = useMangaPreference(SPREAD_OFFSET, id)
+  const [sliding, setSliding] = useMangaPreference(SLIDING, id)
+  const [keyboardScroll, setKeyboardScroll] = useMangaPreference(KEYBOARD_SCROLL, id)
+  const [progressBar, setProgressBar] = useMangaPreference(PROGRESS_BAR, id)
   const [roomForSpread, setRoomForSpread] = useState(() => window.matchMedia(SPREAD_VIEWPORT).matches)
-  const [tapLayout, setTapLayout] = TAP_LAYOUT.use()
-  const [background, setBackgroundState] = BACKGROUND.use()
-  const [grayscale, setGrayscale] = GRAYSCALE.use()
-  const [invert, setInvert] = INVERT.use()
-  const [downloadAhead, setDownloadAhead] = DOWNLOAD_AHEAD.use()
-  const [dim, setDimState] = DIM.use()
-  const [cropBorders, setCropBorders] = CROP_BORDERS.use()
+  const [tapLayout, setTapLayout] = useMangaPreference(TAP_LAYOUT, id)
+  const [background, setBackgroundState] = useMangaPreference(BACKGROUND, id)
+  const [grayscale, setGrayscale] = useMangaPreference(GRAYSCALE, id)
+  const [invert, setInvert] = useMangaPreference(INVERT, id)
+  const [downloadAhead, setDownloadAhead] = useMangaPreference(DOWNLOAD_AHEAD, id)
+  const [dim, setDimState] = useMangaPreference(DIM, id)
+  const [cropBorders, setCropBorders] = useMangaPreference(CROP_BORDERS, id)
   // Both start at fit and are filled in once the manga's meta arrives with the query: the level is the
   // server's to tell us, not this browser's to remember.
   const [zoom, setZoom] = useState<ZoomState>(NO_ZOOM)
@@ -750,8 +751,8 @@ export default function ReaderPage() {
   // Pages whose last request came back an error, and how many times the reader has since asked for
   // each of them again. Dropped when the chapter changes, alongside the backdrop cache.
   const [pageErrors, setPageErrors] = useState<Record<string, { failed: boolean; retries: number }>>({})
-  const [autoScroll, setAutoScroll] = AUTO_SCROLL.use()
-  const [wakeLock, setWakeLock] = WAKE_LOCK.use()
+  const [autoScroll, setAutoScroll] = useMangaPreference(AUTO_SCROLL, id)
+  const [wakeLock, setWakeLock] = useMangaPreference(WAKE_LOCK, id)
   const wakeLockSentinel = useRef<WakeLockSentinel | null>(null)
   const [panelOpen, setPanelOpen] = useState(true)
   const [optionsOpen, setOptionsOpen] = OPTIONS_OPEN.use()
@@ -783,9 +784,10 @@ export default function ReaderPage() {
   const [, startDownloader] = useMutation(START_DOWNLOADER_MUTATION)
 
   // --- Remembering the zoom -----------------------------------------------------------------------
-  // Which manga's meta has already been adopted into the state above. Guards against a refetch putting
-  // the server's level back over one the reader has since moved.
-  const zoomAdoptedFor = useRef<number | null>(null)
+  // Which manga's meta has already been adopted — the zoom below, and the layout and image settings
+  // held per manga in [[mangaSettings.ts]]. Guards against a refetch putting the server's copy back
+  // over something the reader has since moved.
+  const metaAdoptedFor = useRef<number | null>(null)
   // The change the server has not been told about yet, carrying its own manga id: a pending write
   // belongs to the title it was made on, even if the reader has walked to another one since.
   const pendingZoom = useRef<({ mangaId: number } & ZoomLevels) | null>(null)
@@ -813,7 +815,7 @@ export default function ReaderPage() {
   const rememberZoom = useCallback((patch: Partial<ZoomLevels>) => {
     // Before this manga's own level has been adopted there is nothing to remember: anything written
     // here would be the previous title's level, or a fit the reader never chose.
-    if (zoomAdoptedFor.current !== id) return
+    if (metaAdoptedFor.current !== id) return
     pendingZoom.current = { mangaId: id, ...zoomLevels.current, ...patch }
     if (zoomWriteTimer.current) window.clearTimeout(zoomWriteTimer.current)
     zoomWriteTimer.current = window.setTimeout(() => flushZoom.current(), ZOOM_WRITE_DELAY)
@@ -1296,27 +1298,36 @@ export default function ReaderPage() {
   // Adopted once, when the manga's meta arrives. Guarded by the id it was adopted for rather than by a
   // "have we run" flag: the query refetches, and a later refetch must not snap a level the reader has
   // since moved back to whatever the server last heard.
+  //
+  // The reader's query already asks for `manga.meta`, so the per-manga settings come out of the same
+  // answer as the zoom and cost no request of their own.
   useEffect(() => {
     const loaded = data?.manga
-    if (!loaded || zoomAdoptedFor.current === loaded.id) return
-    zoomAdoptedFor.current = loaded.id
+    if (!loaded || metaAdoptedFor.current === loaded.id) return
+    metaAdoptedFor.current = loaded.id
+    adoptMangaSettings(loaded.id, loaded.meta)
     const levels = zoomFromMeta(loaded.meta)
     setStripZoomState(levels.strip)
     setZoom({ ...NO_ZOOM, scale: levels.paged })
   }, [data])
 
   // Walking to another manga: whatever the last one still owed the server goes out now, and the reader
-  // drops back to fit until the new title's own meta lands. Chapters of the same manga keep the level.
+  // drops back to fit — and to the account-wide layout and image settings — until the new title's own
+  // meta lands. Chapters of the same manga keep both: the id does not change, so neither does either.
   useEffect(() => {
     flushZoom.current()
-    zoomAdoptedFor.current = null
+    openManga(id)
+    metaAdoptedFor.current = null
     setStripZoomState(ZOOM_FIT)
     setZoom(NO_ZOOM)
   }, [id])
 
   // Closing the reader inside the debounce window would otherwise lose the last change — the commonest
-  // one there is, since setting the zoom and leaving is a single gesture.
-  useEffect(() => () => flushZoom.current(), [])
+  // one there is, since changing something and leaving is a single gesture.
+  useEffect(() => () => {
+    flushZoom.current()
+    void flushMangaSettings()
+  }, [])
 
   // A layout or a fit change re-frames the page, and so does a page turn: the *pan* belonged to the
   // panel that has just gone, and carrying it over would leave the next page framed on nothing in
@@ -2149,6 +2160,15 @@ export default function ReaderPage() {
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
             </button>
           </header>
+
+          {/* Said once, under the tabs, rather than repeated beside every control: everything on
+              Layout and Image is remembered against *this* series, so a webtoon set to the long
+              strip does not drag every paged title with it. A setting that quietly means something
+              narrower than it looks is worth a sentence — and the keys, which do not, say so in the
+              same breath rather than leaving the reader to work out the exception. */}
+          {optionsTab !== 'keys' && (
+            <p className="reader-options-scope">{t('Remembered for this manga alone — only the keys are shared with the rest of the library.')}</p>
+          )}
 
           <div
             className="reader-options-body"

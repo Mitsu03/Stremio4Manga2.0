@@ -180,6 +180,19 @@ export async function loadSettings(): Promise<void> {
 }
 
 export interface Preference<T> {
+  /**
+   * The name it is stored under. Exposed because a preference can also be held somewhere other than
+   * the account-wide store — the reader keeps most of its settings per manga ([[mangaSettings.ts]]),
+   * and an override store has to key on the same name the global value uses or the two would drift.
+   */
+  readonly name: string
+  /**
+   * The encoding, opened up for the same reason as the name: an override is the identical string in
+   * a different place, so it must be read and written by the identical pair of functions. `decode`
+   * returning null means "not a value I recognise", exactly as it does below.
+   */
+  decode(raw: string): T | null
+  encode(value: T): string
   /** Outside React: module scope, callbacks, one-off reads. */
   get(): T
   set(value: T): void
@@ -222,6 +235,9 @@ export function preference<T>(
   const set = (value: T): void => writeRaw(name, encode(value))
 
   return {
+    name,
+    decode,
+    encode,
     get,
     set,
     subscribe: (listener) => subscribe(name, listener),

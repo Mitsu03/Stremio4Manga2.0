@@ -5,6 +5,7 @@ import App from './App.tsx'
 import { initializeTheme } from './utils/theme'
 import { initializeLanguage } from './utils/i18n'
 import { flushSettings, loadSettings, migrateLegacySettings } from './utils/settings'
+import { flushMangaSettings } from './utils/mangaSettings'
 
 // Before anything reads a preference: the settings that used to have a `localStorage` key each are
 // brought under the one store, so moving them to the account does not read as the app forgetting them.
@@ -21,7 +22,11 @@ void loadSettings()
 // A setting changed and the tab closed a moment later would otherwise sit unsent in the debounce.
 // `visibilitychange` rather than `pagehide`: it fires early enough for the request to actually go.
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'hidden') void flushSettings()
+  if (document.visibilityState !== 'hidden') return
+  void flushSettings()
+  // The reader's own settings are held on the manga rather than on the account, in their own store
+  // with their own debounce, so they need the same nudge ([[mangaSettings.ts]]).
+  void flushMangaSettings()
 })
 
 createRoot(document.getElementById('root')!).render(
