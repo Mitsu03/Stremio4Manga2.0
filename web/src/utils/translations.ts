@@ -681,6 +681,10 @@ export const PT: Record<string, string> = {
     'Limpei as cookies de {count} site. Vai ter de se apresentar outra vez — e todas as contas deste servidor também.',
   'Cleared the cookies for {count} sites. They will have to say hello again — and so will every account on this server.':
     'Limpei as cookies de {count} sites. Vão ter de se apresentar outra vez — e todas as contas deste servidor também.',
+  'Filter by source': 'Filtrar por fonte',
+  'Stop filtering by {source}': 'Deixar de filtrar por {source}',
+  'Show only titles read from {source}': 'Mostrar só os títulos lidos de {source}',
+  'Nothing on those sources is on your shelves.': 'Não há nada dessas fontes nas tuas prateleiras.',
   'Reader options': 'Opções do leitor',
   Layout: 'Disposição',
   Image: 'Imagem',

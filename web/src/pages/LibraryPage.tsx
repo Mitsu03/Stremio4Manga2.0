@@ -424,6 +424,19 @@ function boundSourceId(item: LibraryManga): number | null {
   return sourceBindingFromMeta(item.meta) ?? getSourceBinding(item.id)
 }
 
+/**
+ * The source a card is *shown* as coming from: the bound catalogue when there is one, otherwise the
+ * entry's own — and only when that own catalogue actually carries chapters, since an orphan's source
+ * is a dead end not worth badging.
+ *
+ * Lifted out of the card so the badge and the source chips resolve identically. A chip that
+ * disagreed with the badge under it would read as a bug in the badge, and a copy of this rule that
+ * drifted is exactly how that happens.
+ */
+function cardSource(item: LibraryManga, bound: LibrarySource | null | undefined): LibrarySource | null {
+  return bound ?? (item.chapters.totalCount > 0 ? item.source : null)
+}
+
 // Between a tracked and an untracked copy of a series, the tracked one wins so the card lands on
 // the right shelf instead of under Other; between two tracked copies, the one that knows the most
 // about the series does — bound to a source over unbound, then read the furthest, with the lowest
@@ -911,6 +924,10 @@ export default function LibraryPage() {
   // disappeared rather than as a filter still applied.
   const [search, setSearch] = useState('')
   const [genreFilters, setGenreFilters] = useState<string[]>([])
+  // Source ids are strings on this schema, not numbers — `source { id }` is a LongString, the same
+  // quirk the detail page carries. Keeping them as strings avoids a parse that would quietly round
+  // a 19-digit id.
+  const [sourceFilters, setSourceFilters] = useState<string[]>([])
   const sortRef = useRef<HTMLDivElement | null>(null)
   const sortTriggerRef = useRef<HTMLButtonElement | null>(null)
   const [{ data, fetching, error }, refetchLibrary] = useQuery<LibraryQueryResult>({ query: LIBRARY_QUERY })
@@ -1664,12 +1681,34 @@ export default function LibraryPage() {
     .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
     .map(([genre]) => genre)
 
+  // The same shape as the genre chips: what the library actually carries, commonest first, ties on
+  // name. A title whose source resolves to null is counted under no chip and matched by no chip —
+  // filing it under its own catalogue would badge it one way and filter it another.
+  const sourceCounts = new Map<string, { source: LibrarySource; count: number }>()
+  for (const item of manga) {
+    const source = cardSource(item, unreadByBound.get(boundByManga.get(item.id) ?? -1)?.source)
+    if (!source) continue
+    const seen = sourceCounts.get(source.id)
+    if (seen) seen.count += 1
+    else sourceCounts.set(source.id, { source, count: 1 })
+  }
+  const sources = [...sourceCounts.values()]
+    .sort((a, b) => b.count - a.count || a.source.name.localeCompare(b.source.name))
+    .map((entry) => entry.source)
+
   const needle = searchKey(search.trim())
-  const filtering = needle !== '' || genreFilters.length > 0
-  // Every chosen chip has to hold, not just one of them: each tap is meant to narrow what is left,
+  const filtering = needle !== '' || genreFilters.length > 0 || sourceFilters.length > 0
+  // Every chosen genre has to hold, not just one of them: each tap is meant to narrow what is left,
   // and a union would widen it instead.
+  //
+  // The source chips are the deliberate exception, and go the other way. A title carries many
+  // genres, so requiring all of them narrows to something real; a title is read from exactly *one*
+  // source, so requiring two would empty every shelf on the page. Choosing several sources
+  // therefore widens.
   const matchesFilter = (item: LibraryManga) =>
     genreFilters.every((genre) => item.genre.includes(genre))
+    && (sourceFilters.length === 0
+      || sourceFilters.includes(cardSource(item, unreadByBound.get(boundByManga.get(item.id) ?? -1)?.source)?.id ?? ''))
     && (needle === ''
       || searchKey(item.title).includes(needle)
       || titleInitials(item.title).startsWith(needle)
@@ -1687,6 +1726,12 @@ export default function LibraryPage() {
   const clearFilter = () => {
     setSearch('')
     setGenreFilters([])
+    setSourceFilters([])
+  }
+  const toggleSource = (sourceId: string) => {
+    setSourceFilters((chosen) => chosen.includes(sourceId)
+      ? chosen.filter((id) => id !== sourceId)
+      : [...chosen, sourceId])
   }
   const toggleGenre = (genre: string) => {
     setGenreFilters((chosen) => chosen.includes(genre) ? chosen.filter((name) => name !== genre) : [...chosen, genre])
@@ -1947,6 +1992,33 @@ export default function LibraryPage() {
           })}
           {syncError && <span className="inline-error library-sync-error">{syncError}</span>}
         </div>
+        {/* Above the genres because it is the coarser cut: which shelf of the library you are
+            looking at, rather than what the titles on it are about. Absent with one source, where
+            it could only ever say "all of them". */}
+        {sources.length > 1 && (
+          <div className="library-sources" role="group" aria-label={t('Filter by source')}>
+            {sources.map((source) => {
+              const active = sourceFilters.includes(source.id)
+              return (
+                <button
+                  type="button"
+                  key={source.id}
+                  className={`library-genre-chip library-source-chip${active ? ' active' : ''}`}
+                  aria-pressed={active}
+                  onClick={() => toggleSource(source.id)}
+                  title={active
+                    ? t('Stop filtering by {source}', { source: source.name })
+                    : t('Show only titles read from {source}', { source: source.name })}
+                >
+                  {/* The badge's icon, so a chip and the card it selects look like the same thing. */}
+                  {source.iconUrl && <img src={source.iconUrl} alt="" width="14" height="14" />}
+                  {source.name}
+                </button>
+              )
+            })}
+          </div>
+        )}
+
         {/* One row that scrolls sideways rather than a block that wraps: a few hundred titles carry
             more genres than fit across the page, and letting them wrap would push the shelves off
             the bottom of it. The names are the source's own words, so they are not translated —
@@ -2173,10 +2245,9 @@ export default function LibraryPage() {
               const bound = unreadByBound.get(boundByManga.get(item.id) ?? -1)
               const unread = unreadFor(item)
               const checked = selected.has(item.id)
-              // The same source the detail page names: the bound catalogue when there is one,
-              // otherwise the entry's own — and only when that own catalogue actually carries
-              // chapters, since an orphan's source is a dead end not worth badging.
-              const source = bound?.source ?? (item.chapters.totalCount > 0 ? item.source : null)
+              // Shared with the source chips, so a chip can never select a card the badge names
+              // differently.
+              const source = cardSource(item, bound?.source)
               const cover = (
                 <>
                   <div className="cover-wrap">
@@ -2251,7 +2322,9 @@ export default function LibraryPage() {
       {visibleCount === 0 && (filtering ? (
         <div className="state-panel compact">
           <p>
-            {needle !== '' && genreFilters.length > 0
+            {sourceFilters.length > 0 && needle === '' && genreFilters.length === 0
+              ? t('Nothing on those sources is on your shelves.')
+              : needle !== '' && genreFilters.length > 0
               ? t('No title tagged {genres} matches “{query}”.', { genres: genreFilters.join(', '), query: search.trim() })
               : needle !== ''
                 ? t('No title matches “{query}”.', { query: search.trim() })

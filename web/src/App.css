@@ -67,6 +67,14 @@
 .library-genre-chip { flex: none; padding: 0.28rem 0.72rem; color: var(--ink-soft); background: var(--paper); border: 1px solid var(--line); border-radius: 999px; cursor: pointer; white-space: nowrap; font: 700 0.74rem/1.35 inherit; transition: color 160ms ease, background 160ms ease, border-color 160ms ease; }
 .library-genre-chip:hover { color: var(--ink); border-color: var(--aqua); }
 .library-genre-chip.active { color: var(--aqua-ink); background: var(--aqua-soft); border-color: var(--aqua); }
+/* The coarser cut sits above the genres and scrolls the same way. Its own row rather than sharing
+   one: a source chip and a genre chip select different things, and a single run of pills would
+   invite reading them as one list of tags. */
+.library-sources { display: flex; gap: 0.42rem; margin-top: 0.9rem; padding-bottom: 0.35rem; overflow-x: auto; scrollbar-width: thin; }
+/* The icon is the badge's, so a chip and the card it selects look like the same thing. It rides with
+   the text rather than beside it, which is why the chip becomes a flex row. */
+.library-source-chip { display: inline-flex; align-items: center; gap: 0.36rem; }
+.library-source-chip img { width: 14px; height: 14px; border-radius: 3px; object-fit: cover; flex: none; }
 .state-panel { min-height: 52vh; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; max-width: 700px; }
 .state-panel p { color: var(--ink-soft); font-size: 1.05rem; line-height: 1.65; }
 .state-panel .button { margin-top: 1.4rem; }
