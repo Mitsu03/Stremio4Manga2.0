@@ -30,13 +30,14 @@ export type ReaderAction =
   | 'toggleControls'
   | 'toggleOptions'
   | 'offsetSpread'
+  | 'toggleFullscreen'
 
 /** The order the options dialog lists them in, grouped the way a reader thinks about them. */
 export const KEYBIND_GROUPS: Array<{ name: string; actions: ReaderAction[] }> = [
   { name: 'Turning', actions: ['pageLeft', 'pageRight', 'chapterPrevious', 'chapterNext'] },
   { name: 'Scrolling', actions: ['scrollBackward', 'scrollForward', 'screenBackward', 'screenForward', 'toStart', 'toEnd'] },
   { name: 'Zoom', actions: ['zoomIn', 'zoomOut', 'zoomReset'] },
-  { name: 'Controls', actions: ['toggleControls', 'toggleOptions', 'offsetSpread'] },
+  { name: 'Controls', actions: ['toggleControls', 'toggleOptions', 'offsetSpread', 'toggleFullscreen'] },
 ]
 
 export const KEYBIND_LABELS: Record<ReaderAction, string> = {
@@ -54,6 +55,7 @@ export const KEYBIND_LABELS: Record<ReaderAction, string> = {
   zoomOut: 'Zoom out',
   zoomReset: 'Back to fit',
   toggleControls: 'Show or hide the controls',
+  toggleFullscreen: 'Fill the screen',
   toggleOptions: 'Show or hide the options',
   offsetSpread: 'Shift the page pairing',
 }
@@ -78,6 +80,7 @@ export const DEFAULT_KEYBINDS: Record<ReaderAction, string[]> = {
   zoomOut: ['-', '_'],
   zoomReset: ['0'],
   toggleControls: ['h'],
+  toggleFullscreen: ['f'],
   toggleOptions: ['s'],
   offsetSpread: ['o'],
 }
