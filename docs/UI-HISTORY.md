@@ -3481,6 +3481,8 @@ and two planned.
 the filters move. `SORT_ORDERS` (`LibraryPage.tsx:275-280`) has exactly the four orders section 22
 built — title, date added, unread, last read — and no `random` appears anywhere in the file.*
 
+**Status: shipped** (PR #32, merged as `5d8c119`).
+
 Branch: `feat/library-random`
 
 **Behaviour.** A fifth entry in the sort menu shuffles the shelves. It is the one order with no two
@@ -3512,6 +3514,8 @@ has stopped being a shuffle.
 Section 26 put the source name and icon on every card as a badge, but the badge is read-only:
 `LibraryPage.tsx` has no source-based filter, and section 46's search matches title, author and
 genre only.*
+
+**Status: shipped** (PR #36, merged as `8b14c3b`).
 
 Branch: `feat/library-source-filter`
 
@@ -3547,6 +3551,8 @@ source, so requiring two sources would empty every shelf on the page.
 *Suwayomi-WebUI PR #1144 attaches a free-text note to a manga, stored as metadata, shown above the
 description. `MangaDetailPage.tsx` has no notes field — the one `note` in the file is a code comment
 about the no-chapters marker (`:1163`).*
+
+**Status: shipped** (PR #37, merged as `41ce1b9`).
 
 Branch: `feat/manga-notes`
 
@@ -3594,6 +3600,8 @@ opening a chapter and releases it on leaving. Nothing in `src` mentions `fullscr
 36 declined to build a keybind for "immersive mode" on the grounds that "the reader has no fullscreen
 of its own" — that was a decision about not inventing a feature to hang a shortcut off, not a
 rejection of this.*
+
+**Status: shipped** (PR #34, merged as `b233f58`).
 
 Branch: `feat/reader-fullscreen`
 
@@ -3660,6 +3668,10 @@ holding `cf_clearance` (`:151-198`), bound to the User-Agent that earned it, and
 comment says sending that cookie under a different UA "invalidates it immediately and asks for a
 fresh challenge, which is exactly the loop that gets an address banned". Nothing anywhere clears it.*
 
+**Status: shipped** (PR #35, merged as `9b2f72f`). The upstream mutation's name did not transfer,
+as the report above says, and neither did its shape: this clears a `CookieJar` on a Node server,
+not a CEF browser cache.
+
 Branch: `feat/clear-source-cookies`
 
 **Behaviour.** An action in Settings, beside the backup controls: press it and the server throws away
@@ -3716,6 +3728,8 @@ and offers nothing that acts on it.
 in Manga Reader" — open and unbuilt there too, recorded because it is a documented, wanted
 interaction on the client whose reader UX this one already mirrors closely. Scout report #72, finding
 2. Re-verified against `9d4d1fa`: the line numbers in the report had drifted, the code had not.*
+
+**Status: shipped** (PR #33, merged as `eaf2984`).
 
 Branch: `feat/reader-swipe`
 
@@ -3790,6 +3804,14 @@ dark mode. Scout report of 2026-08-24, finding 3, held on issue #67 as "not now"
 Re-verified against `4791351`: `ThemePreference` is still `'system' | 'light' | 'dark'`
 (`web/src/utils/theme.ts:3`) and there is still exactly one alternate palette.*
 
+**Status: shipped** (PR #40, merged as `ce566c5`). Two palettes, Tokyo Night and Sepia. Two things
+the plan could not have known, both found by looking at the result rather than by reading it. The
+sign-in page hard-codes `color: #fff` on its button over `var(--aqua)` — thin already on the dark
+theme, unreadable on Tokyo Night's lighter blue — so `--on-aqua` joined that page's token subset
+too, which step 4 had counted as nine tokens and is ten. And the options array that step 2 calls
+the validator is now derived from the flavour record rather than written out beside it: two lists
+that must agree are one list.
+
 Branch: `feat/theme-palettes`
 
 **Behaviour.** The Theme card in Settings grows past three buttons: alongside device, light and dark
@@ -3851,6 +3873,14 @@ already linked, rather than one tracker replacing another. Scout report of 2026-
 held on issue #67 as "not now" until 2026-08-31. **Re-priced upward at that point:** the triage
 comment that lowered its cost was reading version 1's Kotlin `TrackerManager`, which is not this
 server. See the note above section 59.*
+
+**Status: shipped** (PRs #41 and #42, merged as `67b1929` and `9cec40b`). MyAnimeList, in the four
+commits this section lays out. Step 6 undercounted: its nineteen call sites were the hits for
+`ANILIST_TRACKER_ID`, and `MangaDetailPage.tsx` — not in the list — held eight more as the bare
+literal `2`, three of them inside GraphQL query text where no constant is referenced at all. Built
+as written, the feature would have shipped connectable and unbindable. **A count of call sites is
+only as complete as the thing searched for; a named constant is the convention for a value, not the
+value.** Everything else held, including the instruction not to write a migration.
 
 Branch: `feat/multi-tracker`
 
