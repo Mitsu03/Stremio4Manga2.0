@@ -51,7 +51,7 @@ import {
 } from '../utils/libraryStats'
 import type { BoundStatsResult, DownloadedChaptersResult, LibraryStatsResult } from '../utils/libraryStats'
 import type { ThemePreference } from '../utils/theme'
-import { ANILIST_TRACKER_ID, LAST_SYNC_QUERY, SET_LAST_SYNC_MUTATION, formatSince, lastSyncFromMeta, statusNames, trackKey } from '../utils/tracking'
+import { ANILIST_TRACKER_ID, LAST_SYNC_QUERY, SET_LAST_SYNC_MUTATION, formatSince, lastSyncFromMeta, statusNames, trackKey, TRACKER_SLUGS } from '../utils/tracking'
 import { startTrackerLogin } from '../utils/oauth'
 
 // What the connection is actually worth, counted the way the library shelves count it: one entry
@@ -1061,7 +1061,10 @@ export default function SettingsPage() {
             {trackers.map((tracker) => {
               const isAnilist = tracker.id === ANILIST_TRACKER_ID
               return (
-                <section className="anilist-banner" key={tracker.id}>
+                <section
+                  className={`anilist-banner${TRACKER_SLUGS[tracker.id] ? ` tracker-${TRACKER_SLUGS[tracker.id]}` : ''}`}
+                  key={tracker.id}
+                >
                   <TrackerAvatar name={tracker.user?.name ?? tracker.name} url={tracker.user?.avatarUrl ?? null} />
                   <div className="anilist-banner-copy">
                     <span className="anilist-banner-status">

@@ -70,6 +70,16 @@ export function trackIdentity(
   return found?.remoteId ? `${found.trackerId}:${found.remoteId}` : undefined
 }
 
+/**
+ * A CSS-safe name for a tracker, so a stylesheet can give each one its own ground. Kept beside the
+ * ids rather than derived from the name, because a name is a proper noun the server sends and a
+ * class is a selector this repo owns; a tracker with no slug falls back to the shared card.
+ */
+export const TRACKER_SLUGS: Record<number, string> = {
+  [ANILIST_TRACKER_ID]: 'anilist',
+  [MYANIMELIST_TRACKER_ID]: 'myanimelist',
+}
+
 /** The same key for one link rather than for a title — for counting distinct remote entries. */
 export function trackKey(record: { trackerId: number; remoteId: string }): string {
   return `${record.trackerId}:${record.remoteId}`

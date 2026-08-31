@@ -27,6 +27,7 @@
   --status-ring: #edf0f5;
   --shadow: 0 18px 50px rgba(32, 48, 78, 0.12);
   --on-aqua: #ffffff;
+  --tracker-wash: 0.18;
   font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
   color: var(--ink);
   background: var(--paper);
@@ -63,9 +64,10 @@
   --status-ring: #202b42;
   --shadow: 0 20px 55px rgba(0, 0, 0, 0.32);
   --on-aqua: #0d1424;
+  --tracker-wash: 0.34;
 }
 
-/* Tokyo Night — the dark one that is not grey. Same 28 tokens, no component knows the difference. */
+/* Tokyo Night — the dark one that is not grey. The same token set, so no component knows. */
 :root[data-theme="tokyo-night"] {
   --ink: #c0caf5;
   --ink-soft: #9aa5ce;
@@ -95,6 +97,7 @@
   --status-ring: #262b40;
   --shadow: 0 20px 55px rgba(0, 0, 0, 0.4);
   --on-aqua: #16161e;
+  --tracker-wash: 0.34;
 }
 
 /* Sepia — a warmer paper for reading by. Light-flavoured, so it declares light ink on its aqua. */
@@ -127,6 +130,7 @@
   --status-ring: #eae0cc;
   --shadow: 0 18px 50px rgba(90, 70, 45, 0.14);
   --on-aqua: #ffffff;
+  --tracker-wash: 0.20;
 }
 
 * { box-sizing: border-box; }
