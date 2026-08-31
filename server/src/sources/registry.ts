@@ -223,6 +223,16 @@ export function sourceHttpFor(options: {
   return httpClient().clientFor(options);
 }
 
+/**
+ * Drop every cookie and Cloudflare clearance the server is holding, and say how many hosts that was.
+ *
+ * Through the registry because it owns the one client: a second `createHttpClient` would have its own
+ * jar, so resetting that would clear nothing anybody is using.
+ */
+export function resetSourceHttp(): number {
+  return httpClient().reset();
+}
+
 export function allDefinitions(): SourceDefinition[] {
   return DEFINITIONS;
 }

@@ -675,6 +675,12 @@ export const PT: Record<string, string> = {
   'Fill the screen': 'Ocupar o ecrã',
   'The browser gets out of the way — Esc gives it back': 'O browser sai da frente — Esc devolve-o',
   'The address bar and tabs stay where they are': 'A barra de endereço e os separadores ficam onde estão',
+  'Clear stored cookies for every source': 'Limpar as cookies guardadas de todas as fontes',
+  'There were no stored cookies to clear.': 'Não havia cookies guardadas para limpar.',
+  'Cleared the cookies for {count} site. It will have to say hello again — and so will every account on this server.':
+    'Limpei as cookies de {count} site. Vai ter de se apresentar outra vez — e todas as contas deste servidor também.',
+  'Cleared the cookies for {count} sites. They will have to say hello again — and so will every account on this server.':
+    'Limpei as cookies de {count} sites. Vão ter de se apresentar outra vez — e todas as contas deste servidor também.',
   'Reader options': 'Opções do leitor',
   Layout: 'Disposição',
   Image: 'Imagem',

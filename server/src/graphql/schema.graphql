@@ -741,6 +741,15 @@ input PartialSettingsInput {
   autoBackupIncludeServerSettings: Boolean
 }
 
+input ClearSourceCookiesInput {
+  clientMutationId: String
+}
+
+type ClearSourceCookiesPayload {
+  """How many hosts the server was holding cookies for."""
+  hosts: Int!
+}
+
 input SetSettingsInput {
   settings: PartialSettingsInput!
 }
@@ -1012,6 +1021,8 @@ type Mutation {
   restoreAutomatedBackup(input: RestoreAutomatedBackupInput!): RestoreBackupPayload!
 
   setSettings(input: SetSettingsInput!): SetSettingsPayload!
+
+  clearSourceCookies(input: ClearSourceCookiesInput!): ClearSourceCookiesPayload!
 
   setGlobalMeta(input: SetGlobalMetaInput!): SetGlobalMetaPayload!
   setMangaMeta(input: SetMangaMetaInput!): SetMangaMetaPayload!

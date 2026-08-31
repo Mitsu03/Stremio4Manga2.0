@@ -122,6 +122,14 @@ export interface SourceHttpOptions {
 /** What the registry holds: one shared jar and queue set, many bound clients. */
 export interface HttpClient {
   clientFor(options: SourceHttpOptions): SourceHttp;
+  /**
+   * Throw away every cookie, every bound User-Agent and the record of which hosts have challenged,
+   * and answer with how many hosts that was.
+   *
+   * It is on the interface rather than reached into because all of that state is closed over inside
+   * `createHttpClient` and is not a property of anything exported - there is nothing to reach.
+   */
+  reset(): number;
 }
 
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
@@ -184,6 +192,17 @@ class CookieJar {
       if (value === '') jar.delete(name);
       else jar.set(name, value);
     }
+  }
+
+  /**
+   * Forget everything. The count is of hosts rather than cookies because that is the number that
+   * means something to a person: how many sites will have to say hello again.
+   */
+  clear(): number {
+    const hosts = this.byHost.size;
+    this.byHost.clear();
+    this.agents.clear();
+    return hosts;
   }
 
   put(host: string, name: string, value: string): void {
@@ -610,6 +629,18 @@ export function createHttpClient(config: Pick<Config, 'flaresolverr'>): HttpClie
   }
 
   return {
+    reset(): number {
+      const hosts = jar.clear();
+      // Cleared here and nowhere else. The comment on `challenged` says nothing removes a host once
+      // added, deliberately - a site that has relaxed only costs a slower sweep, and being wrong the
+      // other way costs a block. A person pressing the button is asserting the situation changed,
+      // which is the one case where dropping it is right.
+      challenged.clear();
+      // The queues are left alone on purpose: a per-host interval is politeness, not stuck state,
+      // and dropping it would land the next sweep as a burst on a site that has just challenged.
+      return hosts;
+    },
+
     clientFor(options: SourceHttpOptions): SourceHttp {
       return {
         text: (url, init = {}) => textOf(url, init, options),
