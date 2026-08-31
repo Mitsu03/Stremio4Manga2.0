@@ -667,6 +667,11 @@ export const PT: Record<string, string> = {
   zoom: 'zoom',
   'Remembered for this manga alone — only the keys are shared with the rest of the library.':
     'Guardado só para este manga — apenas as teclas são partilhadas com o resto da biblioteca.',
+  Random: 'Aleatória',
+  Shuffled: 'Baralhada',
+  'Shuffle the shelves': 'Baralhar as prateleiras',
+  'Shuffle again': 'Baralhar outra vez',
+  'Shuffled. Press again to shuffle differently': 'Baralhada. Carregar outra vez volta a baralhar',
   'Reader options': 'Opções do leitor',
   Layout: 'Disposição',
   Image: 'Imagem',

@@ -265,7 +265,7 @@ const GROUPING = choice<Grouping>('library.grouping', 'status', ['status', 'cate
 // someone thought to click it.
 const HIDDEN_SHELVES = structured<string[]>('library.category-hidden', [], (parsed) =>
   (Array.isArray(parsed) ? parsed.filter((key): key is string => typeof key === 'string') : null))
-type SortOrder = 'title' | 'added' | 'unread' | 'lastRead'
+type SortOrder = 'title' | 'added' | 'unread' | 'lastRead' | 'random'
 type SortDirection = 'asc' | 'desc'
 interface LibrarySort { order: SortOrder; direction: SortDirection }
 
@@ -277,7 +277,27 @@ const SORT_ORDERS: Array<{ order: SortOrder; label: string; ends: Record<SortDir
   { order: 'added', label: 'Date added', ends: { asc: 'Oldest first', desc: 'Newest first' }, natural: 'desc' },
   { order: 'unread', label: 'Unread', ends: { asc: 'Fewest first', desc: 'Most first' }, natural: 'desc' },
   { order: 'lastRead', label: 'Last read', ends: { asc: 'Least recent', desc: 'Most recent' }, natural: 'desc' },
+  // The one order with no two ends to read from, so both of them say the same thing and the second
+  // press shuffles again instead of reversing - reversing a shuffle is still just a shuffle, and
+  // "again" is the only thing a reader pressing Random twice can mean.
+  { order: 'random', label: 'Random', ends: { asc: 'Shuffled', desc: 'Shuffled' }, natural: 'asc' },
 ]
+
+/**
+ * A stable pseudo-random rank for one title under one seed.
+ *
+ * Multiply-xor-shift over the two numbers - enough to scatter sequential ids, which is the whole
+ * job, and cheap enough to call twice per comparison on a library of any size a person actually
+ * has. `Math.imul` keeps it in 32-bit territory rather than drifting into doubles, and the `>>> 0`
+ * makes it unsigned so the subtraction in the comparator orders the way the bits read.
+ */
+function shuffleRank(seed: number, id: number): number {
+  let h = Math.imul(seed ^ id, 0x27d4eb2d)
+  h ^= h >>> 15
+  h = Math.imul(h, 0x85ebca6b)
+  h ^= h >>> 13
+  return h >>> 0
+}
 
 // Title ascending is the default because the order the shelves had until now was not an order at
 // all: LIBRARY_QUERY's rows through deduplicateLibrary, which is stable but arbitrary.
@@ -880,6 +900,10 @@ export default function LibraryPage() {
   const [hiddenShelves, setHiddenShelves] = HIDDEN_SHELVES.use()
   const [groupingPreference, setGroupingPreference] = GROUPING.use()
   const [sort, setSort] = SORT.use()
+  // Drawn on mount and never persisted: a shuffle remembered across sessions has stopped being one.
+  // It is the *seed* rather than the order because the comparator has to be deterministic - see
+  // sortLibrary.
+  const [shuffleSeed, setShuffleSeed] = useState(() => Math.floor(Math.random() * 0x7fffffff))
   const [sortOpen, setSortOpen] = useState(false)
   // Plain state, not a preference like the sort order and the shelf visibility beside it. Those
   // describe how someone likes their library; a search term describes what they are doing this
@@ -1584,6 +1608,16 @@ export default function LibraryPage() {
   const sortLibrary = (items: LibraryManga[]): LibraryManga[] => {
     const direction = sort.direction === 'asc' ? 1 : -1
     return [...items].sort((a, b) => {
+      // The shuffle is a hash of the seed and the id, not `Math.random()`. Two reasons, and either
+      // alone would be enough: this runs before the shelves are cut out of it and again on every
+      // keystroke in the search field, so a comparator that answered differently each call would
+      // reshuffle the grid under the reader's hands - and a comparator that is not consistent
+      // between the same two items is not a valid comparator at all.
+      if (sort.order === 'random') {
+        const shuffled = shuffleRank(shuffleSeed, a.id) - shuffleRank(shuffleSeed, b.id)
+        // No direction multiplier: there is no ascending shuffle to reverse into.
+        return shuffled !== 0 ? shuffled : a.title.localeCompare(b.title)
+      }
       const primary = sort.order === 'title' ? a.title.localeCompare(b.title) : sortValue(a) - sortValue(b)
       return primary !== 0 ? primary * direction : a.title.localeCompare(b.title)
     })
@@ -1676,6 +1710,13 @@ export default function LibraryPage() {
   // Picking the order already in force is what reverses it — the second press of the plan — while
   // picking a different one starts it at the end that order is normally read from.
   const chooseSort = (order: SortOrder) => {
+    // Random has no other end to flip to, so pressing it again draws a new order instead. The sort
+    // is still written, which is what keeps the menu's active row right when it was already random.
+    if (order === 'random') {
+      if (sort.order === 'random') setShuffleSeed(Math.floor(Math.random() * 0x7fffffff))
+      setSort({ order, direction: 'asc' })
+      return
+    }
     const natural = SORT_ORDERS.find((option) => option.order === order)?.natural ?? 'asc'
     const next: LibrarySort = sort.order === order
       ? { order, direction: sort.direction === 'asc' ? 'desc' : 'asc' }
@@ -1771,6 +1812,10 @@ export default function LibraryPage() {
                   {SORT_ORDERS.map((option) => {
                     const active = option.order === sort.order
                     const flipped = sort.direction === 'asc' ? 'desc' : 'asc'
+                    // The other four rows have trained "press again to reverse", so this one has to
+                    // say what it actually does - otherwise the reader learns the wrong rule from
+                    // four examples and one silent exception.
+                    const shuffles = option.order === 'random'
                     // Only the chosen row states a direction. Four rows each showing one would read
                     // as four facts about the library instead of one fact and three offers — and a
                     // screen reader, which has no highlight to go by, would hear every one of them
@@ -1781,24 +1826,32 @@ export default function LibraryPage() {
                         key={option.order}
                         className={`library-sort-option${active ? ' active' : ''}${active && sort.direction === 'asc' ? ' ascending' : ''}`}
                         aria-pressed={active}
-                        aria-label={active
-                          ? t('Sorted by {order}, {end}. Press again to reverse to {other}', {
-                            order: t(option.label),
-                            end: t(option.ends[sort.direction]),
-                            other: t(option.ends[flipped]),
-                          })
-                          : t('Sort by {order}, {end}', { order: t(option.label), end: t(option.ends[option.natural]) })}
-                        title={active
-                          ? t('Reverse to {end}', { end: t(option.ends[flipped]) })
-                          : t('Sort {end}', { end: t(option.ends[option.natural]).toLocaleLowerCase() })}
+                        aria-label={shuffles
+                          ? (active ? t('Shuffled. Press again to shuffle differently') : t('Shuffle the shelves'))
+                          : active
+                            ? t('Sorted by {order}, {end}. Press again to reverse to {other}', {
+                              order: t(option.label),
+                              end: t(option.ends[sort.direction]),
+                              other: t(option.ends[flipped]),
+                            })
+                            : t('Sort by {order}, {end}', { order: t(option.label), end: t(option.ends[option.natural]) })}
+                        title={shuffles
+                          ? (active ? t('Shuffle again') : t('Shuffle the shelves'))
+                          : active
+                            ? t('Reverse to {end}', { end: t(option.ends[flipped]) })
+                            : t('Sort {end}', { end: t(option.ends[option.natural]).toLocaleLowerCase() })}
                         onClick={() => chooseSort(option.order)}
                       >
                         <span>{t(option.label)}</span>
                         {active && (
                           <small>
                             {t(option.ends[sort.direction])}
+                            {/* The arrow points at one end of a range. A shuffle has no ends, so it
+                                gets crossing arrows instead of a direction it does not have. */}
                             <svg viewBox="0 0 24 24" aria-hidden="true" width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
-                              <path d="M12 4v16m0 0 5-5m-5 5-5-5" />
+                              {shuffles
+                                ? <path d="M4 7h4l4 5m0 0 4 5h4m0-10h-4l-4 5m4 5 3-3m-3 3 3 3m0-13 3-3m-3 3 3 3" />
+                                : <path d="M12 4v16m0 0 5-5m-5 5-5-5" />}
                             </svg>
                           </small>
                         )}
