@@ -470,6 +470,26 @@ button.result-row { width: 100%; text-align: left; cursor: pointer; font: inheri
 .result-row img { width: 82px; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 3px 3px 10px 3px; }
 .result-copy h2 { margin-bottom: 0.5rem; }
 .summary { color: var(--ink-soft); line-height: 1.6; }
+
+/* The reader's own line about a title, above the source's description.
+   A row rather than a block so the pencil sits at the end of the note instead of under it, and the
+   empty state is then just the row with nothing before the button. */
+.manga-note { display: flex; align-items: flex-start; gap: 0.5rem; margin: 0 0 0.7rem; }
+.manga-note.editing { flex-direction: column; align-items: stretch; }
+/* Marked as the reader's with a rule down the side — the one thing on this page they wrote. */
+.manga-note-text { flex: 1; margin: 0; padding-left: 0.7rem; border-left: 2px solid var(--aqua); color: var(--ink); line-height: 1.55; font-size: 0.92rem; white-space: pre-wrap; }
+.manga-note-input { width: 100%; padding: 0.6rem 0.7rem; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 8px; resize: vertical; font: inherit; font-size: 0.92rem; line-height: 1.55; }
+.manga-note-input:focus-visible { outline: none; border-color: var(--aqua); }
+.manga-note-actions { display: flex; gap: 0.3rem; justify-content: flex-end; margin-top: 0.35rem; }
+/* Smaller than .chapter-icon-button's 42px: that one anchors a toolbar, this one rides beside a
+   sentence and would shout at that size. */
+.detail-icon-button { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; flex: none; padding: 0; color: var(--ink-soft); background: transparent; border: 1px solid transparent; border-radius: 7px; cursor: pointer; transition: color 160ms ease, background 160ms ease, border-color 160ms ease; }
+.detail-icon-button:hover { color: var(--ink); background: var(--surface); border-color: var(--line); }
+.detail-icon-button svg { width: 16px; height: 16px; }
+/* Only the pencil fades: it is an offer, not a control, and at full strength on a page with no note
+   it reads as something that failed to load. It comes back on hover and on keyboard focus. */
+.manga-note-edit { opacity: 0.55; }
+.manga-note:hover .manga-note-edit, .manga-note-edit:focus-visible { opacity: 1; }
 .result-copy .summary { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
 .settings-card { display: grid; grid-template-columns: minmax(180px, 0.8fr) minmax(260px, 1.2fr); gap: 2rem; align-items: center; padding: 1.7rem 0; border-top: 1px solid var(--line); }
