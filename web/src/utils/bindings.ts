@@ -33,6 +33,41 @@ export function sourceBindingFromMeta(meta: Array<{ key: string; value: string }
   return Number.isInteger(mangaId) && mangaId > 0 ? mangaId : null
 }
 
+/**
+ * A line the reader writes to themselves about a title.
+ *
+ * On the manga the *page* is showing, which is the library entry when the page was opened from the
+ * library - deliberately not the rule tracking follows, where a TrackRecord lives on the bound
+ * source manga. A note is the reader's rather than the catalogue's, so rebinding a title to another
+ * source must not orphan what they wrote about it.
+ */
+export const MANGA_NOTE_META_KEY = 'stremio4manga.note'
+
+export const SET_MANGA_NOTE_MUTATION = `
+  mutation SetMangaNote($mangaId: Int!, $value: String!) {
+    setMangaMeta(input: { meta: { mangaId: $mangaId, key: "${MANGA_NOTE_META_KEY}", value: $value } }) {
+      meta { key value mangaId }
+    }
+  }
+`
+
+// Clearing a note deletes the row, the same rule the binding above follows: there is no empty-note
+// state worth telling apart from an absent one, and inventing one would leave a key behind on every
+// title the reader ever thought about annotating.
+export const DELETE_MANGA_NOTE_MUTATION = `
+  mutation DeleteMangaNote($mangaId: Int!) {
+    deleteMangaMeta(input: { mangaId: $mangaId, key: "${MANGA_NOTE_META_KEY}" }) {
+      meta { key }
+    }
+  }
+`
+
+/** The note in a manga's meta, or null when there is none. Whitespace alone counts as none. */
+export function noteFromMeta(meta: Array<{ key: string; value: string }>): string | null {
+  const value = meta.find((entry) => entry.key === MANGA_NOTE_META_KEY)?.value
+  return value !== undefined && value.trim() !== '' ? value : null
+}
+
 export type ChapterFilter = 'all' | 'unread' | 'read' | 'bookmarked'
 export type ChapterOrder = 'asc' | 'desc'
 

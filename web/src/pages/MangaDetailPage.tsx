@@ -18,6 +18,9 @@ import {
   sourceBindingFromMeta,
   DELETE_SOURCE_BINDING_MUTATION,
   SET_SOURCE_BINDING_MUTATION,
+  SET_MANGA_NOTE_MUTATION,
+  DELETE_MANGA_NOTE_MUTATION,
+  noteFromMeta,
 } from '../utils/bindings'
 import type { ChapterFilter, ChapterOrder } from '../utils/bindings'
 import { chapterTotalLabel, formatChapterNumber, formatUploadDate, hasFinishedPublishing } from '../utils/progress'
@@ -1148,6 +1151,16 @@ export default function MangaDetailPage() {
   // Discover marks the result it sent here with the catalogue it was found in.
   const openedFromSourceId = searchParams.get('source')
   const [boundId, setBoundId] = useState<number | null>(() => getSourceBinding(id))
+  const [, setMangaNote] = useMutation(SET_MANGA_NOTE_MUTATION)
+  const [, deleteMangaNote] = useMutation(DELETE_MANGA_NOTE_MUTATION)
+  // Held locally and written through, so what is on screen is what the reader typed rather than what
+  // the last query happened to return. Adopted once per manga, for the reason the binding above is:
+  // this query refetches whenever a chapter is read, and a later answer must not put the server's
+  // copy back over a note written since.
+  const [note, setNote] = useState<string | null>(null)
+  const [editingNote, setEditingNote] = useState(false)
+  const [noteDraft, setNoteDraft] = useState('')
+  const noteAdoptedFor = useRef<number | null>(null)
   // What honouring that marker came to: the source the title was moved off (undoable, since this is
   // the one source change the user did not ask for), or nothing to move to because the searched
   // catalogue turned out to carry no chapters of it.
@@ -1199,6 +1212,22 @@ export default function MangaDetailPage() {
     // dialog has to go with it rather than hang over the title it just sent the user to.
     setDuplicates(null)
     setDuplicateSources(new Map())
+  }, [id])
+
+  useEffect(() => {
+    const meta = data?.manga?.meta
+    if (!meta || noteAdoptedFor.current === id) return
+    noteAdoptedFor.current = id
+    setNote(noteFromMeta(meta))
+  }, [data?.manga, id])
+
+  // Walking to another title drops the note with it, or the next page would show this one's until
+  // its own meta lands.
+  useEffect(() => {
+    noteAdoptedFor.current = null
+    setNote(null)
+    setEditingNote(false)
+    setNoteDraft('')
   }, [id])
 
   // Server metadata makes the chosen catalogue available to every browser and survives
@@ -1401,6 +1430,22 @@ export default function MangaDetailPage() {
     return () => { cancelled = true }
   }, [duplicates, client])
 
+  /**
+   * Local first, then the round trip - the chapter view's own rule. A note is typed, so waiting for
+   * the server before showing it is a visible stutter on every save, and not waiting costs nothing:
+   * a failed write leaves the reader looking at what they wrote.
+   *
+   * Emptying the box deletes the row rather than storing "", so a note thought better of leaves
+   * nothing behind.
+   */
+  const saveNote = (text: string) => {
+    const trimmed = text.trim()
+    setNote(trimmed === '' ? null : trimmed)
+    setEditingNote(false)
+    if (trimmed === '') void deleteMangaNote({ mangaId: id })
+    else void setMangaNote({ mangaId: id, value: trimmed })
+  }
+
   if (!Number.isInteger(id)) return <div className="state-panel error"><p>{t('Invalid manga id.')}</p></div>
   if (fetching) return <div className="state-panel"><p>{t('Opening manga…')}</p></div>
   if (error) return <div className="state-panel error"><h2>{t('Manga unavailable')}</h2><p>{friendlyError(error)}</p></div>
@@ -1537,6 +1582,67 @@ export default function MangaDetailPage() {
         <div>
           <span className="eyebrow">{manga.author || t('Source title')}{manga.status && manga.status !== 'UNKNOWN' ? ` · ${t(manga.status.toLowerCase())}` : ''}</span>
           <h1>{manga.title}</h1>
+          {/* Above the description because it is the reader's own words about the title and the
+              description is the source's, and the reader's win the higher position. Nothing shows
+              when there is no note but the control to start one. */}
+          {editingNote ? (
+            <div className="manga-note editing">
+              <textarea
+                className="manga-note-input"
+                value={noteDraft}
+                autoFocus
+                rows={3}
+                onChange={(event) => setNoteDraft(event.target.value)}
+                /* Saved on blur as well as on the button: one round trip is cheap, and a note lost
+                   to a mistimed tap somewhere else on the page is not. */
+                onBlur={() => saveNote(noteDraft)}
+                onKeyDown={(event) => {
+                  // Escape abandons the edit, restoring the note rather than saving the draft -
+                  // which is the one thing Escape can mean.
+                  if (event.key === 'Escape') { setNoteDraft(note ?? ''); setEditingNote(false) }
+                }}
+                aria-label={t('Your note')}
+                placeholder={t('A note to yourself — where you stopped, what to watch out for')}
+              />
+              <div className="manga-note-actions">
+                {/* onMouseDown, not onClick: the textarea's blur fires first and would close the
+                    editor out from under the button, so the press has to be caught before it. */}
+                <button
+                  type="button"
+                  className="detail-icon-button"
+                  onMouseDown={(event) => { event.preventDefault(); saveNote(noteDraft) }}
+                  aria-label={t('Save the note')}
+                  title={t('Save the note')}
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="m5 12.5 4.5 4.5L19 7" /></svg>
+                </button>
+                <button
+                  type="button"
+                  className="detail-icon-button"
+                  onMouseDown={(event) => { event.preventDefault(); setNoteDraft(note ?? ''); setEditingNote(false) }}
+                  aria-label={t('Discard the changes')}
+                  title={t('Discard the changes')}
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M6 6l12 12M18 6 6 18" /></svg>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="manga-note">
+              {note && <p className="manga-note-text">{note}</p>}
+              <button
+                type="button"
+                className="detail-icon-button manga-note-edit"
+                onClick={() => { setNoteDraft(note ?? ''); setEditingNote(true) }}
+                aria-label={note ? t('Edit this note') : t('Add a note')}
+                title={note ? t('Edit this note') : t('Add a note')}
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                </svg>
+              </button>
+            </div>
+          )}
           {manga.description && <p className="summary">{htmlToPlainText(manga.description)}</p>}
           {/* Nothing at all when the source reports no tags: plenty report none, and an empty row
               of chips reads as something that failed to load. */}
