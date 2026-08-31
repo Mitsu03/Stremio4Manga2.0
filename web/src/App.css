@@ -1353,6 +1353,42 @@ button.result-row { width: 100%; text-align: left; cursor: pointer; font: inheri
   letter-spacing: -0.02em;
 }
 
+/* Two cards in one column have to be told apart before either is read, so each tracker gets its own
+   ground rather than its own hue alone: the wash runs from a different edge, the cut corner is on a
+   different side, and the accent bar swaps ends with it. Greyscale still separates them.
+
+   The tint is an rgb triple rather than a colour so the same value can be laid over `--surface` at
+   whatever strength a palette needs — `--tracker-wash` is a token like the rest, declared once per
+   palette in index.css, because a dark ground swallows an alpha that reads well on a light one. */
+.anilist-pane .anilist-banner.tracker-anilist {
+  --tracker-tint: 2, 169, 255;
+  background:
+    linear-gradient(105deg, rgba(var(--tracker-tint), var(--tracker-wash)), transparent 52%),
+    var(--surface);
+  border-radius: 9px 9px 26px 9px;
+}
+.anilist-pane .anilist-banner.tracker-anilist::before {
+  inset: 0 auto 0 0;
+  background: linear-gradient(180deg, rgb(var(--tracker-tint)), rgba(var(--tracker-tint), 0.45));
+}
+
+.anilist-pane .anilist-banner.tracker-myanimelist {
+  --tracker-tint: 46, 81, 162;
+  background:
+    linear-gradient(255deg, rgba(var(--tracker-tint), var(--tracker-wash)), transparent 52%),
+    var(--surface);
+  border-radius: 26px 9px 9px 9px;
+}
+.anilist-pane .anilist-banner.tracker-myanimelist::before {
+  inset: 0 0 0 auto;
+  background: linear-gradient(180deg, rgb(var(--tracker-tint)), rgba(var(--tracker-tint), 0.45));
+}
+
+/* The status line borrows the tracker's colour too, but through the palette rather than from the
+   brand: a brand navy on a dark ground is unreadable, and this line is small type. */
+.anilist-banner.tracker-anilist .anilist-banner-status,
+.anilist-banner.tracker-myanimelist .anilist-banner-status { color: var(--ink-soft); }
+
 .anilist-banner-note { color: var(--ink-soft); font: 700 0.74rem/1.2 ui-monospace, Consolas, monospace; }
 
 .anilist-banner-actions { display: flex; align-items: center; gap: 10px; }

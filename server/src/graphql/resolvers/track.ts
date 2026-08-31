@@ -18,7 +18,7 @@
  */
 import type { GraphQLContext } from '../../types.js';
 import type { ResolverGroup } from './index.js';
-import { requireTracker, trackerById, type Tracker } from '../../tracker/index.js';
+import { allTrackers, requireTracker, trackerById, type Tracker } from '../../tracker/index.js';
 import {
   deleteCredential,
   isExpired,
@@ -41,6 +41,16 @@ interface TrackerView {
   isLoggedIn: boolean;
   isTokenExpired: boolean;
   authUrl: string | null;
+  authRequiresVerifier: boolean;
+}
+
+/**
+ * Where the browser comes back to. Built once and used twice — to make the auth
+ * URL and again to redeem the code — because MyAnimeList compares the two and
+ * refuses the exchange if they differ by so much as a trailing slash.
+ */
+function redirectUri(context: GraphQLContext): string {
+  return `${context.config.publicOrigin}/handle/oauth/result`;
 }
 
 /**
@@ -50,7 +60,7 @@ interface TrackerView {
  */
 function trackerView(context: GraphQLContext, tracker: Tracker): TrackerView {
   const credential = readCredential(context.db, context.userId, tracker.id);
-  const url = tracker.authUrl();
+  const url = tracker.authUrl(redirectUri(context));
   return {
     id: tracker.id,
     name: tracker.name,
@@ -60,6 +70,7 @@ function trackerView(context: GraphQLContext, tracker: Tracker): TrackerView {
     isLoggedIn: url !== null && credential !== null && !isExpired(credential),
     isTokenExpired: isExpired(credential),
     authUrl: url,
+    authRequiresVerifier: tracker.authRequiresVerifier,
   };
 }
 
@@ -86,7 +97,7 @@ interface TrackerArgs {
 // ------------------------------------------------------------- mutations --
 
 interface LoginArgs {
-  input: { trackerId: number; callbackUrl: string };
+  input: { trackerId: number; callbackUrl: string; codeVerifier?: string | null };
 }
 
 interface LogoutArgs {
@@ -116,6 +127,9 @@ export const group: ResolverGroup = {
       return tracker ? trackerView(context, tracker) : null;
     },
 
+    trackers: (_parent: unknown, _args: unknown, context: GraphQLContext) =>
+      allTrackers().map((tracker) => trackerView(context, tracker)),
+
     searchTracker: async (
       _parent: unknown,
       args: SearchTrackerArgs,
@@ -129,15 +143,22 @@ export const group: ResolverGroup = {
 
   Mutation: {
     /**
-     * The client hands over the whole callback URL because the token is in the
-     * fragment, which never reaches a server by itself. It is verified against
-     * AniList before it is stored: "connected" in the UI should mean the token
-     * actually works, not that a URL parsed.
+     * The client hands over the whole callback URL rather than the piece it
+     * thinks matters, because the two grants keep the answer in different
+     * places: AniList's token is in the fragment, which never reaches a server
+     * by itself, and MyAnimeList's code is in the query and still has to be
+     * redeemed. Either way the result is verified against the tracker before it
+     * is stored — "connected" in the UI should mean the token actually works,
+     * not that a URL parsed.
      */
     loginTrackerOAuth: async (_parent: unknown, args: LoginArgs, context: GraphQLContext) => {
       const tracker = requireTracker(args.input.trackerId);
 
-      const extracted = await tracker.exchangeCallback(args.input.callbackUrl, null);
+      const extracted = await tracker.exchangeCallback(
+        args.input.callbackUrl,
+        args.input.codeVerifier ?? null,
+        redirectUri(context),
+      );
       if (!extracted) {
         throw new Error(`The ${tracker.name} callback carried no access token.`);
       }

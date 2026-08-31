@@ -3,10 +3,11 @@ import { useMutation } from 'urql'
 import { Link } from 'react-router-dom'
 import { friendlyError } from '../utils/errors'
 import { t } from '../utils/i18n'
+import { takeVerifier } from '../utils/oauth'
 
 const LOGIN_TRACKER_MUTATION = `
-  mutation LoginTrackerOAuth($trackerId: Int!, $callbackUrl: String!) {
-    loginTrackerOAuth(input: { trackerId: $trackerId, callbackUrl: $callbackUrl }) {
+  mutation LoginTrackerOAuth($trackerId: Int!, $callbackUrl: String!, $codeVerifier: String) {
+    loginTrackerOAuth(input: { trackerId: $trackerId, callbackUrl: $callbackUrl, codeVerifier: $codeVerifier }) {
       isLoggedIn
       tracker {
         name
@@ -18,7 +19,7 @@ const LOGIN_TRACKER_MUTATION = `
 export default function OAuthCallbackPage() {
   const [, loginTracker] = useMutation(LOGIN_TRACKER_MUTATION)
   const callbackStarted = useRef(false)
-  const [status, setStatus] = useState(t('Finishing AniList sign-in...'))
+  const [status, setStatus] = useState(t('Finishing sign-in...'))
   const [complete, setComplete] = useState(false)
 
   useEffect(() => {
@@ -32,17 +33,22 @@ export default function OAuthCallbackPage() {
       try {
         trackerId = Number(JSON.parse(state).trackerId) || trackerId
       } catch {
-        // The callback still contains the token; the AniList tracker id is stable.
+        // The callback still contains the token, and AniList's id is the stable
+        // default this route had before any second tracker existed.
       }
     }
 
-    loginTracker({ trackerId, callbackUrl: window.location.href }).then((result) => {
+    // Null for an implicit grant, which has nothing to redeem; the server ignores
+    // it in that case rather than the client having to know which grant this was.
+    const codeVerifier = takeVerifier(trackerId)
+
+    loginTracker({ trackerId, callbackUrl: window.location.href, codeVerifier }).then((result) => {
       if (result.error || !result.data?.loginTrackerOAuth.isLoggedIn) {
-        setStatus(friendlyError(result.error, t('AniList sign-in could not be completed.')))
+        setStatus(friendlyError(result.error, t('The sign-in could not be completed.')))
         return
       }
       setComplete(true)
-      setStatus(t('AniList is connected.'))
+      setStatus(t('{name} is connected.', { name: result.data.loginTrackerOAuth.tracker.name }))
     })
   }, [loginTracker])
 

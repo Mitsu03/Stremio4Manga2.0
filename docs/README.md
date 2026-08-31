@@ -177,6 +177,31 @@ environment rather than from `config.json`.
 With no id available at all, the Settings page draws a tracker that simply
 cannot be connected yet, rather than failing the whole query.
 
+### MyAnimeList
+
+MyAnimeList has **no compiled-in id**, so it is off until you register an app.
+That is not an oversight: a MyAnimeList app carries one registered redirect URL,
+so an id shipped in the source could only ever work for the single origin it was
+registered against.
+
+1. Register an app at <https://myanimelist.net/apisconfig>.
+2. Set its **App Redirect URL** to `<publicOrigin>/handle/oauth/result` — the
+   exact origin in `server/config.json`, with that path.
+3. Start the server with both of these in the environment:
+
+       S4M_MYANIMELIST_CLIENT_ID=<your id>
+       S4M_MYANIMELIST_CLIENT_SECRET=<your secret>
+
+Unlike AniList's, this one **is** a secret. MyAnimeList uses the authorization
+code grant, so the token is redeemed by the server rather than handed to the
+browser, and the secret never leaves the machine. Keep it out of
+`server/config.json`, which is world-readable in some deployments — the
+environment is the right place for it, and on systemd that is an
+`Environment=`, or better an `EnvironmentFile=` with mode 0600.
+
+With either variable missing, MyAnimeList appears alongside AniList as a
+tracker that cannot be connected yet. Nothing else changes.
+
 ## Sources
 
 405 sites ship built in, across 13 languages. They come in two kinds.

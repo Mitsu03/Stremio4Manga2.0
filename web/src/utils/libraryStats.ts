@@ -13,7 +13,7 @@
  * whichever of the two is touched, the other has to be touched with it.
  */
 import { getSourceBinding, sourceBindingFromMeta } from './bindings'
-import { ANILIST_TRACKER_ID } from './tracking'
+import { primaryRecord, trackIdentity } from './tracking'
 
 export const LIBRARY_QUERY = `
   query Library {
@@ -105,12 +105,12 @@ export interface LibraryTotals {
 
 const COMPLETED_STATUS = 2
 
-function anilistRecord(item: StatsManga): StatsTrackRecord | undefined {
-  return item.trackRecords.nodes.find((record) => record.trackerId === ANILIST_TRACKER_ID)
+function trackedRecord(item: StatsManga): StatsTrackRecord | undefined {
+  return primaryRecord(item.trackRecords.nodes)
 }
 
-function anilistId(records: Array<{ trackerId: number; remoteId: string }>): string | undefined {
-  return records.find((record) => record.trackerId === ANILIST_TRACKER_ID)?.remoteId || undefined
+function trackedId(records: Array<{ trackerId: number; remoteId: string }>): string | undefined {
+  return trackIdentity(records)
 }
 
 function boundSourceId(item: StatsManga): number | null {
@@ -128,15 +128,15 @@ function titleKey(title: string): string {
 function deduplicate(items: StatsManga[]): StatsManga[] {
   const remoteByTitle = new Map<string, string>()
   for (const item of items) {
-    const remoteId = anilistId(item.trackRecords.nodes)
+    const remoteId = trackedId(item.trackRecords.nodes)
     if (remoteId) remoteByTitle.set(titleKey(item.title), remoteId)
   }
   const seriesKey = (item: StatsManga) =>
-    anilistId(item.trackRecords.nodes) ?? remoteByTitle.get(titleKey(item.title)) ?? titleKey(item.title)
+    trackedId(item.trackRecords.nodes) ?? remoteByTitle.get(titleKey(item.title)) ?? titleKey(item.title)
   const score = (item: StatsManga) => [
-    anilistRecord(item) ? 1 : 0,
+    trackedRecord(item) ? 1 : 0,
     boundSourceId(item) !== null ? 1 : 0,
-    anilistRecord(item)?.lastChapterRead ?? 0,
+    trackedRecord(item)?.lastChapterRead ?? 0,
     -item.id,
   ]
   const series = new Map<string, StatsManga>()
@@ -179,7 +179,7 @@ export function countLibrary(entries: StatsManga[], boundNodes: StatsBoundManga[
     const numbers = [...new Set(node.chapters.nodes.map((chapter) => chapter.chapterNumber))]
     return [node.id, {
       numbers,
-      progress: node.trackRecords.nodes.find((record) => record.trackerId === ANILIST_TRACKER_ID)?.lastChapterRead ?? 0,
+      progress: primaryRecord(node.trackRecords.nodes)?.lastChapterRead ?? 0,
       localReadThrough: node.chapters.nodes.reduce((latest, chapter) => chapter.isRead ? Math.max(latest, chapter.chapterNumber) : latest, 0),
     }]
   }))
@@ -189,7 +189,7 @@ export function countLibrary(entries: StatsManga[], boundNodes: StatsBoundManga[
   let chaptersRead = 0
   let chaptersTotal = 0
   for (const item of titles) {
-    const record = anilistRecord(item)
+    const record = trackedRecord(item)
     if (record?.status === COMPLETED_STATUS) completed += 1
 
     const state = bound.get(boundSourceId(item) ?? -1)

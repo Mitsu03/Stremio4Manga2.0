@@ -1,6 +1,89 @@
 import { t } from './i18n'
 
 export const ANILIST_TRACKER_ID = 2
+export const MYANIMELIST_TRACKER_ID = 1
+
+/**
+ * The order two links are compared in when nothing else separates them. It is the registry's own
+ * order on the server, repeated here because the client has to break ties the same way twice in a
+ * row — a helper that answered by array order would give a title one identity on the library page
+ * and another on the statistics page, from the same data.
+ */
+const TRACKER_PREFERENCE = [ANILIST_TRACKER_ID, MYANIMELIST_TRACKER_ID]
+
+/**
+ * A tracker's name without asking the server for it. The name on `TrackerType` is the one to use
+ * wherever a query is already in flight; this is for the places that have a record and no tracker —
+ * the reader's "open on ..." link, which would otherwise fetch a whole tracker to render a word.
+ */
+export const TRACKER_NAMES: Record<number, string> = {
+  [ANILIST_TRACKER_ID]: 'AniList',
+  [MYANIMELIST_TRACKER_ID]: 'MyAnimeList',
+}
+
+function preferenceOf(trackerId: number): number {
+  const index = TRACKER_PREFERENCE.indexOf(trackerId)
+  return index === -1 ? TRACKER_PREFERENCE.length : index
+}
+
+interface Linked {
+  trackerId: number
+  lastChapterRead: number
+}
+
+/**
+ * Which of a title's links is *the* progress, now that there can be more than one.
+ *
+ * Whichever tracker is furthest ahead. A reader who marks a chapter read here has it pushed to
+ * every link, so the links agree in the ordinary case and this only decides after progress arrived
+ * somewhere else — where "furthest ahead" is the answer that never walks a shelf backwards. Ties go
+ * to `TRACKER_PREFERENCE`, so the answer does not depend on the order the server returned the rows.
+ */
+export function primaryRecord<T extends Linked>(records: readonly T[]): T | undefined {
+  let best: T | undefined
+  for (const record of records) {
+    if (
+      !best ||
+      record.lastChapterRead > best.lastChapterRead ||
+      (record.lastChapterRead === best.lastChapterRead &&
+        preferenceOf(record.trackerId) < preferenceOf(best.trackerId))
+    ) {
+      best = record
+    }
+  }
+  return best
+}
+
+/**
+ * A stable key for "the same series", across the two library rows a series usually has.
+ *
+ * A remote id is only unique inside its own tracker — AniList 87443 and MyAnimeList 87443 are
+ * different series — so the tracker id is part of the key. The link chosen is the first one in
+ * `TRACKER_PREFERENCE` the row actually has, *not* the furthest ahead: identity has to be the same
+ * answer for two rows whose progress differs, which is the whole reason it is being computed.
+ */
+export function trackIdentity(
+  records: ReadonlyArray<{ trackerId: number; remoteId?: string }>,
+): string | undefined {
+  const ranked = [...records].sort((a, b) => preferenceOf(a.trackerId) - preferenceOf(b.trackerId))
+  const found = ranked.find((record) => record.remoteId)
+  return found?.remoteId ? `${found.trackerId}:${found.remoteId}` : undefined
+}
+
+/**
+ * A CSS-safe name for a tracker, so a stylesheet can give each one its own ground. Kept beside the
+ * ids rather than derived from the name, because a name is a proper noun the server sends and a
+ * class is a selector this repo owns; a tracker with no slug falls back to the shared card.
+ */
+export const TRACKER_SLUGS: Record<number, string> = {
+  [ANILIST_TRACKER_ID]: 'anilist',
+  [MYANIMELIST_TRACKER_ID]: 'myanimelist',
+}
+
+/** The same key for one link rather than for a title — for counting distinct remote entries. */
+export function trackKey(record: { trackerId: number; remoteId: string }): string {
+  return `${record.trackerId}:${record.remoteId}`
+}
 
 /** AniList's list statuses, under the names the library shelves use. */
 export const statusNames: Record<number, string> = {
