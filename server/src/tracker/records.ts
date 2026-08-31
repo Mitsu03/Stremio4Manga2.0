@@ -1,5 +1,5 @@
 /**
- * `track_record`: the join between a library row and a title on AniList.
+ * `track_record`: the join between a library row and a title on a tracker.
  *
  * Two facts shape everything here.
  *
@@ -17,6 +17,7 @@
 import type { Db } from '../db/open.js';
 import * as anilist from './anilist.js';
 import { ANILIST_SOURCE_ID, ANILIST_TRACKER_ID } from './anilist.js';
+import { requireTracker, trackerById, type TrackerEntry } from './index.js';
 import {
   NotLoggedInError,
   readCredential,
@@ -234,13 +235,14 @@ export async function unbindRecord(
   const record = recordById(db, userId, recordId);
   if (!record) return null;
 
-  if (deleteRemoteTrack && record.trackerId === ANILIST_TRACKER_ID) {
+  const tracker = trackerById(record.trackerId);
+  if (deleteRemoteTrack && tracker?.supportsRemoteDeletion) {
     // The UI always sends false. Honouring true is a deletion on someone
-    // else's service, so it is best-effort: failing to reach AniList must not
-    // leave a local record the reader has already been told is gone.
+    // else's service, so it is best-effort: failing to reach the tracker must
+    // not leave a local record the reader has already been told is gone.
     try {
       const { credential, remoteUser } = await remoteAccount(db, userId, record.trackerId);
-      await anilist.deleteListEntry(credential.accessToken, remoteUser, record.remoteId);
+      await tracker.deleteListEntry(credential.accessToken, remoteUser, record.remoteId);
     } catch {
       // Swallowed on purpose — see above.
     }
@@ -268,7 +270,7 @@ async function remoteAccount(
   const credential = requireCredential(db, userId, trackerId);
   if (credential.remoteUser) return { credential, remoteUser: credential.remoteUser };
 
-  const profile = await anilist.viewer(credential.accessToken);
+  const profile = await requireTracker(trackerId).viewer(credential.accessToken);
   saveProfile(db, userId, trackerId, {
     remoteUser: profile.id,
     displayName: profile.name,
@@ -278,7 +280,7 @@ async function remoteAccount(
   return { credential: { ...credential, remoteUser: profile.id }, remoteUser: profile.id };
 }
 
-function fieldsFromEntry(entry: anilist.AniListEntry, trackerId: number): RecordFields {
+function fieldsFromEntry(entry: TrackerEntry, trackerId: number): RecordFields {
   return {
     trackerId,
     remoteId: entry.remoteId,
@@ -309,9 +311,10 @@ export async function bindByRemoteId(
   trackerId: number,
   remoteId: string,
 ): Promise<TrackRecord> {
+  const tracker = requireTracker(trackerId);
   const { credential, remoteUser } = await remoteAccount(db, userId, trackerId);
-  const entry = await anilist.findListEntry(credential.accessToken, remoteUser, remoteId);
-  if (!entry) throw new Error(`AniList has no manga with id ${remoteId}.`);
+  const entry = await tracker.findListEntry(credential.accessToken, remoteUser, remoteId);
+  if (!entry) throw new Error(`${tracker.name} has no manga with id ${remoteId}.`);
   return upsertRecord(db, userId, mangaId, fieldsFromEntry(entry, trackerId));
 }
 
@@ -356,8 +359,9 @@ export async function refreshRecord(
   const record = recordById(db, userId, recordId);
   if (!record) throw new Error(`No track record ${recordId}.`);
 
+  const tracker = requireTracker(record.trackerId);
   const { credential, remoteUser } = await remoteAccount(db, userId, record.trackerId);
-  const entry = await anilist.findListEntry(credential.accessToken, remoteUser, record.remoteId);
+  const entry = await tracker.findListEntry(credential.accessToken, remoteUser, record.remoteId);
   if (!entry) return record;
   return upsertRecord(db, userId, record.mangaId, fieldsFromEntry(entry, record.trackerId));
 }
@@ -383,8 +387,10 @@ export async function reportProgress(
 ): Promise<boolean> {
   if (!Number.isFinite(chapterNumber) || chapterNumber <= 0) return false;
 
+  // A record whose tracker this build does not know is left alone rather than
+  // dropped: the row is somebody's reading history, and a tracker can come back.
   const records = recordsForManga(db, userId, mangaId).filter(
-    (record) => record.trackerId === ANILIST_TRACKER_ID,
+    (record) => trackerById(record.trackerId) !== null,
   );
 
   let reported = false;
@@ -408,7 +414,7 @@ export async function reportProgress(
     if (record.totalChapters > 0 && Math.floor(chapterNumber) >= record.totalChapters) status = 2;
 
     try {
-      await anilist.updateProgress(
+      await requireTracker(record.trackerId).updateProgress(
         credential.accessToken,
         record.remoteId,
         chapterNumber,
@@ -420,8 +426,8 @@ export async function reportProgress(
     }
     reported = true;
 
-    // Both local rows for this series carry the same remote id, and AniList
-    // now agrees with the higher number, so both are moved. Without this the
+    // Both local rows for this series carry the same remote id, and the
+    // tracker now agrees with the higher number, so both are moved. Without this the
     // library shelf would keep showing the old progress until a refresh.
     db.run(
       `UPDATE track_record
