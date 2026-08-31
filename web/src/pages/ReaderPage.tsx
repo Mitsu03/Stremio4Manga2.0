@@ -615,9 +615,18 @@ const AUTO_SCROLL = choice<AutoScrollSpeed>('reader.autoscroll', 'off', AUTO_SCR
 // discovered.
 const WAKE_LOCK = flag('reader.wakelock', false)
 
+// Same rule, same reason. Section 36 declined to bind a key to "immersive mode" because the reader
+// had no fullscreen of its own; it does now, so the keybind table gained `toggleFullscreen` with it.
+const FULLSCREEN = flag('reader.fullscreen', false)
+
 // Absent rather than disabled where the browser has no wake lock — insecure contexts and most
 // desktop Firefox. A toggle that can never take effect is worse than no toggle.
 const wakeLockSupported = typeof navigator !== 'undefined' && 'wakeLock' in navigator
+
+// Absent rather than disabled for the same reason as the wake lock. `fullscreenEnabled` is false in
+// an iframe without `allow="fullscreen"` as well as on a browser that has none, and both mean the
+// toggle could never take effect.
+const fullscreenSupported = typeof document !== 'undefined' && Boolean(document.fullscreenEnabled)
 
 // Off, paired by position, or paired by what each page turns out to look like. The same key the
 // boolean used, and the same two values it wrote, so a stored setting carries over untouched.
@@ -768,6 +777,11 @@ export default function ReaderPage() {
   const [autoScroll, setAutoScroll] = useMangaPreference(AUTO_SCROLL, id)
   const [wakeLock, setWakeLock] = useMangaPreference(WAKE_LOCK, id)
   const wakeLockSentinel = useRef<WakeLockSentinel | null>(null)
+  const [fullscreen, setFullscreen] = useMangaPreference(FULLSCREEN, id)
+  // Set when the reader leaves fullscreen by a route this code did not take - Esc, or the browser's
+  // own control. It stops the arming effect below from putting it straight back, which would make Esc
+  // do nothing inside the app. Cleared on a chapter change, so the next chapter arms again.
+  const leftFullscreen = useRef(false)
   const [panelOpen, setPanelOpen] = useState(true)
   const [optionsOpen, setOptionsOpen] = OPTIONS_OPEN.use()
   // Not remembered: the dialog opens on Layout every time, which is where all but three of the
@@ -881,6 +895,25 @@ export default function ReaderPage() {
     setBackgroundState(nextBackground)
     if (nextBackground === 'fixed') setBackdrop(null)
   }
+
+  // Both swallow their rejection. iOS Safari refuses fullscreen outright and a browser can refuse
+  // for reasons of its own; a refusal is not a reader error, the same call the wake lock makes.
+  const enterFullscreen = useCallback(async () => {
+    try {
+      await document.documentElement.requestFullscreen()
+    } catch {
+      // Refused. The toggle stays on: it describes what the reader asked for, not what was granted.
+    }
+  }, [])
+
+  const toggleFullscreen = useCallback(() => {
+    const next = !fullscreen
+    setFullscreen(next)
+    leftFullscreen.current = false
+    // Called from a click or a key press, so the gesture requirement is already satisfied here.
+    if (next) void enterFullscreen()
+    else if (document.fullscreenElement) void document.exitFullscreen().catch(() => {})
+  }, [enterFullscreen, fullscreen, setFullscreen])
 
   const setStripZoom = useCallback((nextZoom: number) => {
     const clamped = Math.min(STRIP_ZOOM_MAX, Math.max(STRIP_ZOOM_MIN, Math.round(nextZoom * 100) / 100))
@@ -1035,6 +1068,46 @@ export default function ReaderPage() {
       wakeLockSentinel.current = null
     }
   }, [prepared, wakeLock])
+
+  /**
+   * Fullscreen needs a user gesture; the wake lock does not. This is the one place the wake lock's
+   * shape does not transfer.
+   *
+   * Requesting on `prepared` alone works for a chapter opened by a tap and fails silently for one
+   * reached by a deep link on a cold load - which is the case the toggle is most wanted for. So the
+   * request is armed here and fired by the first tap or key inside the reader, and the toggle itself
+   * requests directly, because turning it on *is* a gesture.
+   */
+  useEffect(() => {
+    if (!fullscreenSupported || !fullscreen || !prepared) return
+    if (document.fullscreenElement || leftFullscreen.current) return
+    const arm = () => { void enterFullscreen() }
+    document.addEventListener('pointerdown', arm, { once: true })
+    document.addEventListener('keydown', arm, { once: true })
+    return () => {
+      document.removeEventListener('pointerdown', arm)
+      document.removeEventListener('keydown', arm)
+    }
+  }, [enterFullscreen, fullscreen, prepared])
+
+  // The reader can leave fullscreen without touching the toggle. Record it rather than fight it: the
+  // flag stays on so the next chapter arms again, but nothing re-requests in place.
+  useEffect(() => {
+    if (!fullscreenSupported) return
+    const onChange = () => { leftFullscreen.current = !document.fullscreenElement }
+    document.addEventListener('fullscreenchange', onChange)
+    return () => document.removeEventListener('fullscreenchange', onChange)
+  }, [])
+
+  // A new chapter is a fresh chance to fill the screen, whatever happened on the last one.
+  useEffect(() => { leftFullscreen.current = false }, [id, sourceOrder])
+
+  // Closing the reader gives the browser back. Not conditional on the flag: the reader may have been
+  // put into fullscreen and the flag turned off since, and leaving the document fullscreen after
+  // navigating away is the one outcome nobody asked for.
+  useEffect(() => () => {
+    if (fullscreenSupported && document.fullscreenElement) void document.exitFullscreen().catch(() => {})
+  }, [])
 
   // A window that cannot hold two pages side by side shows one, and starts showing two again the
   // moment it can. The stored setting is never touched by this — the reader is told what fits, not
@@ -1485,6 +1558,7 @@ export default function ReaderPage() {
       // The controls and the options are reachable from a focused picker, since neither of them is
       // something a <select> could want the key for; everything else waits until focus leaves it.
       if (action === 'toggleControls') setPanelOpen((current) => !current)
+      if (action === 'toggleFullscreen' && fullscreenSupported) toggleFullscreen()
       if (action === 'toggleOptions') setOptionsOpen(!optionsOpen)
       if (isFormControl(event.target)) return
       if (action === 'pageLeft') goToPage(leftPage)
@@ -2550,17 +2624,30 @@ export default function ReaderPage() {
               </small>
             </section>
 
-            {/* Not gated on the layout — a long strip keeps the screen on for the same reason. */}
-            {wakeLockSupported && (
+            {/* Neither is gated on the layout — a long strip keeps the screen on, and fills it, for
+                the same reasons a paged one does. The group shows when *either* row can, and each
+                row still answers for itself: a browser with one and not the other is real. */}
+            {(wakeLockSupported || fullscreenSupported) && (
               <section className="reader-options-group">
                 <span className="reader-control-label">{t('Screen')}</span>
-                <button className="reader-check" type="button" aria-pressed={wakeLock} onClick={() => setWakeLock(!wakeLock)}>
-                  <span className="reader-check-box" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7" /></svg></span>
-                  <span>
-                    <strong>{t('Keep the screen awake')}</strong>
-                    <small>{wakeLock ? t('On while a chapter is open') : t('Off — the screen dims as usual')}</small>
-                  </span>
-                </button>
+                {wakeLockSupported && (
+                  <button className="reader-check" type="button" aria-pressed={wakeLock} onClick={() => setWakeLock(!wakeLock)}>
+                    <span className="reader-check-box" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7" /></svg></span>
+                    <span>
+                      <strong>{t('Keep the screen awake')}</strong>
+                      <small>{wakeLock ? t('On while a chapter is open') : t('Off — the screen dims as usual')}</small>
+                    </span>
+                  </button>
+                )}
+                {fullscreenSupported && (
+                  <button className="reader-check" type="button" aria-pressed={fullscreen} onClick={toggleFullscreen}>
+                    <span className="reader-check-box" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7" /></svg></span>
+                    <span>
+                      <strong>{t('Fill the screen')}</strong>
+                      <small>{fullscreen ? t('The browser gets out of the way — Esc gives it back') : t('The address bar and tabs stay where they are')}</small>
+                    </span>
+                  </button>
+                )}
               </section>
             )}
           </div>
