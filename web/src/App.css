@@ -23,7 +23,7 @@
    toolbar of glyphs and must not outweigh them. */
 .library-search { position: relative; display: inline-flex; align-items: center; }
 .library-search > svg { position: absolute; left: 0.62rem; width: 15px; height: 15px; color: var(--ink-soft); pointer-events: none; }
-.library-search input { width: clamp(130px, 17vw, 220px); min-width: 0; padding: 0.44rem 1.75rem 0.44rem 2rem; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 999px; font: 700 0.82rem/1.2 inherit; }
+.library-search input { width: clamp(130px, 17vw, 220px); min-width: 0; padding: 0.44rem 1.75rem 0.44rem 2rem; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 999px; font-weight: 700; font-size: 0.82rem; line-height: 1.2; }
 .library-search input::placeholder { color: var(--ink-soft); font-weight: 600; }
 .library-search input:focus { border-color: var(--aqua); outline-offset: 1px; }
 /* The browser's own clear glyph is unlabelled and disappears on some platforms, so the field paints
@@ -39,14 +39,17 @@
 .library-sync-button.loading svg { animation: library-sync-spin 0.9s linear infinite; }
 .library-sync-button:disabled { cursor: default; }
 @keyframes library-sync-spin { to { transform: rotate(360deg); } }
-.library-sort { position: relative; display: inline-flex; }
+.library-sort, .library-source-filter { position: relative; display: inline-flex; }
 /* Right-aligned to the trigger: the toolbar sits at the right edge of the page, so a menu growing
    rightwards would hang off it. */
 /* Clamped rather than fixed: the toolbar sits at the right edge with three more buttons beside it,
    and a rigid 232px menu runs off a phone. min-width has to be the clamped one — it beats
    max-width when the two disagree. */
-.library-sort-menu { position: absolute; top: calc(100% + 0.5rem); right: 0; z-index: 15; display: flex; flex-direction: column; min-width: min(232px, calc(100vw - 2.5rem)); max-width: calc(100vw - 2.5rem); padding: 0.3rem; background: var(--surface); border: 1px solid var(--line); border-radius: 4px 4px 14px 4px; box-shadow: 0 12px 28px rgba(32, 48, 78, 0.14); }
-.library-sort-option { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; padding: 0.5rem 0.6rem; color: var(--ink-soft); background: none; border: 0; border-radius: 8px; cursor: pointer; text-align: left; white-space: nowrap; font: 700 0.85rem/1.3 inherit; transition: color 160ms ease, background 160ms ease; }
+/* One panel shape for both toolbar disclosures. The sources came up out of a row under the shelf
+   tabs to sit beside the sort order, and giving them a second panel of their own would have made two
+   surfaces out of one idea: a list of choices, hanging off the button that opened it. */
+.library-sort-menu, .library-source-menu { position: absolute; top: calc(100% + 0.5rem); right: 0; z-index: 15; display: flex; flex-direction: column; min-width: min(232px, calc(100vw - 2.5rem)); max-width: calc(100vw - 2.5rem); padding: 0.3rem; background: var(--surface); border: 1px solid var(--line); border-radius: 4px 4px 14px 4px; box-shadow: 0 12px 28px rgba(32, 48, 78, 0.14); }
+.library-sort-option { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; padding: 0.5rem 0.6rem; color: var(--ink-soft); background: none; border: 0; border-radius: 8px; cursor: pointer; text-align: left; white-space: nowrap; font-weight: 700; font-size: 0.85rem; line-height: 1.3; transition: color 160ms ease, background 160ms ease; }
 .library-sort-option small { display: inline-flex; align-items: center; gap: 0.32rem; color: var(--aqua-ink); white-space: nowrap; font: 700 0.68rem/1 ui-monospace, monospace; }
 .library-sort-option small svg { flex: none; transition: transform 160ms ease; }
 .library-sort-option.ascending small svg { transform: rotate(180deg); }
@@ -54,27 +57,47 @@
    it makes every row look chosen as the cursor crosses it. */
 .library-sort-option:hover { color: var(--ink); background: var(--paper); }
 .library-sort-option.active, .library-sort-option.active:hover { color: var(--ink); background: var(--aqua-soft); box-shadow: inset 3px 0 0 var(--aqua); }
+/* Four orders fit under the button that opens them; a library read from fifteen catalogues does not,
+   and a panel taller than the window would put its last rows somewhere unreachable. The roomier
+   padding is what the scroll costs: overflow clips in both directions, and the focus ring is drawn
+   three pixels outside a row, so the panel has to hold that much away from its own edge. */
+.library-source-menu { max-height: min(320px, 60vh); padding: 0.42rem; overflow-y: auto; scrollbar-width: thin; }
+/* Centred rather than on the baseline the sort rows share: those are words beside words, and this
+   row leads with a mark whose middle, not whose foot, is what lines up with a name. */
+.library-source-option { align-items: center; }
+.library-source-option > span { display: inline-flex; align-items: center; gap: 0.4rem; min-width: 0; }
+.library-source-option > span > span { overflow: hidden; text-overflow: ellipsis; }
+/* The size the same icon is drawn at under a cover, which is where the reader met it first. Just
+   under the row's em box, so the mark sits inside the name's line rather than standing up out of it. */
+.library-source-option img { width: 13px; height: 13px; flex: none; object-fit: contain; border-radius: 2px; }
 .library-filterbar { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.5rem 1.6rem; margin-top: 1.2rem; padding-top: 1.1rem; border-top: 1px solid var(--line); }
 .library-sync-error { margin-left: auto; align-self: center; }
-.library-filter-tab { padding: 0.25rem 0; color: var(--ink-soft); background: none; border: 0; border-bottom: 3px solid transparent; cursor: pointer; font: 700 0.95rem/1.5 inherit; transition: color 160ms ease, border-color 160ms ease; }
+.library-filter-tab { padding: 0.25rem 0; color: var(--ink-soft); background: none; border: 0; border-bottom: 3px solid transparent; cursor: pointer; font-weight: 700; font-size: 0.95rem; line-height: 1.5; transition: color 160ms ease, border-color 160ms ease; }
 .library-filter-tab small { margin-left: 0.25rem; color: var(--ink-soft); font: 700 0.68rem/1 ui-monospace, monospace; }
 .library-filter-tab:hover { color: var(--ink); }
 .library-filter-tab.active { color: var(--ink); border-bottom-color: var(--aqua); }
 .library-filter-tab.active small { color: var(--aqua); }
 /* Pills rather than the shelf tabs' underlines: these narrow what a shelf shows instead of choosing
-   which shelves there are, and two rows of the same control would say they do the same thing. */
-.library-genres { display: flex; gap: 0.42rem; margin-top: 0.9rem; padding-bottom: 0.35rem; overflow-x: auto; scrollbar-width: thin; }
-.library-genre-chip { flex: none; padding: 0.28rem 0.72rem; color: var(--ink-soft); background: var(--paper); border: 1px solid var(--line); border-radius: 999px; cursor: pointer; white-space: nowrap; font: 700 0.74rem/1.35 inherit; transition: color 160ms ease, background 160ms ease, border-color 160ms ease; }
+   which shelves there are, and a second row of the same control would say they do the same thing.
+   The one row left under the tabs is the genres, which earn a row because there are as many of them
+   as the library has subjects and no panel would hold them; the sources, of which there are a
+   handful, went into the toolbar with the sort order instead. The row sits closer to the tabs than
+   the tabs sit to the rule above them, so it reads as something hanging off a shelf rather than as a
+   second band of controls standing beside the first. The gap is split between the margin and a
+   padding because the row scrolls: overflow-x clips vertically too, and a chip at rest no longer has
+   a border of its own, so the focus ring is the only edge a keyboard reaches it by and the row has to
+   leave it somewhere to be drawn. */
+.library-genres { display: flex; gap: 0.42rem; margin-top: 0.35rem; padding-top: 0.3rem; padding-bottom: 0.35rem; overflow-x: auto; scrollbar-width: thin; }
+/* A chip at rest is a plate, not a ring. --paper is the page's own background, so the fill was never
+   doing anything and the border was drawing the entire pill by itself; a closed contour is what makes
+   a shape read as an object, and a row of them under the shelf tabs gave the filters more presence
+   than the shelves they filter. The border stays in the box at transparent so nothing shifts when
+   hover and the chosen state take it back, which leaves the ring saying only what it should: this is
+   the chip under the cursor, or the one you picked. The label drops to 600 for the same reason —
+   700 is the tabs' weight, and only one of the two rows can be the loud one. */
+.library-genre-chip { flex: none; padding: 0.28rem 0.72rem; color: var(--ink-soft); background: var(--surface); border: 1px solid transparent; border-radius: 999px; cursor: pointer; white-space: nowrap; font-weight: 600; font-size: 0.74rem; line-height: 1.35; transition: color 160ms ease, background 160ms ease, border-color 160ms ease; }
 .library-genre-chip:hover { color: var(--ink); border-color: var(--aqua); }
 .library-genre-chip.active { color: var(--aqua-ink); background: var(--aqua-soft); border-color: var(--aqua); }
-/* The coarser cut sits above the genres and scrolls the same way. Its own row rather than sharing
-   one: a source chip and a genre chip select different things, and a single run of pills would
-   invite reading them as one list of tags. */
-.library-sources { display: flex; gap: 0.42rem; margin-top: 0.9rem; padding-bottom: 0.35rem; overflow-x: auto; scrollbar-width: thin; }
-/* The icon is the badge's, so a chip and the card it selects look like the same thing. It rides with
-   the text rather than beside it, which is why the chip becomes a flex row. */
-.library-source-chip { display: inline-flex; align-items: center; gap: 0.36rem; }
-.library-source-chip img { width: 14px; height: 14px; border-radius: 3px; object-fit: cover; flex: none; }
 .state-panel { min-height: 52vh; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; max-width: 700px; }
 .state-panel p { color: var(--ink-soft); font-size: 1.05rem; line-height: 1.65; }
 .state-panel .button { margin-top: 1.4rem; }
@@ -112,7 +135,7 @@
 .library-batch-bar .button.quiet:first-of-type { margin-left: auto; }
 .library-batch-close { width: 36px; min-width: 36px; padding: 0; }
 .library-batch-close svg { flex: none; width: 16px; height: 16px; }
-.library-batch-select { min-height: 36px; max-width: 220px; padding: 0 0.7rem; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 4px 4px 12px 4px; font: 700 0.85rem/1 inherit; }
+.library-batch-select { min-height: 36px; max-width: 220px; padding: 0 0.7rem; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 4px 4px 12px 4px; font-weight: 700; font-size: 0.85rem; line-height: 1; }
 .library-batch-notice { margin-bottom: 2rem; }
 .library-migrate-panel { margin: -1.4rem 0 2rem; padding: 0.9rem 1rem 1rem; background: var(--surface); border: 1px solid var(--line); border-radius: 4px 4px 18px 4px; }
 .library-migrate-panel > p { max-width: 68ch; margin: 0 0 0.9rem; color: var(--ink-soft); font-size: 0.85rem; line-height: 1.55; }
@@ -171,7 +194,7 @@
    the chapter and its date: this card is about one chapter, not about how far the series has got. */
 .found-shelf .recent-heading { border-bottom-color: var(--aqua); }
 .found-shelf .recent-copy { padding-top: 3.1rem; }
-.found-shelf .recent-copy small { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; margin-top: 0.34rem; color: rgba(255, 255, 255, 0.86); font: 700 0.8rem/1.3 inherit; }
+.found-shelf .recent-copy small { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; margin-top: 0.34rem; color: rgba(255, 255, 255, 0.86); font-weight: 700; font-size: 0.8rem; line-height: 1.3; }
 .found-shelf .recent-copy time { display: block; margin-top: 0.34rem; color: rgba(255, 255, 255, 0.66); font: 700 0.66rem/1 ui-monospace, Consolas, monospace; }
 
 /* Always visible, never hover-revealed: a chip that materialises under a travelling cursor is the
@@ -877,7 +900,7 @@ button.result-row { width: 100%; text-align: left; cursor: pointer; font: inheri
 .strip-page .page-error { width: 100%; min-height: 100vh; border: 0; border-radius: 0; }
 .page-error svg { width: 30px; height: 30px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 .page-error p { margin: 0; font-size: 0.8rem; }
-.page-error button { padding: 0.55rem 1.15rem; color: #f2f3f5; background: #34373b; border: 1px solid #41454b; border-radius: 6px; cursor: pointer; font: 700 0.76rem/1 inherit; }
+.page-error button { padding: 0.55rem 1.15rem; color: #f2f3f5; background: #34373b; border: 1px solid #41454b; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 0.76rem; line-height: 1; }
 .page-error button:hover { background: #44484e; }
 .strip-end { min-height: 55vh; display: grid; align-content: center; justify-items: center; gap: 0.85rem; padding: 3rem 1.5rem 5rem; text-align: center; background: #111317; }
 .strip-end .eyebrow { color: #ff6469; font-size: 0.64rem; }
@@ -999,7 +1022,7 @@ button.result-row { width: 100%; text-align: left; cursor: pointer; font: inheri
 /* The tabs are the dialog's title: two words that say what it holds, so a heading above them would
    only repeat itself. */
 .reader-options-tabs { display: flex; align-items: center; gap: 0.2rem; }
-.reader-options-tab { padding: 0.42rem 0.75rem; color: #9aa1ab; background: transparent; border: 0; border-radius: 6px; cursor: pointer; font: 700 0.82rem/1.2 inherit; transition: color 160ms ease, background-color 160ms ease; }
+.reader-options-tab { padding: 0.42rem 0.75rem; color: #9aa1ab; background: transparent; border: 0; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 0.82rem; line-height: 1.2; transition: color 160ms ease, background-color 160ms ease; }
 .reader-options-tab:hover { color: #ffffff; background: #2b2e32; }
 .reader-options-tab[aria-selected="true"] { color: #ff9298; background: rgba(255, 91, 97, 0.16); }
 /* Sits between the tabs and the first group, indented to the body rather than to the head, so it
@@ -1011,7 +1034,7 @@ button.result-row { width: 100%; text-align: left; cursor: pointer; font: inheri
 .reader-options-hint { display: block; margin-top: 0.4rem; color: #8f969f; font-size: 0.66rem; line-height: 1.45; }
 /* Equal columns, so a row of two choices splits the dialog down the middle whatever the labels say. */
 .reader-choices { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 0.4rem; }
-.reader-choice { display: flex; align-items: center; justify-content: center; gap: 0.4rem; min-height: 40px; padding: 0.5rem 0.55rem; color: #aeb4bd; background: #2b2e32; border: 1px solid transparent; border-radius: 6px; cursor: pointer; font: 700 0.74rem/1.25 inherit; transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease; }
+.reader-choice { display: flex; align-items: center; justify-content: center; gap: 0.4rem; min-height: 40px; padding: 0.5rem 0.55rem; color: #aeb4bd; background: #2b2e32; border: 1px solid transparent; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 0.74rem; line-height: 1.25; transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease; }
 .reader-choices.tiles .reader-choice { flex-direction: column; gap: 0.35rem; padding: 0.7rem 0.5rem; }
 /* Five icons in a row need every pixel of the dialog's width, so they drop the label and the side
    padding and keep only the drawing. */
@@ -1269,7 +1292,9 @@ button.result-row { width: 100%; text-align: left; cursor: pointer; font: inheri
   border-radius: 5px 5px 14px 5px;
   background: none;
   color: var(--ink-soft);
-  font: 600 0.92rem/1.2 inherit;
+  font-weight: 600;
+  font-size: 0.92rem;
+  line-height: 1.2;
   text-align: left;
   cursor: pointer;
 }
@@ -1403,7 +1428,9 @@ button.result-row { width: 100%; text-align: left; cursor: pointer; font: inheri
   border-radius: 6px 6px 16px 6px;
   background: var(--aqua);
   color: var(--on-aqua);
-  font: 700 0.88rem/1 inherit;
+  font-weight: 700;
+  font-size: 0.88rem;
+  line-height: 1;
   cursor: pointer;
 }
 
