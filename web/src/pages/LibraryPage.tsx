@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import type { RefObject } from 'react'
 import { useMutation, useQuery } from 'urql'
 import { Link } from 'react-router-dom'
 import { friendlyError } from '../utils/errors'
@@ -912,6 +913,38 @@ function ContinueReadingShelf({ libraryByBound, libraryByRemote, libraryByTitle,
   )
 }
 
+// The toolbar's panels are the only things on this page that cover the shelves, so they close the
+// way something covering a page is expected to: a press anywhere else, or Escape. Without both one
+// would sit there over the grid until something else was clicked twice. One hook rather than a copy
+// per panel — dismissal is a contract the whole toolbar keeps, and a second panel arriving with its
+// own slightly different idea of it is how two controls on one row start behaving differently.
+function useDismissable(
+  open: boolean,
+  setOpen: (open: boolean) => void,
+  panel: RefObject<HTMLDivElement | null>,
+  trigger: RefObject<HTMLButtonElement | null>,
+) {
+  useEffect(() => {
+    if (!open) return
+    const dismiss = (event: Event) => {
+      if (event instanceof KeyboardEvent) {
+        if (event.key !== 'Escape') return
+        // Escape hands the toolbar its place back. Without it focus falls to the body and the next
+        // Tab restarts from the top of the page, which is how a keyboard user loses the library.
+        trigger.current?.focus()
+      }
+      if (event.type === 'pointerdown' && panel.current?.contains(event.target as Node)) return
+      setOpen(false)
+    }
+    document.addEventListener('pointerdown', dismiss)
+    document.addEventListener('keydown', dismiss)
+    return () => {
+      document.removeEventListener('pointerdown', dismiss)
+      document.removeEventListener('keydown', dismiss)
+    }
+  }, [open, setOpen, panel, trigger])
+}
+
 export default function LibraryPage() {
   const [selectedShelves, setSelectedShelves] = SHELF_FILTERS.use()
   const [hiddenShelves, setHiddenShelves] = HIDDEN_SHELVES.use()
@@ -932,8 +965,11 @@ export default function LibraryPage() {
   // quirk the detail page carries. Keeping them as strings avoids a parse that would quietly round
   // a 19-digit id.
   const [sourceFilters, setSourceFilters] = useState<string[]>([])
+  const [sourcesOpen, setSourcesOpen] = useState(false)
   const sortRef = useRef<HTMLDivElement | null>(null)
   const sortTriggerRef = useRef<HTMLButtonElement | null>(null)
+  const sourcesRef = useRef<HTMLDivElement | null>(null)
+  const sourcesTriggerRef = useRef<HTMLButtonElement | null>(null)
   const [{ data, fetching, error }, refetchLibrary] = useQuery<LibraryQueryResult>({ query: LIBRARY_QUERY })
   // Kept fresh across a visit to Settings, where the categories themselves are managed.
   const [{ data: categoryData }, refetchCategories] = useQuery<CategoriesResult>({
@@ -1003,28 +1039,8 @@ export default function LibraryPage() {
   )
   const migrateTarget = migrateSources.find((source) => source.id === migrateSourceId) ?? null
 
-  // The sort menu is the one thing on this page that covers the shelves, so it closes the way a menu
-  // is expected to: a press anywhere else, or Escape. Without both it would sit there over the grid
-  // until something else was clicked twice.
-  useEffect(() => {
-    if (!sortOpen) return
-    const dismiss = (event: Event) => {
-      if (event instanceof KeyboardEvent) {
-        if (event.key !== 'Escape') return
-        // Escape hands the toolbar its place back. Without it focus falls to the body and the next
-        // Tab restarts from the top of the page, which is how a keyboard user loses the library.
-        sortTriggerRef.current?.focus()
-      }
-      if (event.type === 'pointerdown' && sortRef.current?.contains(event.target as Node)) return
-      setSortOpen(false)
-    }
-    document.addEventListener('pointerdown', dismiss)
-    document.addEventListener('keydown', dismiss)
-    return () => {
-      document.removeEventListener('pointerdown', dismiss)
-      document.removeEventListener('keydown', dismiss)
-    }
-  }, [sortOpen])
+  useDismissable(sortOpen, setSortOpen, sortRef, sortTriggerRef)
+  useDismissable(sourcesOpen, setSourcesOpen, sourcesRef, sourcesTriggerRef)
 
   // Map each library entry to its bound source manga, then fetch those sources' real unread counts.
   const boundByManga = useMemo(() => {
@@ -1701,6 +1717,10 @@ export default function LibraryPage() {
   const sources = [...sourceCounts.values()]
     .sort((a, b) => b.count - a.count || a.source.name.localeCompare(b.source.name))
     .map((entry) => entry.source)
+  // Named in the order the panel lists them rather than the order they were pressed, so the label a
+  // screen reader hears and the rows a sighted user sees are reading off the same list. Empty means
+  // no source is filtering, which is every source rather than none of them.
+  const chosenSources = sources.filter((source) => sourceFilters.includes(source.id)).map((source) => source.name).join(', ')
 
   const needle = searchKey(search.trim())
   const filtering = needle !== '' || genreFilters.length > 0 || sourceFilters.length > 0
@@ -1914,6 +1934,93 @@ export default function LibraryPage() {
               {/* The grid reorders behind the menu with nothing else to announce it. */}
               <span className="visually-hidden" role="status">{t('Sorted by {summary}', { summary: sortSummary })}</span>
             </div>
+            {/* The sources live here, with the other controls that say how you are looking at the
+                library, rather than in a row of their own under the shelf tabs. A band of pills made
+                a second tier of controls out of something reached for once in a while, and put more
+                weight under the tabs than the tabs themselves carry; the source of every title is
+                also already written under its cover in the grid below, so the header was saying out
+                loud what the page says quietly a hundred times.
+
+                A disclosure like the sort menu beside it rather than a shape of its own: one gesture
+                covers both, and a list that runs downwards is what fifteen sources would have needed
+                anyway, where a sideways row of pills only hides them. It is not a `role="menu"` for
+                the same reason the sort menu is not one — these are toggles reached with Tab, and
+                unlike an order, several of them can be in force at once. */}
+            {sources.length > 1 && (
+              <div
+                className="library-source-filter"
+                ref={sourcesRef}
+                // Tabbing off the last source leaves the panel behind otherwise. The relatedTarget
+                // guard keeps it open when the whole window loses focus, which is not the user
+                // leaving it.
+                onBlur={(event) => {
+                  if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget as Node)) setSourcesOpen(false)
+                }}
+              >
+                {/* Lit while the panel is open like its neighbours, but also while a source is
+                    chosen and the panel is shut: a filter still narrowing the shelves with nothing
+                    on screen to say so is the one thing a folded-away control can get wrong. */}
+                <button
+                  type="button"
+                  ref={sourcesTriggerRef}
+                  className={`library-sync-button library-select-button${sourcesOpen || sourceFilters.length > 0 ? ' active' : ''}`}
+                  onClick={() => setSourcesOpen((open) => !open)}
+                  aria-expanded={sourcesOpen}
+                  aria-label={chosenSources === ''
+                    ? t('Filter by source, currently showing every source')
+                    : t('Filter by source, currently showing {sources}', { sources: chosenSources })}
+                  title={chosenSources === '' ? t('Filter by source') : t('Showing {sources}', { sources: chosenSources })}
+                >
+                  {/* Stacked plates: the catalogues a shelf is drawn from, which is not something any
+                      of the arrows, lists or clouds beside it could be mistaken for. */}
+                  <svg viewBox="0 0 24 24" aria-hidden="true" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="m12 3.5 8.5 4.25L12 12 3.5 7.75Z" />
+                    <path d="m3.5 12 8.5 4.25L20.5 12" />
+                    <path d="m3.5 16.25 8.5 4.25 8.5-4.25" />
+                  </svg>
+                </button>
+                {sourcesOpen && (
+                  <div className="library-sort-menu library-source-menu" role="group" aria-label={t('Filter by source')}>
+                    {sources.map((source) => {
+                      const active = sourceFilters.includes(source.id)
+                      return (
+                        <button
+                          type="button"
+                          key={source.id}
+                          className={`library-sort-option library-source-option${active ? ' active' : ''}`}
+                          aria-pressed={active}
+                          onClick={() => toggleSource(source.id)}
+                          title={active
+                            ? t('Stop filtering by {source}', { source: source.name })
+                            : t('Show only titles read from {source}', { source: source.name })}
+                        >
+                          <span>
+                            {/* The badge's icon, so a row here and the caption under a cover are
+                                plainly the same source rather than two ways of naming one. */}
+                            {source.iconUrl && <img src={source.iconUrl} alt="" width="14" height="14" />}
+                            <span>{source.name}</span>
+                          </span>
+                          {/* A tick rather than the sort menu's arrow: several sources can be on at
+                              once, so each row has to answer for itself instead of one of them
+                              reporting the single state of the whole list. */}
+                          {active && (
+                            <small>
+                              <svg viewBox="0 0 24 24" aria-hidden="true" width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="m5 12.5 4.5 4.5L19 7.5" />
+                              </svg>
+                            </small>
+                          )}
+                        </button>
+                      )
+                    })}
+                  </div>
+                )}
+                {/* The grid narrows behind the panel with nothing else to announce it. */}
+                <span className="visually-hidden" role="status">
+                  {chosenSources === '' ? t('Showing every source') : t('Showing {sources}', { sources: chosenSources })}
+                </span>
+              </div>
+            )}
             {/* Absent until there is a category to group by, which is also why it can be a single
                 toggle rather than a picker: there are only ever two ways to arrange the shelves. */}
             {categories.length > 0 && (
@@ -1998,33 +2105,6 @@ export default function LibraryPage() {
           })}
           {syncError && <span className="inline-error library-sync-error">{syncError}</span>}
         </div>
-        {/* Above the genres because it is the coarser cut: which shelf of the library you are
-            looking at, rather than what the titles on it are about. Absent with one source, where
-            it could only ever say "all of them". */}
-        {sources.length > 1 && (
-          <div className="library-sources" role="group" aria-label={t('Filter by source')}>
-            {sources.map((source) => {
-              const active = sourceFilters.includes(source.id)
-              return (
-                <button
-                  type="button"
-                  key={source.id}
-                  className={`library-genre-chip library-source-chip${active ? ' active' : ''}`}
-                  aria-pressed={active}
-                  onClick={() => toggleSource(source.id)}
-                  title={active
-                    ? t('Stop filtering by {source}', { source: source.name })
-                    : t('Show only titles read from {source}', { source: source.name })}
-                >
-                  {/* The badge's icon, so a chip and the card it selects look like the same thing. */}
-                  {source.iconUrl && <img src={source.iconUrl} alt="" width="14" height="14" />}
-                  {source.name}
-                </button>
-              )
-            })}
-          </div>
-        )}
-
         {/* One row that scrolls sideways rather than a block that wraps: a few hundred titles carry
             more genres than fit across the page, and letting them wrap would push the shelves off
             the bottom of it. The names are the source's own words, so they are not translated —
