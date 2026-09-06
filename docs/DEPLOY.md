@@ -198,6 +198,61 @@ their defaults.
 `S4M_CONFIG` overrides the config path entirely, for a deployment that keeps its
 configuration somewhere else.
 
+## The tracker credentials, which are not in the config
+
+AniList and MyAnimeList are connected per account, from Settings inside the app.
+What the *server* supplies is the application registration behind them, and that
+comes from the environment rather than from `config.json`: one of the three
+values is a real secret, and `config.json` is world-readable in some
+deployments. [README.md](README.md#connecting-anilist) has the registration
+steps and what each value means; this is where they go on a server.
+
+| | |
+|---|---|
+| `S4M_ANILIST_CLIENT_ID` | Optional. An id is compiled in, and it only ever returns the browser to the origin it was registered for — which is not yours. Register your own the moment AniList starts sending people somewhere else. |
+| `S4M_MYANIMELIST_CLIENT_ID` | Required for MyAnimeList. Nothing is compiled in, because a MyAnimeList app carries one redirect URL and a shipped id could only ever work for one origin. |
+| `S4M_MYANIMELIST_CLIENT_SECRET` | Required for MyAnimeList, and the one value here that is genuinely a secret. The server redeems the code itself, so it never reaches a browser. |
+
+With any of them missing the tracker still appears in Settings, as one that
+cannot be connected yet. Nothing fails at startup and nothing else changes.
+
+### Put them in a drop-in, not in the unit
+
+Re-running `install.sh` rewrites `/etc/systemd/system/stremio4manga.service`
+from the template every time — an upgrade by reinstall included. An
+`Environment=` line added to that file is therefore gone after the next run, and
+the symptom is a tracker that quietly goes back to being unconnectable. A
+drop-in is a separate file, and neither `install.sh` nor `s4m update` touches
+it.
+
+```bash
+sudo install -d -m 0700 /etc/stremio4manga
+sudo tee /etc/stremio4manga/env >/dev/null <<'EOF'
+S4M_MYANIMELIST_CLIENT_ID=your-id
+S4M_MYANIMELIST_CLIENT_SECRET=your-secret
+EOF
+sudo chmod 0600 /etc/stremio4manga/env
+
+sudo systemctl edit stremio4manga
+```
+
+That last command opens an editor on the drop-in. The whole of it is:
+
+```ini
+[Service]
+EnvironmentFile=/etc/stremio4manga/env
+```
+
+Then `sudo systemctl restart stremio4manga`.
+
+The file is 0600 and owned by root on purpose. systemd reads it as PID 1, before
+it drops to `User=`, so the account the server runs as never needs to be able to
+read the secret it runs with — and `ProtectSystem=strict` in the unit means a
+compromised source parser could not write there either.
+
+In a container the same variables go in as `-e S4M_MYANIMELIST_CLIENT_ID=…` on
+the `podman run`, or in the pod's own environment file.
+
 ## TLS
 
 The server speaks plain HTTP and binds to loopback. It never terminates TLS and
@@ -523,8 +578,11 @@ What to expect:
   already draws "source not installed" for a title it cannot resolve, and a row
   that shows a name and remembers where you got to is worth far more than the
   progress that dropping it would throw away.
-- **Trackers other than AniList are not imported**, and are counted in the
-  report so you know what was left behind.
+- **Trackers other than AniList are not imported** — MyAnimeList included, even
+  though this server has a MyAnimeList of its own. The old server's tracking
+  rows are read and counted in the report so you know what was left behind, but
+  only AniList's are carried over; anyone who tracked on MyAnimeList binds those
+  titles again from Settings.
 - **Source bindings do not survive.** The format carries no row ids, so a
   binding whose value was another title's id in the old database cannot be
   translated. They are dropped rather than left pointing at whatever now
